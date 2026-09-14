@@ -1,4 +1,23 @@
-# PLANK handoff
+# Teraguchi handoff
+
+The authorized Mac client and Linux Host are installed and have streamed Flame.
+Read [the macOS 26 qualification record](docs/development/macos-26-qualification.md)
+for exact artifact pins, strict decoder results, and current limits. The built
+client is root `328688773be3b9d9ae0c51a71cbd98b0e2ae034e` with client
+`0dd2812288c3cacb9553a028477a3d36313d5461`; the Host is upstream v1.0.103.
+Newer docs/CI commits do not relabel these artifacts.
+
+Next: investigate the operator-reported picture freeze during QuickTime import/play.
+Neither endpoint nor Flame exited in the observed interval; reconnect restored
+streaming. Preserve PCoIP and Xorg. The live source is NvFBC 8-bit/up-converted.
+Native ten-bit capture, physical color/output checks, full input, WAN, and signed
+production distribution remain unqualified. Do not develop additional transport
+while host gates remain open.
+
+## Inherited PLANK handoff snapshot
+
+The following records describe Alan's upstream state when this fork was created.
+They are retained as source history, not current Teraguchi deployment instructions.
 
 Read AGENTS.md and the platform build runbook before work.
 

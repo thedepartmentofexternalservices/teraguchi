@@ -63,10 +63,11 @@ case $role in
     ;;
   macos-*)
     test "$(uname -m)" = arm64
-    test "$(sw_vers -productVersion | cut -d . -f 1)" -ge 27
-    test "$(xcrun --sdk macosx --show-sdk-version | cut -d . -f 1)" -ge 27
     if [[ $role = macos-client ]]; then
-      export PLANK_MAC_CLIENT_DEPS="$PLANK_DEP_ROOT/macos-client"
+      source "$PLANK_SOURCE_ROOT/scripts/build/macos-client-target.sh"
+      plank_macos_client_target
+      test "$(sw_vers -productVersion | cut -d . -f 1)" -ge "${PLANK_MACOS_CLIENT_TARGET%%.*}"
+      export PLANK_MAC_CLIENT_DEPS="$PLANK_DEP_ROOT/client-$PLANK_MACOS_CLIENT_TARGET-sdk$PLANK_MACOS_CLIENT_SDK"
       if [[ ! -f "$PLANK_MAC_CLIENT_DEPS/install/lib/libavcodec.dylib" ]]; then
         bash "$PLANK_SOURCE_ROOT/scripts/build/bootstrap-macos-client-deps.sh"
       fi
@@ -76,6 +77,9 @@ case $role in
         "$PLANK_DEP_ROOT/aqt/bin/aqt" install-qt mac desktop 6.10.2 clang_64 \
           --outputdir "$PLANK_DEP_ROOT/qt" --archives qtbase qtdeclarative qtsvg qttools qtshadertools
       fi
+    else
+      test "$(sw_vers -productVersion | cut -d . -f 1)" -ge 27
+      test "$(xcrun --sdk macosx --show-sdk-version | cut -d . -f 1)" -ge 27
     fi
     ;;
 esac

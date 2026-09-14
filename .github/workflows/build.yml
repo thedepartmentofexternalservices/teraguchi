@@ -120,11 +120,18 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Require macOS 27 and SDK 27 on Apple Silicon
+      - name: Require the selected product's Apple toolchain
+        env:
+          PLANK_CI_MAC_PRODUCT: ${{ matrix.product }}
         run: |
           test "$(uname -m)" = arm64
-          test "$(sw_vers -productVersion | cut -d . -f 1)" -ge 27
-          test "$(xcrun --sdk macosx --show-sdk-version | cut -d . -f 1)" -ge 27
+          if [[ $PLANK_CI_MAC_PRODUCT == client ]]; then
+            source scripts/build/macos-client-target.sh
+            plank_macos_client_target
+          else
+            test "$(sw_vers -productVersion | cut -d . -f 1)" -ge 27
+            test "$(xcrun --sdk macosx --show-sdk-version | cut -d . -f 1)" -ge 27
+          fi
           command -v cmake
           command -v ninja
       - run: python3 scripts/ci/context.py

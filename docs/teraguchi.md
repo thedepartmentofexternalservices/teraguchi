@@ -8,24 +8,21 @@ release claims, and studio integration clearly owned by DXS.
 
 ## Current state
 
-The public fork starts at PLANK root commit
-`d40f5587aea130cd967a426da60026859e820994`. Its initial documentation changes
-establish attribution and scope. Product source, submodule pins, configuration
-paths, application names, package identifiers, and wire behavior remain the
-upstream baseline. No Teraguchi package has been built or installed, and no
-Teraguchi production qualification is claimed.
+The fork retains PLANK's history from root
+`d40f5587aea130cd967a426da60026859e820994`. A bounded macOS 26 client adaptation
+has now been built, installed, and connected to the authorized Linux Host running
+the verified upstream v1.0.103 package. Alan's Host and transport code remain
+unchanged. See the [qualification record](development/macos-26-qualification.md)
+for exact built pins, hardware-decode evidence, and an unresolved picture freeze.
+No Teraguchi production qualification is claimed.
 
 The existing [Phase 0 project](https://github.com/thedepartmentofexternalservices/teraguchi-sunshine-kyber)
-retains the requirements, probes, and redacted evidence. It is also public.
-Its local raw results are ignored and must not be copied into this fork.
-This documentation change does not import that repository's history or patches.
-
-The operator has authorized the designated Mac Client and Linux Host for
-installation and testing. Preserve existing remote access and display
-configuration; the boot-time PLANK display helper stays disabled during this
-first qualification. The existing host and hardware gates remain open;
-additional Teraguchi transport development waits for those gates. Reading
-PLANK's existing transport source does not count as developing a new transport.
+retains the requirements, probes, and redacted evidence. Both repositories are
+public; raw evidence stays in the appropriate private store and is never published.
+The operator authorized this Mac Client and Linux Host for installation/testing.
+Preserve existing remote access and display configuration. The boot-time PLANK
+display helper stays disabled. Additional Teraguchi transport development waits
+for the remaining host gates.
 
 ## First supported configuration to qualify
 
@@ -47,19 +44,15 @@ after the Mac production gate and a separate feasibility decision.
 
 ## Next work
 
-1. Follow the [completed macOS 26 source review](development/macos-26-feasibility.md).
-   A bounded compatibility build is recommended; explicit build/launch guards
-   and bundled dependency targets need coordinated changes. Client compatibility work is in progress; no runtime support is claimed.
-2. Correct hardware-decode attestation before accepting new Mac results. Both
-   the PLANK probe and the earlier Phase 0 probe identify VideoToolbox output
-   without proving its decoder used hardware. Strict `MAC-01`/`MAC-02` passes
-   are reopened; throughput observations remain. PLANK's identity-GBR profile
-   also needs its own exact-format decode and presentation evidence.
-3. Resume host qualification only with an agreed test session and recovery
-   access. Establish a pinned PLANK baseline before changing its runtime.
-4. Adapt the existing client interface and onboarding after feasibility is
-   established. Keep protocol names and component paths stable while cosmetic
-   work is separated from compatibility and behavior changes.
+1. Reproduce and resolve the live picture freeze reported during QuickTime
+   import/play. Preserve the working recovery path and collect evidence at both ends.
+2. Qualify sustained identity-GBR rendering and color precision. Strict moving
+   BT.709 hardware decode now passes on the M2 Ultra; the earlier M5 results still
+   need session hardware attestation. Neither result proves physical output depth.
+3. Resume genuine ten-bit desktop capture when console recovery is verified.
+   Keep the present NvFBC 8-bit source clearly labeled during functional tests.
+4. Qualify Wacom, keyboard, dual-display, WAN, and release behavior, then adapt
+   the interface and onboarding in separate changes.
 
 ## Collaboration and public information
 
