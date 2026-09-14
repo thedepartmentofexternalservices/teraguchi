@@ -1,0 +1,14 @@
+{
+  "schema": "teraguchi.input.modifier-profile-draft/1",
+  "name": "physical-identity",
+  "mapping": {
+    "KEY_LEFTSHIFT": "KEY_LEFTSHIFT",
+    "KEY_RIGHTSHIFT": "KEY_RIGHTSHIFT",
+    "KEY_LEFTCTRL": "KEY_LEFTCTRL",
+    "KEY_RIGHTCTRL": "KEY_RIGHTCTRL",
+    "KEY_LEFTALT": "KEY_LEFTALT",
+    "KEY_RIGHTALT": "KEY_RIGHTALT",
+    "KEY_LEFTMETA": "KEY_LEFTMETA",
+    "KEY_RIGHTMETA": "KEY_RIGHTMETA"
+  }
+}

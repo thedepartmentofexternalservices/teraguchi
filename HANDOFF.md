@@ -2,6 +2,30 @@
 
 Read AGENTS.md and the platform build runbook before work.
 
+## Teraguchi Linux input preparation
+
+Local root branch `codex/linux-input-preparation` starts at
+`60f3ddb28c39ec34794a10ea3e88079e53472056`. All product gitlinks are unchanged.
+A separate local `plank-libvirtualhid` candidate, `a16905e31635f2211f918a96f0788e98dc12db89`,
+starts at the currently pinned library `93d57db99a5bf4b1a9fbbc7ad1371671725b7e97`.
+It prepares 0–8191 normalized pen pressure, native evdev keypad selection through
+the existing API and repeat identity/release serialization. Do not advance the
+host dependency until the Linux build and backend suite pass.
+
+The root adds a file-only modifier profile checker and nine saved Flame shortcut
+fixtures. Identity remains the default draft. Read the
+[behavior, evidence and qualification order](docs/development/teraguchi-linux-input-preparation.md).
+16,401 portable helper assertions, both negative controls, sanitizer checks,
+14 profile tests and 12 CI policy/context tests pass locally. Linux integration,
+CMake wiring and physical input remain unqualified. No installation, host access,
+permission change, workflow dispatch, transport change or publication occurred.
+
+Next with the operator present: local Mac pen observation and permission review,
+then active Flame preset confirmation in an agreed session. Prepare a qualified
+Linux builder run before any host candidate; retain verified recovery and native
+capture gates. The existing strict Mac candidate rejects an 8-bit source even
+when its encoded output is ten-bit. Older sections below are prior checkpoints.
+
 ## Teraguchi Mac keyboard candidate
 
 Local branch `codex/macos-keyboard-input` starts from root
