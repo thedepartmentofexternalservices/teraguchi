@@ -2,6 +2,26 @@
 
 Read AGENTS.md and the platform build runbook before work.
 
+## Teraguchi Mac input candidate
+
+Local branch `codex/macos-pen-input` builds on the strict-video candidate below.
+Its root parent is `7cf9479731faaffb0aea111a206ec0c82649aeb7`; the client gitlink
+is `07983bda03c1f1f9069f27956c19e6e1b9f9dd07`. Recursive dependency pins are
+unchanged from the parent listed below.
+The Mac client now assembles Cocoa/SDL pen samples and forwards normalized pen
+input with cleanup and local toolbar routing. See
+[Mac input behavior, tests and remaining gates](docs/development/teraguchi-macos-input.md).
+The full build, exhaustive synthetic pressure preservation, modifier/pen
+queue-order tests, strict-video regressions and eight Quit scenarios pass.
+The local `macos-pen-monitor` is ready for a physical
+check; no client or host has been installed or changed by this work.
+
+Source review found the host normalized pen's `0...4096` limit. A separate Linux
+dependency change and real device/Flame test must establish `0...8191` support.
+Reserved Mac chords, modifier remapping and separate keypad Enter also remain
+open. Native capture and recovery gates still apply before testing this strict
+candidate on a live host. The saved source work is local, not published.
+
 ## Teraguchi strict-video candidate
 
 The local `codex/strict-video-admission` branch starts from Teraguchi main

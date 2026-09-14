@@ -38,13 +38,17 @@ case $role in
     export PLANK_QT_ROOT="$PLANK_DEP_ROOT/qt/6.10.2/macos"
     if [[ ${PLANK_CI_SIGNED:-false} = true ]]; then
       bash "$PLANK_SOURCE_ROOT/scripts/package/build-macos-client-dmg.sh" "$PLANK_SOURCE_ROOT" "$PLANK_WORK_ROOT/client-package"
+      client_build=${PLANK_MAC_CLIENT_BUILD:-"$PLANK_WORK_ROOT/client-package/build"}
     else
       bash "$PLANK_SOURCE_ROOT/scripts/build/build-macos-client.sh" "$PLANK_SOURCE_ROOT" "$PLANK_WORK_ROOT/client-build"
+      client_build="$PLANK_WORK_ROOT/client-build"
     fi
     bash "$PLANK_SOURCE_ROOT/scripts/test/build-macos-decode-probe.sh" "$PLANK_WORK_ROOT/decode-probe"
     python3 "$PLANK_SOURCE_ROOT/scripts/test/check-macos-decode-probe.py" "$PLANK_WORK_ROOT/decode-probe/macos-videotoolbox-decode" "$PLANK_WORK_ROOT/decode-cases"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-quit-bridge.sh" "$PLANK_WORK_ROOT/quit-regression"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-strict-video.sh" "$PLANK_WORK_ROOT/strict-video"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-client-pen.sh" "$PLANK_WORK_ROOT/pen-input" \
+      "$client_build/moonlight-common-c/libmoonlight-common-c.a"
     ;;
   *) exit 2 ;;
 esac
