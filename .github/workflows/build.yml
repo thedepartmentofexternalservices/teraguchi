@@ -36,6 +36,7 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 -m unittest discover -s tests/ci -v
+      - run: bash scripts/test/check-decode-contract.sh "$RUNNER_TEMP/decode-contract"
       - name: Check client compatibility and package gates
         run: |
           python3 tests/packaging/test-macos-client-target.py -v

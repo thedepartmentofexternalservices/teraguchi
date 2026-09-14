@@ -32,6 +32,9 @@ test "$(rustc --version | awk '{print $2}')" = 1.89.0
 patch_file="$client/app/deploy/linux/ffmpeg-patches/0001-hevc-enable-hwaccel-for-identity-gbr.patch"
 printf '%s  %s\n' 059cc9c0d585d71e292cd7421a43f239b1e7ce94e8598d0a7427dfe48e55847e "$patch_file" | shasum -a 256 -c -
 patch --batch --reverse --dry-run -d "$PLANK_MAC_CLIENT_DEPS/src/ffmpeg-9.0.1" -p1 < "$patch_file"
+hardware_patch="$source_root/scripts/build/ffmpeg-patches/0002-videotoolbox-require-and-attest-hardware.patch"
+printf '%s  %s\n' bb566eabf8faac5d2dea992d9814fdcf9aa3e0b2d1605f5a0a14e64e5be6bc57 "$hardware_patch" | shasum -a 256 -c -
+patch --batch --reverse --dry-run -d "$PLANK_MAC_CLIENT_DEPS/src/ffmpeg-9.0.1" -p1 < "$hardware_patch"
 pkg-config --modversion sdl3 sdl3-ttf openssl opus libavcodec libavutil
 mkdir -p "$build"
 cd "$build"
