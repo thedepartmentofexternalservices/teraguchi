@@ -13,12 +13,13 @@ Tested: Mac Studio M2 Ultra, 64 GB, macOS 26.5.2 (25F84), connected to Rocky Lin
 9.7 with Flame 2027.1 (application package 2027.1.0-249). See the qualification
 record for GPU, source-depth, and package details.
 
-Immediate recovery: the operator logged out inside Rocky, ending Xorg. PLANK's
-supervisor and PCoIP stayed active, but no media worker or TCP listener remained.
-Recovery by logging back into the desktop through PCoIP is pending. Do not change
-display configuration or restart services to mask this lifecycle limitation.
+Rocky Log Out ended Xorg and left PLANK offline while its supervisor and PCoIP
+stayed active. Recovery is verified: PCoIP login restored the desktop, PLANK
+attached a new worker, and the client bookmark returned online. Closing PCoIP
+preserved the desktop. No manual Host restart or configuration change occurred.
+PLANK-only login/logout recovery remains unqualified.
 
-Then investigate the operator-reported picture freeze during QuickTime import/play.
+Next, investigate the operator-reported picture freeze during QuickTime import/play.
 Neither endpoint nor Flame exited in the observed interval; reconnect restored
 streaming. Preserve PCoIP and Xorg. The live source is NvFBC 8-bit/up-converted.
 Native ten-bit capture, physical color/output checks, full input, WAN, and signed

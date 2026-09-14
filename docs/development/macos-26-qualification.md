@@ -176,8 +176,13 @@ This is a desktop/session lifecycle limitation in the tested configuration,
 separate from the fixed Mac menu Quit. The upstream Host package is unchanged.
 The [supervisor contract](../architecture/host-session-supervisor.md) requires
 an eligible X11 user or greeter session and does not create a new graphical login.
-Recovery through the existing PCoIP login has been requested but is not yet
-verified. Do not call a running supervisor proof that the Host is connectable.
+Recovery through the existing PCoIP login was verified: it restored a Rocky
+desktop, Xorg returned, and the supervisor attached a new media worker. The
+operator then closed/disconnected PCoIP without choosing Rocky Log Out. PLANK's
+TCP port became reachable and the Mac client logged the bookmark online again.
+No manual Host restart or configuration change was needed. This is one observed
+PCoIP-assisted recovery, not proof of PLANK-only graphical login. Do not call a
+running supervisor proof that the Host is connectable.
 
 Use PLANK **Disconnect** to return to the bookmark list, or Mac **Quit
 plank-client** to exit the client while leaving the remote desktop running.
@@ -186,7 +191,7 @@ qualify independent login/logout recovery or replacement of PCoIP access.
 
 ## Remaining gates
 
-- Verify recovery after Rocky desktop logout with the existing remote-access path.
+- Qualify repeated logout recovery and a PLANK-only graphical login path.
 - Reproduce and resolve the reported picture freeze; qualify sustained sessions.
 - Native 10-bit capture through the deployed adapter and physical output precision.
 - Sustained identity-GBR color checks and two physical 4K outputs.
