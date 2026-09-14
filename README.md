@@ -16,16 +16,16 @@ support commitment or endorsement.
 
 ## Teraguchi status
 
-This fork starts from PLANK's existing implementation. The first change is
-project documentation and attribution; application branding and runtime behavior
-are still inherited from PLANK. There is no qualified Teraguchi release yet.
+The macOS 26 development client builds and streams Flame on the tested M2 Ultra.
+Application branding and protocol behavior remain inherited from PLANK. There is
+no production-qualified Teraguchi release.
 
-Apple Silicon is the first client target. The [macOS 26 source review](docs/development/macos-26-feasibility.md)
-recommends a bounded compatibility build; runtime support remains unproved.
-Upstream currently targets macOS 27. Windows client support remains
-an option after the Mac production gate. Native 10-bit capture, exact-format
-hardware decode, Mac pen input, and end-to-end Flame behavior still need
-Teraguchi qualification. See the [scope document](docs/teraguchi.md).
+Apple Silicon is the first client target. See the
+[macOS 26 qualification results](docs/development/macos-26-qualification.md) for
+hardware-decode proof, the installed Host baseline, and one reported picture
+freeze under investigation. Native ten-bit capture, physical output precision,
+Mac pen input, sustained stability, and end-to-end Flame behavior remain open.
+Windows support is a later decision after the Mac production gate.
 
 ## PLANK upstream overview
 

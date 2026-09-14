@@ -1,10 +1,17 @@
 # macOS Client build inputs and procedure
 
-Experimental Apple Silicon/macOS27 only. Read the canonical release runbook
+Experimental Apple Silicon Client targeting macOS 26.0 by default. A development
+build has streamed Flame on macOS 26.5.2; production support and other 26.x versions
+remain unqualified. See the [tested configuration](../macos-26-qualification.md).
+The Mac Host retains its separate 27-only policy. Read the canonical release runbook
 first. Linux builder/test roles remain unchanged. Use clean Git worktrees and
 verified Git bundles imported dependency-first, with recursive fetch disabled.
 
-Install Xcode/SDK27 and accept its license before bootstrap. Required tools are
+Install Apple Command Line Tools or Xcode with SDK26 or newer before bootstrap.
+Set `PLANK_MACOS_CLIENT_TARGET=26.0` (or27.0 explicitly); the SDK must be at
+least that major version. The shared client helper propagates the target to
+CMake, qmake, Cargo and generated Info.plist, and checks the private dependency
+profile before any reuse. Required tools are
 Apple clang/make/git, Python3 with `venv`/pip, curl, tar, patch and CMake. The
 bootstrap finds the official CMake app in `/Applications/CMake.app/Contents/bin`
 or `cmake` on PATH; install CMake separately, as Xcode does not supply it.
@@ -20,7 +27,8 @@ values explicitly; never infer a path from an old candidate directory:
 export PLANK_CANONICAL_ROOT="$HOME/dev/plank"
 export PLANK_DEP_ROOT="$HOME/Library/Caches/plank-build"
 export PLANK_WORK_ROOT="$PLANK_DEP_ROOT/work"
-export PLANK_MAC_CLIENT_DEPS="$PLANK_DEP_ROOT/macos-client-deps"
+export PLANK_MACOS_CLIENT_TARGET=26.0
+export PLANK_MAC_CLIENT_DEPS="$PLANK_DEP_ROOT/client-$PLANK_MACOS_CLIENT_TARGET-sdk$(xcrun --sdk macosx --show-sdk-version)"
 export PLANK_QT_ROOT="$PLANK_DEP_ROOT/qt-6.10.2/6.10.2/macos"
 export PLANK_RUSTUP_ROOT="$PLANK_DEP_ROOT/rustup-1.89.0"
 export PLANK_CARGO_ROOT="$PLANK_DEP_ROOT/cargo"
@@ -50,8 +58,8 @@ bash "$PLANK_SOURCE_ROOT/scripts/build/bootstrap-macos-client-deps.sh"
 
 The script pins archive SHA256 values and prepares private OpenSSL3.5.5,
 Opus1.5.2, SDL3.4.2, SDL_ttf3.2.2, FreeType2.14.1 and FFmpeg9.0.1. It applies
-the same required HEVC identity-GBR patch as Linux (also enables VideoToolbox
-format probing). A missing Client checkout is an input-preflight error, not a
+the same required HEVC identity-GBR patch as Linux, plus the Mac-only
+[hardware requirement and attestation patch](../../../scripts/build/ffmpeg-patches/README.md). A missing Client checkout is an input-preflight error, not a
 compiler failure. `ffmpeg` as the optional argument resumes only that stage.
 Candidate builds must independently reverse-dry-run that patch and verify its
 hash. Private dylibs must be bundled with relocatable install names, licensed,
@@ -72,6 +80,17 @@ bootstrap bundle, so fetching that origin is not a source update.
 bash "$PLANK_SOURCE_ROOT/scripts/build/build-macos-client.sh" \
   "$PLANK_SOURCE_ROOT" "$PLANK_WORK_ROOT/client-build"
 ```
+
+Run the native Quit regression against the prepared Qt and SDL dependencies:
+
+```bash
+bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-quit-bridge.sh" \
+  "$PLANK_WORK_ROOT/quit-regression"
+```
+
+It checks the original missing-handoff failure and four fixed behaviors without
+opening windows or connecting to a Host. The Mac client CI build runs it too.
+Live menu Quit and process exit remain separate acceptance checks.
 
 For a self-contained drag-to-Applications DMG, in the signing SSH session:
 

@@ -1,4 +1,43 @@
-# PLANK handoff
+# Teraguchi handoff
+
+The authorized Mac client and Linux Host are installed and have streamed Flame.
+Read [the macOS 26 qualification record](docs/development/macos-26-qualification.md)
+for exact artifact pins, strict decoder results, and current limits. The built
+client is root `22bcfec9531ab1243c615a441713d450366c9a11` with client
+`2f0e0dbf9c10bb6f382150f6ec6ee3d9b657ac8d`; the Host is upstream v1.0.103.
+Native menu Quit now disconnects and exits during an active stream. Four headless
+regression cases and the operator's live test pass. Newer docs/CI commits do not
+relabel this artifact or the earlier sustained decoder measurements.
+
+Tested: Mac Studio M2 Ultra, 64 GB, macOS 26.5.2 (25F84), connected to Rocky Linux
+9.7 with Flame 2027.1 (application package 2027.1.0-249). See the qualification
+record for GPU, source-depth, and package details.
+
+PLANK-only graphical login now passes on the designated Host: the operator saw
+the GDM greeter, signed into Rocky, logged out, and reached the desktop again
+without PCoIP. Session records confirm greeter/user/greeter/user transitions.
+With explicit approval, GDM is now active/enabled and owns display-manager.service;
+PCoIP remains installed but inactive/disabled. PLANK stayed active/enabled and
+the Mac bookmark returned online. The Xorg configuration is unchanged. Private
+Ansible procedures and an exercised SSH recovery script are retained; all trial
+rollback timers are stopped. Startup after a reboot remains untested.
+
+Hosted build and privacy checks passed at root `100a109`, including Mac Quit
+regressions. The Linux Host job passed after retrying an HTTP 504 dependency
+download failure. Subsequent documentation changes do not relabel that result.
+
+Next, investigate the operator-reported picture freeze during QuickTime import/play.
+Neither endpoint nor Flame exited in the observed interval; reconnect restored
+streaming. Preserve GDM access, the SSH fallback, and Xorg. The live source is
+NvFBC 8-bit/up-converted.
+Native ten-bit capture, physical color/output checks, full input, WAN, and signed
+production distribution remain unqualified. Do not develop additional transport
+while host gates remain open.
+
+## Inherited PLANK handoff snapshot
+
+The following records describe Alan's upstream state when this fork was created.
+They are retained as source history, not current Teraguchi deployment instructions.
 
 Read AGENTS.md and the platform build runbook before work.
 

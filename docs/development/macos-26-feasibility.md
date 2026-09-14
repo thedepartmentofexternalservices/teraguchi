@@ -1,6 +1,11 @@
 # macOS 26 client feasibility
 
-Reviewed 2026-09-14. **Proceed to a bounded compatibility build; runtime support
+Historical feasibility review, 2026-09-14. The build restrictions and untested
+state below describe the pinned source inspected before implementation. See the
+[current qualification record](macos-26-qualification.md) for the completed
+build, tested configuration, Quit fix, and remaining production gates.
+
+Original conclusion: **Proceed to a bounded compatibility build; runtime support
 is not proved.** The inspected client has explicit macOS 27 build and launch
 restrictions, but this review found no macOS 27-only API requirement in its
 active Apple rendering path. A replacement renderer or transport is not

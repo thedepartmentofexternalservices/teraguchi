@@ -1,0 +1,69 @@
+--- a/libavcodec/videotoolbox.c
++++ b/libavcodec/videotoolbox.c
+@@ -504,6 +504,26 @@
+     return avctx->hwaccel_context;
+ }
+ 
++// Query the decoder session itself, rather than inferring hardware from frames.
++int av_videotoolbox_is_hardware_accelerated(AVCodecContext *avctx)
++{
++    AVVideotoolboxContext *videotoolbox = videotoolbox_get_context(avctx);
++    CFTypeRef value = NULL;
++    OSStatus status;
++    int result = AVERROR(EINVAL);
++
++    if (!videotoolbox || !videotoolbox->session)
++        return result;
++    status = VTSessionCopyProperty(videotoolbox->session,
++                                  kVTDecompressionPropertyKey_UsingHardwareAcceleratedVideoDecoder,
++                                  kCFAllocatorDefault, &value);
++    if (status == noErr && value && CFGetTypeID(value) == CFBooleanGetTypeID())
++        result = CFBooleanGetValue(value) ? 1 : 0;
++    if (value)
++        CFRelease(value);
++    return result;
++}
++
+ static void videotoolbox_stop(AVCodecContext *avctx)
+ {
+     AVVideotoolboxContext *videotoolbox = videotoolbox_get_context(avctx);
+@@ -845,8 +865,7 @@
+                                                                    &kCFTypeDictionaryValueCallBacks);
+ 
+     CFDictionarySetValue(config_info,
+-                        avctx->codec_id == AV_CODEC_ID_HEVC
+-                        || avctx->codec_id == AV_CODEC_ID_PRORES
++                        avctx->codec_id == AV_CODEC_ID_PRORES
+                         || avctx->codec_id == AV_CODEC_ID_PRORES_RAW
+                             ?
+                             kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder :
+@@ -1033,6 +1052,12 @@
+         av_log(avctx, AV_LOG_VERBOSE, "VideoToolbox reported invalid data.\n");
+         return AVERROR_INVALIDDATA;
+     case 0:
++        if ((avctx->codec_id == AV_CODEC_ID_HEVC || avctx->codec_id == AV_CODEC_ID_H264) &&
++            av_videotoolbox_is_hardware_accelerated(avctx) != 1) {
++            av_log(avctx, AV_LOG_ERROR, "VideoToolbox session hardware decoding was not attested\n");
++            videotoolbox_stop(avctx);
++            return AVERROR(ENOSYS);
++        }
+         return 0;
+     default:
+         av_log(avctx, AV_LOG_VERBOSE, "Unknown VideoToolbox session creation error %d\n", (int)status);
+--- a/libavcodec/videotoolbox.h
++++ b/libavcodec/videotoolbox.h
+@@ -79,6 +79,14 @@
+ } AVVideotoolboxContext;
+ 
+ /**
++ * Report the active session's hardware decoder property.
++ * Returns 1 for verified hardware, 0 for software, or a negative AVERROR
++ * when no session exists or the property cannot be read as a Boolean.
++ * This private build extension is required by the qualification probe.
++ */
++int av_videotoolbox_is_hardware_accelerated(AVCodecContext *avctx);
++
++/**
+  * @}
+  */
+ 
