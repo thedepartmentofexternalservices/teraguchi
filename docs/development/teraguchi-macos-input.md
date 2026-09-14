@@ -73,16 +73,18 @@ active profile or a complete shortcut catalogue:
 
 Source review of the current keyboard handler confirms distinct left/right
 Ctrl and Alt virtual keys, physical scancode lookup and repeat suppression.
-It does not implement the earlier proposed host-side Mac modifier profile or
-reserved-key tap. Command-to-Control remapping must not silently remove the
+The follow-on [Mac keyboard candidate](teraguchi-macos-keyboard.md) adds owned-key
+cleanup and a reserved-key bridge; physical capture and the host-side Mac modifier
+profile remain unqualified. Command-to-Control remapping must not silently remove the
 Super key needed by the audio chord. Right Option must remain available as
 Right Alt for Mark In. The handler currently maps keypad Enter and Return to
 the same virtual key; separate keypad Enter remains a requirement gap.
 
 Keep normal Mac Quit behavior intact while designing reserved-chord capture.
 The older Phase 0 event-tap patch cannot be declared integrated merely because
-its isolated callback tests passed. It needs adaptation to this client and
-ordered keyboard/pen lifecycle tests, plus physical permissions/capture checks.
+its isolated callback tests passed. The follow-on candidate replaces its direct
+sending path with ordered markers and tests; physical permissions/capture checks
+are still required.
 
 ## Reproduce local checks
 

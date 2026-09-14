@@ -2,6 +2,26 @@
 
 Read AGENTS.md and the platform build runbook before work.
 
+## Teraguchi Mac keyboard candidate
+
+Local branch `codex/macos-keyboard-input` starts from root
+`cc393154bc6ab3a7d358be93ed40d056f623a3c3` and client
+`07983bda03c1f1f9069f27956c19e6e1b9f9dd07`. Recursive dependencies are unchanged.
+The candidate client gitlink is `22985f9df115702aadc10f1ff79be43f957dd21a`.
+It adds physical key ownership, ordered reserved-key capture and pen-before-key
+cleanup. Read [the behavior, validation and remaining gates](docs/development/teraguchi-macos-keyboard.md).
+
+The full Mac build, 75 keyboard assertions, 61 bridge assertions, 16,427 pen
+assertions, common-C modifier/pen queue test and eight native Quit scenarios pass
+locally. No live tap, physical keyboard test, client installation or host change
+was performed. This candidate is local and unpublished.
+
+Next: qualify permissions and physical reserved chords, then the complete Flame
+shortcut/pen path on the authorized test host with verified recovery access.
+Distinct keypad Enter and host modifier profiles need coordinated host work;
+the existing host pressure and native-capture gates remain open. Older sections
+below describe earlier checkpoints and upstream history.
+
 ## Teraguchi Mac input candidate
 
 Local branch `codex/macos-pen-input` builds on the strict-video candidate below.

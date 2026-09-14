@@ -9,6 +9,8 @@
   Mac admission policy, native capture source review and remaining live gates.
   [Mac pen and Flame shortcuts](development/teraguchi-macos-input.md) covers the
   client bridge, local diagnostic, host pressure limit and keyboard gaps.
+  [Mac keyboard capture](development/teraguchi-macos-keyboard.md) covers owned-key
+  cleanup, reserved chords, local test evidence and remaining host requirements.
 - [Security](security/): threat models and security-focused contracts.
   [Private information policy](security/private-information.md) defines the
   boundary between public development material and private operational notes.
