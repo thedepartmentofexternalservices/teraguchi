@@ -3,11 +3,22 @@
 The authorized Mac client and Linux Host are installed and have streamed Flame.
 Read [the macOS 26 qualification record](docs/development/macos-26-qualification.md)
 for exact artifact pins, strict decoder results, and current limits. The built
-client is root `328688773be3b9d9ae0c51a71cbd98b0e2ae034e` with client
-`0dd2812288c3cacb9553a028477a3d36313d5461`; the Host is upstream v1.0.103.
-Newer docs/CI commits do not relabel these artifacts.
+client is root `22bcfec9531ab1243c615a441713d450366c9a11` with client
+`2f0e0dbf9c10bb6f382150f6ec6ee3d9b657ac8d`; the Host is upstream v1.0.103.
+Native menu Quit now disconnects and exits during an active stream. Four headless
+regression cases and the operator's live test pass. Newer docs/CI commits do not
+relabel this artifact or the earlier sustained decoder measurements.
 
-Next: investigate the operator-reported picture freeze during QuickTime import/play.
+Tested: Mac Studio M2 Ultra, 64 GB, macOS 26.5.2 (25F84), connected to Rocky Linux
+9.7 with Flame 2027.1 (application package 2027.1.0-249). See the qualification
+record for GPU, source-depth, and package details.
+
+Immediate recovery: the operator logged out inside Rocky, ending Xorg. PLANK's
+supervisor and PCoIP stayed active, but no media worker or TCP listener remained.
+Recovery by logging back into the desktop through PCoIP is pending. Do not change
+display configuration or restart services to mask this lifecycle limitation.
+
+Then investigate the operator-reported picture freeze during QuickTime import/play.
 Neither endpoint nor Flame exited in the observed interval; reconnect restored
 streaming. Preserve PCoIP and Xorg. The live source is NvFBC 8-bit/up-converted.
 Native ten-bit capture, physical color/output checks, full input, WAN, and signed

@@ -1,7 +1,9 @@
 # macOS Client build inputs and procedure
 
-Experimental Apple Silicon Client targeting macOS26.0 by default; runtime
-support remains unqualified. The Mac Host retains its separate27-only policy. Read the canonical release runbook
+Experimental Apple Silicon Client targeting macOS 26.0 by default. A development
+build has streamed Flame on macOS 26.5.2; production support and other 26.x versions
+remain unqualified. See the [tested configuration](../macos-26-qualification.md).
+The Mac Host retains its separate 27-only policy. Read the canonical release runbook
 first. Linux builder/test roles remain unchanged. Use clean Git worktrees and
 verified Git bundles imported dependency-first, with recursive fetch disabled.
 
@@ -78,6 +80,17 @@ bootstrap bundle, so fetching that origin is not a source update.
 bash "$PLANK_SOURCE_ROOT/scripts/build/build-macos-client.sh" \
   "$PLANK_SOURCE_ROOT" "$PLANK_WORK_ROOT/client-build"
 ```
+
+Run the native Quit regression against the prepared Qt and SDL dependencies:
+
+```bash
+bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-quit-bridge.sh" \
+  "$PLANK_WORK_ROOT/quit-regression"
+```
+
+It checks the original missing-handoff failure and four fixed behaviors without
+opening windows or connecting to a Host. The Mac client CI build runs it too.
+Live menu Quit and process exit remain separate acceptance checks.
 
 For a self-contained drag-to-Applications DMG, in the signing SSH session:
 
