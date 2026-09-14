@@ -13,6 +13,10 @@ case $role in
 esac
 git -C "$PLANK_SOURCE_ROOT" submodule update --init third_party/kyber-kymux
 if [[ -n $product ]]; then
+  if [[ $product = apps/client ]]; then
+    # Existing checkouts cache the old URL after .gitmodules switches forks.
+    git -C "$PLANK_SOURCE_ROOT" submodule sync -- apps/client
+  fi
   git -C "$PLANK_SOURCE_ROOT" submodule update --init --recursive "$product"
 fi
 export CARGO_HOME="$PLANK_CARGO_ROOT" RUSTUP_HOME="$PLANK_RUSTUP_ROOT"
