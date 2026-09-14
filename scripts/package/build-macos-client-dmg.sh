@@ -7,6 +7,8 @@ output=$2
 : "${PLANK_MACOS_SIGNING_IDENTITY:?Developer ID Application SHA1 required}"
 : "${PLANK_NOTARY_PROFILE:?Keychain profile required}"
 : "${PLANK_QT_ROOT:?}"
+source "$source_root/scripts/build/macos-client-target.sh"
+plank_macos_client_target
 test -z "$(git -C "$source_root" status --porcelain)"
 test -z "$(git -C "$source_root/apps/client" status --porcelain)"
 source "$source_root/scripts/package/package-version.sh"
@@ -33,7 +35,7 @@ for plugin in "$app/Contents/PlugIns/sqldrivers/"*.dylib; do
     [[ ${plugin##*/} == libqsqlite.dylib ]] || rm "$plugin"
 done
 mkdir "$output/plank.iconset"
-clang -fobjc-arc -mmacosx-version-min=27.0 "$source_root/scripts/package/macos-app-icon.m" \
+clang -fobjc-arc "-mmacosx-version-min=$PLANK_MACOS_CLIENT_TARGET" "$source_root/scripts/package/macos-app-icon.m" \
     -framework Foundation -framework CoreGraphics -framework ImageIO -o "$output/macos-app-icon"
 "$output/macos-app-icon" "$source_root/branding/assets/plank-logo.png" "$output/plank.iconset"
 iconutil -c icns "$output/plank.iconset" -o "$app/Contents/Resources/plank.icns"
@@ -69,6 +71,7 @@ while IFS= read -r -d '' framework; do
     codesign --force --options runtime --timestamp --sign "$PLANK_MACOS_SIGNING_IDENTITY" "$framework"
 done < <(find "$app" -depth -type d -name '*.framework' -print0)
 codesign --force --options runtime --timestamp --sign "$PLANK_MACOS_SIGNING_IDENTITY" "$app"
+python3 "$source_root/scripts/test/check-macos-minimum-os.py" "$app" "$PLANK_MACOS_CLIENT_TARGET"
 codesign --verify --deep --strict "$app"
 if ! app_version=$(QT_QPA_PLATFORM=offscreen "$app/Contents/MacOS/plank-client" --version); then
     echo 'Packaged Client failed offscreen launch; inspect ~/Library/Logs/PLANK/Client' >&2
@@ -90,4 +93,4 @@ xcrun stapler validate "$dmg"
 spctl --assess --type open --context context:primary-signature --verbose=2 "$dmg"
 shasum -a 256 "$dmg"
 echo 'macos_client_dmg_gate=pass install=not-performed'
-plank_collect_package "$source_root" client macos arm64 macos-27 "$dmg"
+plank_collect_package "$source_root" client macos arm64 "macos-${PLANK_MACOS_CLIENT_TARGET%%.*}" "$dmg"

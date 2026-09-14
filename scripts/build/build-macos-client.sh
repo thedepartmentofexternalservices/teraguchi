@@ -10,10 +10,9 @@ build=$2
 : "${PLANK_CARGO_ROOT:?}"
 : "${PLANK_BUILD_BRANCH:?Detached builds require an explicit branch}"
 [[ $(uname -s) == Darwin && $(uname -m) == arm64 ]] || exit 2
-export MACOSX_DEPLOYMENT_TARGET=27.0
-export SDKROOT
-SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
-[[ $(xcrun --sdk macosx --show-sdk-version) == 27* ]] || exit 2
+source "$source_root/scripts/build/macos-client-target.sh"
+plank_macos_client_target
+plank_macos_client_dependency_profile build "$source_root"
 export CARGO_HOME="$PLANK_CARGO_ROOT" RUSTUP_HOME="$PLANK_RUSTUP_ROOT"
 export RUSTFLAGS="${RUSTFLAGS:+$RUSTFLAGS }-C strip=none" # SDK27 proc-macro guard.
 source "$source_root/scripts/build/build-paths.sh"
@@ -41,7 +40,7 @@ cd "$build"
 qmake -r "$client/moonlight-qt.pro" CONFIG+=release CONFIG+=disable-prebuilts \
     CONFIG+=plank-transport CONFIG+=disable-libplacebo CONFIG+=disable-wayland \
     CONFIG+=disable-x11 CONFIG+=disable-libva CONFIG+=disable-libdrm \
-    QMAKE_MACOSX_DEPLOYMENT_TARGET=27.0 QMAKE_APPLE_DEVICE_ARCHS=arm64 \
+    "QMAKE_MACOSX_DEPLOYMENT_TARGET=$PLANK_MACOS_CLIENT_TARGET" QMAKE_APPLE_DEVICE_ARCHS=arm64 \
     PLANK_VERSION="$version" \
     "QMAKE_CFLAGS+=$PLANK_C_FILE_FLAGS" "QMAKE_CXXFLAGS+=$PLANK_C_FILE_FLAGS"
 make -j"${PLANK_BUILD_JOBS:-8}" release
