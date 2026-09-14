@@ -14,6 +14,7 @@ extern "C" {
 #include <cerrno>
 #include <climits>
 #include "decode-contract.h"
+#include "../../apps/client/app/streaming/video/teraguchiframe.h"
 
 static AVPixelFormat requireVT(AVCodecContext*, const AVPixelFormat* formats)
 {
@@ -123,6 +124,12 @@ int main(int argc, char** argv)
                 r.frame->colorspace, r.frame->color_range};
             mismatch = decodeMismatch(expectedFormat, observed, hardware, hardwareStatus);
             if (mismatch) return AVERROR_INVALIDDATA;
+            if (hardware && !strcmp(argv[3], "hevc-rext10-444-identity") &&
+                    !teraguchiNativeFrameMatches(r.frame, r.context->codec_id,
+                        r.context->profile, hardwareStatus, expectedWidth, expectedHeight)) {
+                mismatch = "product_frame_contract";
+                return AVERROR_INVALIDDATA;
+            }
             if (frames >= expected) { mismatch = "frame_count"; return AVERROR_INVALIDDATA; }
             const OSType cv = hardware ? CVPixelBufferGetPixelFormatType((CVPixelBufferRef)r.frame->data[3]) : 0;
             if (!frames) {

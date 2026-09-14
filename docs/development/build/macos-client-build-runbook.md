@@ -62,6 +62,11 @@ package yet. Do not use the old upstream setup-deps/prebuilts workflow.
 
 ## Build and package
 
+Teraguchi's root Mac build enables the
+[strict video admission policy](../teraguchi-strict-video.md). Existing NvFBC
+bookmarks will be rejected by that candidate. A successful compile does not
+authorize switching the host capture path or replacing an installed client.
+
 Initialize Client, common-c, qmdnsengine and Kymux at their exact gitlinks from
 verified local Git bundles/mirrors. Do not initialize the Linux Host to build
 this Client. Import Client bundles before root bundles and always fetch with

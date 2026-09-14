@@ -1,6 +1,26 @@
-# PLANK handoff
+# Teraguchi / PLANK handoff
 
 Read AGENTS.md and the platform build runbook before work.
+
+## Teraguchi strict-video candidate
+
+The local `codex/strict-video-admission` branch starts from Teraguchi main
+`0494d91a9cc1facfdcb608c0a0e465912cb03af7`. New root Mac builds enable strict
+native capture / HEVC RExt 4:4:4 10-bit / hardware decode admission. Read
+[the change and results](docs/development/teraguchi-strict-video.md) before
+building or installing: existing NvFBC bookmarks are rejected by this candidate.
+The full Mac build, policy/metadata tests, decode matrix, moving hardware
+fixtures and Quit regressions pass. No installed client or host changed.
+The client gitlink is `b2c52d829264f1a3e334562594efd46c9d096d05`; common-c
+`b9650552f98d97f6e30c9f007115c6246f0809e5`, qmdnsengine
+`b7a5a9f225d5e14b39f9fd1f905c4f505cf2ee99`, and Kymux
+`912ece5c64787997f978673ca60d313898a3548c` are unchanged.
+
+Next: qualify live native capture with verified recovery access, then exercise
+the candidate's startup/reset/reconnect failures and physical presentation.
+Mac Wacom/shortcut work can proceed locally while recovery access is pending.
+New transport work and Windows remain gated. The retained upstream handoff
+below describes PLANK history, not additional Teraguchi qualification.
 
 ## Hosted builds qualified; signing pending
 

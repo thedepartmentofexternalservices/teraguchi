@@ -5,6 +5,8 @@
 - [Development](development/): platform matrix, acceptance, build runbooks and plans.
   [GitHub-hosted builds](development/build/github-builds.md) covers CI scope,
   artifacts and signing boundaries.
+  [Teraguchi strict video](development/teraguchi-strict-video.md) describes the
+  Mac admission policy, native capture source review and remaining live gates.
 - [Security](security/): threat models and security-focused contracts.
   [Private information policy](security/private-information.md) defines the
   boundary between public development material and private operational notes.

@@ -44,6 +44,7 @@ case $role in
     bash "$PLANK_SOURCE_ROOT/scripts/test/build-macos-decode-probe.sh" "$PLANK_WORK_ROOT/decode-probe"
     python3 "$PLANK_SOURCE_ROOT/scripts/test/check-macos-decode-probe.py" "$PLANK_WORK_ROOT/decode-probe/macos-videotoolbox-decode" "$PLANK_WORK_ROOT/decode-cases"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-quit-bridge.sh" "$PLANK_WORK_ROOT/quit-regression"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-strict-video.sh" "$PLANK_WORK_ROOT/strict-video"
     ;;
   *) exit 2 ;;
 esac

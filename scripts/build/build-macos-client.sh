@@ -41,6 +41,7 @@ cd "$build"
 # Recursive generation is mandatory when retaining a build: otherwise existing
 # subproject Makefiles may silently retain the previous source/version/flags.
 qmake -r "$client/moonlight-qt.pro" CONFIG+=release CONFIG+=disable-prebuilts \
+    CONFIG+=teraguchi-strict-video \
     CONFIG+=plank-transport CONFIG+=disable-libplacebo CONFIG+=disable-wayland \
     CONFIG+=disable-x11 CONFIG+=disable-libva CONFIG+=disable-libdrm \
     "QMAKE_MACOSX_DEPLOYMENT_TARGET=$PLANK_MACOS_CLIENT_TARGET" QMAKE_APPLE_DEVICE_ARCHS=arm64 \
