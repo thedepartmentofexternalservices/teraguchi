@@ -4,8 +4,9 @@ The private FFmpeg patch requires hardware for HEVC/H.264 VideoToolbox sessions
 and reads UsingHardwareAcceleratedVideoDecoder from the created session. Missing,
 unreadable, false, or non-Boolean values fail the hardware path. The existing
 application-level exact-format software fallback remains available; it cannot
-satisfy Teraguchi's hardware gate. This slice preserves the macOS 27 product target
-and contains no Quit, Host, or transport change.
+satisfy Teraguchi's hardware gate. This slice uses the client target policy already
+on main (26.0 by default, with explicit 27.0 supported). Its diff changes no Quit,
+deployment-target, Host, or transport behavior.
 
 ## Run the checks
 

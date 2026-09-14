@@ -13,6 +13,10 @@ case $role in
 esac
 git -C "$PLANK_SOURCE_ROOT" submodule update --init third_party/kyber-kymux
 if [[ -n $product ]]; then
+  if [[ $product = apps/client ]]; then
+    # Existing checkouts cache the old URL after .gitmodules switches forks.
+    git -C "$PLANK_SOURCE_ROOT" submodule sync -- apps/client
+  fi
   git -C "$PLANK_SOURCE_ROOT" submodule update --init --recursive "$product"
 fi
 export CARGO_HOME="$PLANK_CARGO_ROOT" RUSTUP_HOME="$PLANK_RUSTUP_ROOT"
@@ -63,10 +67,11 @@ case $role in
     ;;
   macos-*)
     test "$(uname -m)" = arm64
-    test "$(sw_vers -productVersion | cut -d . -f 1)" -ge 27
-    test "$(xcrun --sdk macosx --show-sdk-version | cut -d . -f 1)" -ge 27
     if [[ $role = macos-client ]]; then
-      export PLANK_MAC_CLIENT_DEPS="$PLANK_DEP_ROOT/macos-client"
+      source "$PLANK_SOURCE_ROOT/scripts/build/macos-client-target.sh"
+      plank_macos_client_target
+      test "$(sw_vers -productVersion | cut -d . -f 1)" -ge "${PLANK_MACOS_CLIENT_TARGET%%.*}"
+      export PLANK_MAC_CLIENT_DEPS="$PLANK_DEP_ROOT/client-$PLANK_MACOS_CLIENT_TARGET-sdk$PLANK_MACOS_CLIENT_SDK"
       if [[ ! -f "$PLANK_MAC_CLIENT_DEPS/install/lib/libavcodec.dylib" ]]; then
         bash "$PLANK_SOURCE_ROOT/scripts/build/bootstrap-macos-client-deps.sh"
       fi
@@ -76,6 +81,9 @@ case $role in
         "$PLANK_DEP_ROOT/aqt/bin/aqt" install-qt mac desktop 6.10.2 clang_64 \
           --outputdir "$PLANK_DEP_ROOT/qt" --archives qtbase qtdeclarative qtsvg qttools qtshadertools
       fi
+    else
+      test "$(sw_vers -productVersion | cut -d . -f 1)" -ge 27
+      test "$(xcrun --sdk macosx --show-sdk-version | cut -d . -f 1)" -ge 27
     fi
     ;;
 esac

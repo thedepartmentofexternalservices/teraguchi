@@ -32,7 +32,10 @@ case $role in
     fi
     ;;
   macos-client)
-    export PLANK_MAC_CLIENT_DEPS="$PLANK_DEP_ROOT/macos-client" PLANK_QT_ROOT="$PLANK_DEP_ROOT/qt/6.10.2/macos"
+    source "$PLANK_SOURCE_ROOT/scripts/build/macos-client-target.sh"
+    plank_macos_client_target
+    export PLANK_MAC_CLIENT_DEPS="$PLANK_DEP_ROOT/client-$PLANK_MACOS_CLIENT_TARGET-sdk$PLANK_MACOS_CLIENT_SDK"
+    export PLANK_QT_ROOT="$PLANK_DEP_ROOT/qt/6.10.2/macos"
     if [[ ${PLANK_CI_SIGNED:-false} = true ]]; then
       bash "$PLANK_SOURCE_ROOT/scripts/package/build-macos-client-dmg.sh" "$PLANK_SOURCE_ROOT" "$PLANK_WORK_ROOT/client-package"
     else
@@ -40,6 +43,7 @@ case $role in
     fi
     bash "$PLANK_SOURCE_ROOT/scripts/test/build-macos-decode-probe.sh" "$PLANK_WORK_ROOT/decode-probe"
     python3 "$PLANK_SOURCE_ROOT/scripts/test/check-macos-decode-probe.py" "$PLANK_WORK_ROOT/decode-probe/macos-videotoolbox-decode" "$PLANK_WORK_ROOT/decode-cases"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-quit-bridge.sh" "$PLANK_WORK_ROOT/quit-regression"
     ;;
   *) exit 2 ;;
 esac

@@ -36,6 +36,20 @@ cd plank
 git submodule update --init --recursive apps/client third_party/kyber-kymux
 ```
 
+When updating an existing checkout after the client repository URL changes,
+synchronize its cached URL before fetching the new client commit:
+
+```bash
+git submodule sync -- apps/client
+git submodule update --init --recursive apps/client
+```
+
+Hosted client bootstrap does this automatically. The sync targets only the
+top-level client, preserving nested submodule mirror settings. It replaces any
+local top-level client URL override; builders using a verified local mirror
+must reapply that override after sync and before update, following their builder
+runbook instead of the hosted bootstrap.
+
 The submodule section names intentionally differ from their working paths.
 For a Linux Host build, initialize apps/host/linux instead of apps/client.
 Read `.gitmodules`; do not invent new names when overriding clone URLs.
