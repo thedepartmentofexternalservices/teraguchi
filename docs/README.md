@@ -13,6 +13,8 @@
   cleanup, reserved chords, local test evidence and remaining host requirements.
   [Linux input preparation](development/teraguchi-linux-input-preparation.md) covers
   the uninstalled pressure/keypad dependency candidate and draft modifier checks.
+  [Workstation picker preview](development/teraguchi-workstation-ui.md) covers
+  the first P3 Qt interface, offline interaction tests and live-adapter boundary.
 - [Security](security/): threat models and security-focused contracts.
   [Private information policy](security/private-information.md) defines the
   boundary between public development material and private operational notes.

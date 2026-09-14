@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="/preview">
+    <file alias="Preview.qml">Preview.qml</file>
+  </qresource>
+  <qresource prefix="/teraguchi">
+    <file alias="WorkstationFlow.qml">../../apps/client/app/gui/teraguchi/WorkstationFlow.qml</file>
+    <file alias="WorkstationPicker.qml">../../apps/client/app/gui/teraguchi/WorkstationPicker.qml</file>
+    <file alias="TeraguchiButton.qml">../../apps/client/app/gui/teraguchi/TeraguchiButton.qml</file>
+    <file alias="TeraguchiTheme.qml">../../apps/client/app/gui/teraguchi/TeraguchiTheme.qml</file>
+  </qresource>
+</RCC>

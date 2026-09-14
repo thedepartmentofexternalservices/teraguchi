@@ -50,6 +50,7 @@ case $role in
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-client-pen.sh" "$PLANK_WORK_ROOT/pen-input" \
       "$client_build/moonlight-common-c/libmoonlight-common-c.a"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-client-keyboard.sh" "$PLANK_WORK_ROOT/keyboard-input"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-workstation-ui.sh" "$PLANK_WORK_ROOT/workstation-ui"
     ;;
   *) exit 2 ;;
 esac

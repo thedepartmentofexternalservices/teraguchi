@@ -2,6 +2,39 @@
 
 Read AGENTS.md and the platform build runbook before work.
 
+## Teraguchi workstation picker preview
+
+Local branch `codex/workstation-picker` starts at root
+`22745871f88fcf50cdf0a6d9f867433f5cbcf5eb` and client
+`22985f9df115702aadc10f1ff79be43f957dd21a`. Its client gitlink is
+`601982d84f8e76cad6128fdf4763fef68379e359`. Host, transport and other recursive
+pins are unchanged. P3 interface preparation has begun; P2 qualification stays
+open. The separate Linux input candidate below has not been promoted.
+
+The reusable QML workstation list and connection flow are compiled only into
+an offline preview. The normal client resource manifest and `main.qml` are
+unchanged. The preview uses sample assigned workstations, denies network
+requests, has no credentials or saved settings, and starts no stream or input
+capture. It covers one/two displays, unavailable or occupied seats, exact-format
+rejection, cancellation, interrupted connections and explicit reconnect.
+Read [the scope, tests and adapter boundary](docs/development/teraguchi-workstation-ui.md).
+
+The standalone arm64 preview build passes on the development Mac with Qt6.10.2.
+41 behavior/UI cases plus QtTest setup/cleanup pass (43 results). Both negative
+controls are rejected; network denial, 15 offscreen renders and 12 CI tests pass.
+Normal and compact ready/error/recovery screens were visually checked. The
+compiler/QML check is not a full Client release build, physical presentation
+acceptance or live authentication test. Hosted CI wiring is added but unrun.
+The source and recovery bundles remain local; nothing has been published or
+installed. No host was accessed or changed and no GUI was left running.
+
+Next: connect the view to authoritative assignment and existing PLANK
+login/session APIs, preserving certificate/seat/exact-video checks and stale
+callback cancellation. Add refresh failure/freshness behavior before live use.
+Keep permission grants, physical input/display tests and recovery qualification
+for an agreed operator session. Do not infer access or occupancy from public
+host metadata, and do not replace the installed client to bypass P2 gates.
+
 ## Teraguchi Linux input preparation
 
 Local root branch `codex/linux-input-preparation` starts at
