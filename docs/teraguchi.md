@@ -45,12 +45,15 @@ after the Mac production gate and a separate feasibility decision.
 
 ## Next work
 
-1. Review macOS 26 feasibility in the pinned client and its build dependencies.
-   Identify concrete SDK/API and dependency blockers before proposing a port.
-   Lowering the deployment target alone is not proof of compatibility.
-2. Map the existing Phase 0 probes to PLANK's exact video and input paths.
-   PLANK's identity-GBR profile needs its own hardware-decode and presentation
-   evidence; earlier BT.709 YCbCr sample results do not qualify that tuple.
+1. Follow the [completed macOS 26 source review](development/macos-26-feasibility.md).
+   A bounded compatibility build is recommended; explicit build/launch guards
+   and bundled dependency targets need coordinated changes. No client port
+   or runtime qualification has been performed.
+2. Correct hardware-decode attestation before accepting new Mac results. Both
+   the PLANK probe and the earlier Phase 0 probe identify VideoToolbox output
+   without proving its decoder used hardware. Strict `MAC-01`/`MAC-02` passes
+   are reopened; throughput observations remain. PLANK's identity-GBR profile
+   also needs its own exact-format decode and presentation evidence.
 3. Resume host qualification only with an agreed test session and recovery
    access. Establish a pinned PLANK baseline before changing its runtime.
 4. Adapt the existing client interface and onboarding after feasibility is

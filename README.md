@@ -20,8 +20,9 @@ This fork starts from PLANK's existing implementation. The first change is
 project documentation and attribution; application branding and runtime behavior
 are still inherited from PLANK. There is no qualified Teraguchi release yet.
 
-Apple Silicon is the first client target. macOS 26 compatibility is under
-evaluation; upstream currently targets macOS 27. Windows client support remains
+Apple Silicon is the first client target. The [macOS 26 source review](docs/development/macos-26-feasibility.md)
+recommends a bounded compatibility build; runtime support remains unproved.
+Upstream currently targets macOS 27. Windows client support remains
 an option after the Mac production gate. Native 10-bit capture, exact-format
 hardware decode, Mac pen input, and end-to-end Flame behavior still need
 Teraguchi qualification. See the [scope document](docs/teraguchi.md).
