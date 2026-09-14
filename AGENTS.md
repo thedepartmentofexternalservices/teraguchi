@@ -3,7 +3,11 @@
 Read [docs/teraguchi.md](docs/teraguchi.md) first for this fork's scope, current
 qualification limits, and next steps. The operator has authorized the designated
 Mac for client build/testing and the designated Linux Host for installation/testing.
-Preserve existing remote access and display configuration. The upstream
+The operator subsequently approved native GDM startup on that same Host after
+PLANK-only login/logout tests. Preserve this verified GDM baseline, the unchanged
+Xorg configuration, and the retained PCoIP package/SSH recovery procedure. PCoIP
+is stopped and disabled at boot. This authorization applies only to the designated
+test Host; consult the private notes before any machine action. The upstream
 engineering rules below remain the baseline; their macOS 27 support statements
 do not establish macOS 26 support for Teraguchi. Preserve attribution and use
 small, separately qualified changes for Teraguchi-specific behavior.

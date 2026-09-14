@@ -20,8 +20,12 @@ support matrix. Private hostnames, addresses, and media remain outside Git.
 | PLANK Host | Verified upstream v1.0.103 RPM |
 | Live stream | One 3840x2160 at 60 fps, HEVC RExt 4:4:4 10-bit, NVENC, VideoToolbox/Metal; NvFBC 8-bit source up-converted |
 
-PCoIP remained installed and active. This was a studio-network functional test;
-WAN, two physical 4K displays, and native ten-bit source/output remain separate gates.
+PCoIP was active during the first streaming and Quit tests. Subsequent PLANK-only
+login/logout tests passed with GDM 40.1-38.el9_7 and PCoIP stopped. GDM is now
+enabled at boot; PCoIP 26.05.3-1.el9 remains installed but disabled. See the logout
+section below for the approved host configuration change and recovery evidence.
+These were studio-network functional tests; WAN, two physical 4K displays, and
+native ten-bit source/output remain separate gates.
 
 ## Reproducible source and artifacts
 
@@ -60,11 +64,12 @@ arm64 coverage, dependency closure, deep strict code-signature verification,
 and offscreen version checks passed. All 25 focused tests passed: minimum-OS
 validation, build-path checks, client target/cache policy, and CI context. Shell
 syntax and diff checks passed. Hosted build and privacy checks passed for
-root `e40a8e5a899f51d1cce350aacd784b6304392e33`
-([build run](https://github.com/thedepartmentofexternalservices/teraguchi/actions/runs/34853636532)).
-That result predates the Quit fix; current-head CI must pass separately. Hosted
-Mac jobs compile on the configured Xcode 27 runner and do not establish macOS 26
-runtime, bundled-app, or hardware acceptance. No operating-system upgrade was performed.
+root `100a10919fe47ea26354c448aa6d598d65e404cc`, including the four native Quit
+cases ([build run](https://github.com/thedepartmentofexternalservices/teraguchi/actions/runs/34857501723)).
+The Linux Host job passed after retrying an HTTP 504 while downloading pinned
+Boost; no source correction was needed. Later documentation edits do not relabel
+that CI result. Hosted Mac jobs compile on the configured Xcode 27 runner and do
+not establish macOS 26 runtime, bundled-app, or hardware acceptance. No operating-system upgrade was performed.
 
 The hardware patch requires VideoToolbox hardware for HEVC/H.264 and queries the
 session's hardware-decoder property. A missing, unreadable, or false property
@@ -91,9 +96,10 @@ qualify other Mac models, physical output precision, or end-to-end pixel fidelit
 
 The authorized Rocky 9.7 Host has an RTX PRO 6000 Blackwell Max-Q and driver
 580.126.18. The verified RPM installed without other package changes. PLANK Host
-and PAM broker are active. PCoIP, Xorg, and all 29 recorded display/remote-access
-configuration hashes were preserved. Boot-time display preparation remains
-disabled; the existing display configuration remains the recovery baseline.
+and PAM broker are active. At installation, PCoIP, Xorg, and all 29 recorded
+display/remote-access configuration hashes were preserved. The later approved
+GDM switch is documented below; it preserved the Autodesk Xorg file byte-for-byte.
+Boot-time PLANK display preparation remains disabled.
 
 A Mac-to-Host TLS 1.3 check verified the certificate and hostname and received
 HTTP 200. The live client negotiated one 3840x2160, 60 fps HEVC 10-bit 4:4:4
@@ -186,19 +192,52 @@ running supervisor proof that the Host is connectable.
 
 Use PLANK **Disconnect** to return to the bookmark list, or Mac **Quit
 plank-client** to exit the client while leaving the remote desktop running.
-Rocky **Log Out** ends that desktop and its applications. This test does not
-qualify independent login/logout recovery or replacement of PCoIP access.
+Rocky **Log Out** ends that desktop and its applications.
+
+### Verified PLANK-only GDM login
+
+The installed PCoIP startup hook configured GDM for a headless XDMCP session with
+the local greeter suppressed. Stopping PCoIP let its packaged restore hook restore
+the normal GDM configuration. Under a timed rollback, the operator reached the
+Rocky login screen through PLANK, signed in, logged out of Rocky, and signed in
+again. Host records confirm active local X11 greeter/user/greeter/user transitions.
+PCoIP stayed inactive throughout that test. The operator explicitly confirmed
+reaching the desktop on the second login.
+
+The operator then approved enabling GDM at boot, disabling PCoIP startup, and
+retaining SSH recovery. The first persistence sequence changed the shared
+display-manager alias with GDM still running; a state mismatch and subsequent
+restart timeout required recovery. The retained rollback script restored PCoIP
+runtime and boot ownership successfully. The corrected Ansible procedure stopped
+both display managers and verified zero PIDs before changing the alias, then
+started GDM. Its independent rollback remained armed until all checks passed:
+
+- GDM active/enabled and display-manager.service resolves to gdm.service.
+- PCoIP inactive/disabled, with its package and SSH rollback script retained.
+- PLANK Host active/enabled with its original supervisor PID, an active local
+  X11 greeter, and a listening TCP port; the Mac bookmark returned online.
+- Autodesk Xorg configuration unchanged against the pre-switch backup.
+- All three trial/repair rollback timers inactive after successful verification.
+
+This was a host configuration change on the single designated test Host, not a
+Host package or protocol change in this PR. The private Ansible playbook enforces
+both inventory and machine identity and is limited to that Host. It refuses a
+running Flame application. No other workstation was targeted. The exact procedure,
+backups, and recovery command remain in the private audit store. The current GDM
+runtime and boot configuration pass inspection; no reboot was performed, so cold
+boot recovery and repeated long-session transitions remain unqualified.
 
 ## Remaining gates
 
-- Qualify repeated logout recovery and a PLANK-only graphical login path.
+- Qualify startup after a reboot and repeated PLANK-only login/logout sessions.
 - Reproduce and resolve the reported picture freeze; qualify sustained sessions.
 - Native 10-bit capture through the deployed adapter and physical output precision.
 - Sustained identity-GBR color checks and two physical 4K outputs.
 - Wacom and ordered Flame shortcut tests through the full path.
 - WAN, assigned-host access, exclusive-seat, recovery, and signed distribution.
 
-Preserve the existing remote-access session while console recovery is deferred.
+Preserve the verified GDM access configuration and retained SSH recovery path;
+physical console recovery remains unverified.
 Additional Teraguchi transport development waits for the host gates. Windows
 work follows the Mac production gate. Private machine inventory, logs, captures,
 and commands stay in the private audit store outside Git.

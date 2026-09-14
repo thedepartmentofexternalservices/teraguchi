@@ -20,7 +20,10 @@ The existing [Phase 0 project](https://github.com/thedepartmentofexternalservice
 retains the requirements, probes, and redacted evidence. Both repositories are
 public; raw evidence stays in the appropriate private store and is never published.
 The operator authorized this Mac Client and Linux Host for installation/testing.
-Preserve existing remote access and display configuration. The boot-time PLANK
+PLANK-only GDM login/logout now passes on that Host. The operator approved GDM
+startup with PCoIP retained, stopped, and disabled; an exercised SSH recovery
+procedure is retained privately. Preserve this access baseline and the unchanged
+Xorg configuration. Startup after a reboot remains untested. The boot-time PLANK
 display helper stays disabled. Additional Teraguchi transport development waits
 for the remaining host gates.
 
