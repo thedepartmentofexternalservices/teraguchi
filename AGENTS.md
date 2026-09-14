@@ -1,7 +1,9 @@
 # Teraguchi fork context
 
 Read [docs/teraguchi.md](docs/teraguchi.md) first for this fork's scope, current
-qualification limits, and next steps. Machine work is paused. The upstream
+qualification limits, and next steps. The operator has authorized the designated
+Mac for client build/testing and the designated Linux Host for installation/testing.
+Preserve existing remote access and display configuration. The upstream
 engineering rules below remain the baseline; their macOS 27 support statements
 do not establish macOS 26 support for Teraguchi. Preserve attribution and use
 small, separately qualified changes for Teraguchi-specific behavior.
@@ -94,8 +96,11 @@ probes only on the user-authorized dedicated development Mac. Do not add older
 macOS compatibility paths. Beta results require revalidation against the final
 OS release. This work does not change the supported Linux release gates below.
 
-Experimental macOS Client builds use the same authorized dedicated development
-Mac, Apple Silicon, SDK27 and deployment target27.0. See
+Teraguchi macOS Client builds use the operator-authorized Apple Silicon Mac,
+SDK26 or newer, and deployment target26.0 by default. The explicit
+`PLANK_MACOS_CLIENT_TARGET` setting also permits27.0; all dependency and package
+checks must use that same setting. The earlier prohibition on older macOS
+compatibility applies to the Mac Host, not this authorized Client work. See
 `docs/development/plans/macos-client.plan` and `docs/development/build/macos-client-build-runbook.md`. This is not
 permission to compile Linux packages on the Mac or restore inherited prebuilts.
 

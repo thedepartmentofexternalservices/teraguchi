@@ -20,8 +20,10 @@ retains the requirements, probes, and redacted evidence. It is also public.
 Its local raw results are ignored and must not be copied into this fork.
 This documentation change does not import that repository's history or patches.
 
-Machine testing is paused. Do not change occupied Flame workstations or their
-remote-access configuration. The existing host and hardware gates remain open;
+The operator has authorized the designated Mac Client and Linux Host for
+installation and testing. Preserve existing remote access and display
+configuration; the boot-time PLANK display helper stays disabled during this
+first qualification. The existing host and hardware gates remain open;
 additional Teraguchi transport development waits for those gates. Reading
 PLANK's existing transport source does not count as developing a new transport.
 
@@ -47,8 +49,7 @@ after the Mac production gate and a separate feasibility decision.
 
 1. Follow the [completed macOS 26 source review](development/macos-26-feasibility.md).
    A bounded compatibility build is recommended; explicit build/launch guards
-   and bundled dependency targets need coordinated changes. No client port
-   or runtime qualification has been performed.
+   and bundled dependency targets need coordinated changes. Client compatibility work is in progress; no runtime support is claimed.
 2. Correct hardware-decode attestation before accepting new Mac results. Both
    the PLANK probe and the earlier Phase 0 probe identify VideoToolbox output
    without proving its decoder used hardware. Strict `MAC-01`/`MAC-02` passes
