@@ -1,4 +1,36 @@
-# PLANK
+# Teraguchi
+
+Teraguchi is a Flame-focused derivative of [PLANK](https://github.com/instinctual/plank),
+created by [Alan Latteri](https://github.com/alatteri).
+
+Alan's work on PLANK provides the foundation for this project, including its
+remote-workstation architecture, video pipeline, transport, and qualification
+tooling. The Department of External Services (DXS) maintains the Teraguchi fork
+and its planned artist experience, studio integration, and additional platform
+work. We aim to contribute reusable improvements and testing back to PLANK.
+
+See [Attribution](ATTRIBUTION.md) for upstream credits and component licensing,
+and [Teraguchi scope and next steps](docs/teraguchi.md) for this fork's status.
+Teraguchi-specific support belongs to DXS; this fork does not imply an upstream
+support commitment or endorsement.
+
+## Teraguchi status
+
+This fork starts from PLANK's existing implementation. The first change is
+project documentation and attribution; application branding and runtime behavior
+are still inherited from PLANK. There is no qualified Teraguchi release yet.
+
+Apple Silicon is the first client target. macOS 26 compatibility is under
+evaluation; upstream currently targets macOS 27. Windows client support remains
+an option after the Mac production gate. Native 10-bit capture, exact-format
+hardware decode, Mac pen input, and end-to-end Flame behavior still need
+Teraguchi qualification. See the [scope document](docs/teraguchi.md).
+
+## PLANK upstream overview
+
+The following overview, platform descriptions, build instructions, and licensing
+notes are retained from upstream. They describe the PLANK baseline; upstream
+build or qualification results are not Teraguchi release claims.
 
 PLANK is a low-latency remote-workstation system with Linux and macOS Hosts
 and Clients. This repository builds independently of private infrastructure.

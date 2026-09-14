@@ -1,3 +1,11 @@
+# Teraguchi fork context
+
+Read [docs/teraguchi.md](docs/teraguchi.md) first for this fork's scope, current
+qualification limits, and next steps. Machine work is paused. The upstream
+engineering rules below remain the baseline; their macOS 27 support statements
+do not establish macOS 26 support for Teraguchi. Preserve attribution and use
+small, separately qualified changes for Teraguchi-specific behavior.
+
 # Repository Guidelines
 
 ## Project Structure & Module Organization
