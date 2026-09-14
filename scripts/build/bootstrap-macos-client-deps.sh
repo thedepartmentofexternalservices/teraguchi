@@ -85,6 +85,10 @@ identity_patch="$PLANK_SOURCE_ROOT/apps/client/app/deploy/linux/ffmpeg-patches/0
 printf '%s  %s\n' 059cc9c0d585d71e292cd7421a43f239b1e7ce94e8598d0a7427dfe48e55847e "$identity_patch" | shasum -a 256 -c -
 patch --batch --forward -d "$ffmpeg_source" -p1 < "$identity_patch"
 patch --batch --reverse --dry-run -d "$ffmpeg_source" -p1 < "$identity_patch"
+hardware_patch="$PLANK_SOURCE_ROOT/scripts/build/ffmpeg-patches/0002-videotoolbox-require-and-attest-hardware.patch"
+printf '%s  %s\n' bb566eabf8faac5d2dea992d9814fdcf9aa3e0b2d1605f5a0a14e64e5be6bc57 "$hardware_patch" | shasum -a 256 -c -
+patch --batch --forward -d "$ffmpeg_source" -p1 < "$hardware_patch"
+patch --batch --reverse --dry-run -d "$ffmpeg_source" -p1 < "$hardware_patch"
 mkdir -p "$PLANK_MAC_CLIENT_DEPS/build-ffmpeg"
 (
     cd "$PLANK_MAC_CLIENT_DEPS/build-ffmpeg"

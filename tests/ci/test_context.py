@@ -49,7 +49,7 @@ class ContextTests(unittest.TestCase):
             subprocess.run(['python3', str(ROOT / 'scripts/ci/context.py')], env=env, check=True,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             values = dict(line.split('=', 1) for line in env_file.read_text().splitlines())
-            worktree = base / 'plank-ci/source'
+            worktree = (base / 'plank-ci/source').resolve()
             self.assertEqual(values['PLANK_SOURCE_ROOT'], str(worktree))
             self.assertEqual(values['PLANK_BUILD_BRANCH'], context.branch_name('feature/check'))
             self.assertEqual(subprocess.check_output(['git', '-C', str(worktree), 'rev-parse', 'HEAD'], text=True).strip(), sha)
