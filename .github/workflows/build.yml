@@ -36,6 +36,11 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 -m unittest discover -s tests/ci -v
+      - name: Check client compatibility and package gates
+        run: |
+          python3 tests/packaging/test-macos-client-target.py -v
+          python3 tests/packaging/test-macos-minimum-os.py -v
+          python3 tests/packaging/test-build-paths.py -v
       - name: Require the intended source revision
         run: test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
 
