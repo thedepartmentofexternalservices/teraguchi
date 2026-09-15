@@ -21,8 +21,13 @@ qualify the live path.
 
 An opt-in diagnostic build records up to 15 seconds of pen/mouse coordinates,
 host cursor position, window mapping and cursor ownership in the existing
-private client log. It changes no coordinate or input behavior. Installation
-and a physical trace are pending. See [the input checkpoint](docs/development/teraguchi-macos-input.md#mac-pen-cursor-and-flame-margins).
+private client log. It changes no coordinate or input behavior. The diagnostic
+candidate was installed and captured live traces. The operator then reported
+that the pen cursor disappears inside the video, while remaining visible outside.
+Host positions were arriving and mapped, with the native cursor hidden during
+pen ownership. The replacement overlay's visible rendering is unqualified.
+Flame still showed 5% margins while a host read showed the full tablet area;
+this mismatch does not mean the operator changed preferences to zero. See [the input checkpoint](docs/development/teraguchi-macos-input.md#mac-pen-cursor-and-flame-margins).
 No host settings were changed by the agent.
 
 The preceding onboarding pilot was installed from root `fd5e9c3` and client

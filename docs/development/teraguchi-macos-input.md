@@ -107,10 +107,19 @@ updates are absent. Samples are asynchronous; timestamps do not imply individual
 packet acknowledgement. The trace uses the existing private client log and does
 not include keyboard text or artwork. Keep those logs outside Git.
 
-This instrumentation changes no input routing or coordinate mapping. The next
-physical check must compare a hover and harmless selection with 5% margins and
-inspect cursor ownership before choosing another repair. The diagnostic build
-is not a qualified fix or an artist-distribution candidate.
+This instrumentation changes no input routing or coordinate mapping. The
+installed diagnostic captured valid host positions and window mapping while
+native-cursor visibility was disabled during pen ownership. The operator reports
+the cursor is visible outside the video area but disappears inside it. Hidden
+layer-object checks did not cover this visible presentation failure. Reproduce
+it with an isolated Metal window before another physical alignment test.
+
+The operator also confirmed Flame's panel still showed 5% margins, while a
+subsequent host read returned the full tablet area. Do not infer the preference
+panel value from that property alone. Input endpoints may be retained across a
+resumable session; reconnect-induced recreation or stale Flame device state is
+a hypothesis, not an established cause. The diagnostic build is not a qualified
+fix or an artist-distribution candidate.
 
 ## Host pressure gate found during review
 
