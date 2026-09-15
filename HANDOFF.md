@@ -11,6 +11,16 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
+The onboarding pilot is now installed from root `fd5e9c3` and client
+`5955945b`. Its bundled setup loaded automatically, and the live list contains
+only the configured workstation. Settings and the separate Mac input dialog
+were visually checked in the installed app. Fresh portable startup, saved setup,
+restart, idle Quit, signature and all 107 Mach-O minimum-OS checks pass. The
+previous working pilot is retained privately. Both input grants need operator
+renewal after this ad-hoc rebuild; no new live session was attempted. The pilot
+remains local-only; trusted artist distribution and clean-guest onboarding are
+still open. Private notes hold exact hashes, setup revision/expiry and recovery.
+
 The operator confirmed the dual-output top-edge repair works, then requested
 simpler onboarding. The current slice puts import and Mac input review in
 Settings, keeps the studio name in the header and shows only the next required
@@ -25,8 +35,8 @@ Linux screen edge. A session-scoped presentation repair now hides those controls
 only while the visible fullscreen pair has focus and restores the prior state
 on focus loss, minimize, windowed mode and cleanup. App switching and Force Quit
 remain available. 21 display tests, 142 hidden native checks, eight Quit scenarios
-and packaged startup smoke pass. The updated local pilot is installed from root
-`fff0818` and the client gitlink below. The operator renewed input grants after the ad-hoc signature changed and
+and packaged startup smoke pass. That previous pilot was installed from root
+`fff0818` and client `e405dfeb`. The operator renewed input grants after the ad-hoc signature changed and
 confirmed the live top-edge repair. Broader focus/cleanup acceptance remains open.
 
 The supervised pilot now reaches a working headless desktop, confirmed by the
