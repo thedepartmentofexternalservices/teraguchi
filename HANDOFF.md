@@ -11,18 +11,18 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
-Current client gitlink: `03671c6c9847615592a45d0e63397d42fb25081d` on `codex/assignment-refresh`.
+Current client gitlink: `d8ef18c8f4cbdcde505e73c6136fa181ed63f755` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).
 The `codex/assignment-refresh` development slice adds bounded assignment-cache
 freshness and asynchronous refresh handling to the offline picker. The native local Tailscale provider and scoped PAM/Session handoff now compile;
 see [the integration boundary](docs/development/teraguchi-tailscale-workstations.md).
-The explicit development picker now wires credentials, one-output binding,
+The explicit development picker now wires credentials, selected-output binding,
 native Session cleanup and [Mac permission onboarding](docs/development/teraguchi-mac-permissions.md).
 Non-prompting permission checks guard login, startup, reconnect and the native
 streaming loop; Settings opens only after an explicit click. The arm64/macOS 26
-build, 135 QML tests, five native permission tests, keyboard/bridge checks, strict
+build, 139 QML tests, five native permission tests, keyboard/bridge checks, strict
 video, eight Quit scenarios and actual-client startup smoke pass. Thirty-eight
 network-denied simulated screens render.
 
@@ -32,10 +32,14 @@ results, 31,680 ten-bit GPU channel checks and 71 production-renderer lifecycle
 checks pass locally. A deliberate uncropped negative control fails as required.
 The lifecycle fixture uses hidden, non-activating windows and synthetic software
 frames; it does not prove hardware decode or physical display behavior.
-The picker still rejects two displays until native Mac window placement and
-display-loss/fullscreen handling are wired. Trusted distribution/product
-identity and live guest/session/permission qualification also remain pending.
-The installed client, host, builder state and postponed soak are unchanged.
+The native Mac window layer now binds one/two physical outputs before PAM and
+retains their identities/modes through startup and reconnect. It places separate
+windows, keeps both crops in borderless fullscreen and windowed mode, groups
+minimize/restore and disconnects on either close or display change. 20 synthetic
+binding QtTest results, 92 hidden native placement checks and 139 QML results pass.
+Physical two-output/Spaces/focus/input and live session qualification remain open.
+Next independent work: trusted studio setup and stable distribution/product
+identity. The installed client, host, builder state and postponed soak are unchanged.
 
 ## Teraguchi macOS workstation interface
 

@@ -44,7 +44,16 @@ TestCase {
             property int cancellations: 0
             function cancelAssignedAuthentication(id) { cancellations++; }
             property string displayError: ""
-            function assignedDisplayError(displays) { return displayError; }
+            property bool displaysCurrent: true
+            property string displayToken: ""
+            property int displayCancellations: 0
+            function prepareAssignedDisplays(displays, window) {
+                if (displayError) return {error: displayError};
+                displayToken = "selection-a";
+                return {token: displayToken};
+            }
+            function assignedDisplaysCurrent(token) { return displaysCurrent && token !== "" && token === displayToken; }
+            function cancelAssignedDisplays(token) { if (token === displayToken) { displayToken = ""; displayCancellations++; } }
             function prepareAssignedTarget(provider, nodeId) { return canPrepare; }
             function assignedLoginTarget(provider, nodeId) {
                 if (!hostVerified) return ({});
@@ -98,6 +107,37 @@ TestCase {
         compare(computers.requests, 0);
         compare(flow.displayCount, 2);
         compare(flow.problemTitle, "Selected displays unavailable");
+    }
+    function test_displayChangeBeforeCredentialsBlocksLogin() {
+        computers.displaysCurrent = false;
+        flow.begin(false);
+        compare(credentialsSpy.count, 0); compare(computers.requests, 0);
+        compare(flow.problemTitle, "Selected displays unavailable");
+        compare(computers.displayCancellations, 1);
+    }
+    function test_displayChangeBeforeSubmitDoesNotSendPassword() {
+        flow.begin(false);
+        computers.displaysCurrent = false;
+        verify(!login.submit(flow.generation, "example-artist", "synthetic-value"));
+        compare(computers.requests, 0); compare(computers.sessions, 0);
+        compare(flow.problemTitle, "Selected displays unavailable");
+    }
+    function test_displayChangeDuringPamDiscardsResult() {
+        flow.begin(false);
+        verify(login.submit(flow.generation, "example-artist", "synthetic-value"));
+        const request = login.requestId;
+        computers.displaysCurrent = false;
+        computers.assignedAuthenticationCompleted(request, "bookmark-a", undefined);
+        compare(computers.sessions, 0); compare(computers.cancellations, 1);
+        compare(flow.problemTitle, "Selected displays unavailable");
+    }
+    function test_twoDisplaysRetainSelectionThroughLogin() {
+        flow.chooseDisplays(2); flow.begin(false);
+        compare(credentialsSpy.count, 1); compare(login.target.displayToken, "selection-a");
+        verify(login.submit(flow.generation, "example-artist", "synthetic-value"));
+        computers.assignedAuthenticationCompleted(login.requestId, "bookmark-a", undefined);
+        compare(sessionSpy.count, 1); compare(computers.sessions, 1);
+        compare(flow.attemptDisplays, 2); compare(computers.displayCancellations, 1);
     }
     function test_missingPermissionsBlocksBeforeHostPreparation() {
         computers.inputAllowed = false;

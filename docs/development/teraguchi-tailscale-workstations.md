@@ -120,15 +120,19 @@ are rejected. The picker uses a separate `Teraguchi Development` settings
 namespace and disables mDNS. It does not edit the installed PLANK bookmark
 profile. This explicit launcher input is not a signed configuration distributor.
 
-One display binds to the physical screen containing the launcher window at
-session start; only that output participates in host layout resolution. Losing
-or moving off the selected output closes the assigned session. Existing bookmark
-layout choices are not overwritten. **Two-display Mac sessions are rejected
-before credentials** and again at the native boundary. The inherited two-output
-window placement remains Wayland-only. The [Metal renderer portion](teraguchi-mac-two-output.md)
-now supports two cropped outputs in local tests. Native Mac window lifecycle and
-physical qualification are still required for the dual-display P3/P4 target.
-No one-output fallback satisfies a two-output request.
+One display binds to the physical screen containing the launcher when Connect
+is selected. Two requires exactly two independent, unrotated screens arranged
+side by side. Both must use qualified native resolutions. Native identities and
+modes are retained across PAM and Session creation, checked again before startup
+and reconnect, and monitored while streaming. The launcher can move without
+redirecting a pending connection. Display changes require a new connection.
+
+The [Mac presentation layer](teraguchi-mac-two-output.md) creates a window on each
+bound output, preserves both crops through fullscreen/windowed transitions, and
+closes the whole session if either window closes or loses its display. Native
+identities stay in memory. Existing bookmark choices are not overwritten.
+Physical two-output lifecycle/input and exact-candidate qualification remain
+open. No one-output fallback satisfies a two-output request.
 
 ## Validation
 

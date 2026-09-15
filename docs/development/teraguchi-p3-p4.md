@@ -36,10 +36,13 @@ requires the P2 hardware gates and P3 access/distribution controls.
   bridge locally. Real active-session cleanup remains a live gate.
 - [x] Add [two-output Metal rendering](teraguchi-mac-two-output.md) with shared
   video/input crop geometry, ten-bit GPU checks and hidden-window resource tests.
-- [ ] Wire and qualify native Mac two-output window placement and lifecycle.
-  The integrated entry still binds one physical output and explicitly rejects
-  two before credentials. It does not silently select one or span two onto one
-  surface. Renderer tests do not establish a complete two-display session.
+- [x] Wire native Mac two-output window placement, paired fullscreen/windowed
+  transitions, close/minimize/restore and both-output monitoring. Bind native
+  display identities before PAM and retain them through reconnect. Synthetic
+  binding and hidden native placement checks pass.
+- [ ] Qualify native Mac window lifecycle on two physical outputs, including
+  Spaces, focus, scale, display loss, reconnect and input across the seam.
+  Local fixtures do not establish a complete live two-display session.
 - [ ] Qualify the exact integrated candidate with external guest sharing, live
   PAM, startup cancellation, display loss, reconnect, revocation and seat denial.
 
@@ -119,8 +122,8 @@ Offline P3 work cannot satisfy these gates. Builder provisioning remains paused.
 ## Next coding slice
 
 The [integrated development picker](teraguchi-tailscale-workstations.md) now reaches
-native login and Session execution with permission onboarding. Next: native Mac
-two-output window placement/lifecycle and trusted configuration/product identity.
-The Metal renderer portion now has local crop and cleanup checks. Then prepare
-external guest and exact-candidate live acceptance. Keep P2 hardware limits and
-the deferred operator work explicit; this slice does not complete P3 or enter P4.
+native login and Session execution with permission onboarding and bound one/two
+Mac outputs. Next independent coding: trusted studio configuration and product
+distribution identity, then the external-guest acceptance cases. Physical Mac
+window/input qualification and P2 hardware limits remain explicit; this slice
+does not complete P3 or enter P4.

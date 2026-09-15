@@ -6,11 +6,44 @@ The Metal renderer now accepts one or two presentation targets. It presents a
 crop of the existing combined desktop on each target using PLANK's shared
 presentation geometry. The transport and decoder still carry one canvas.
 
-This completes the renderer portion of the Mac two-output work. **The development
-picker still rejects a two-display session.** Session window creation and
-placement remain Wayland-only. Native Mac window placement, display loss,
-fullscreen transitions and exact-candidate qualification are the next slice.
-The renderer tests do not enable an incomplete session path.
+The explicit development picker now connects this renderer to native Mac window
+creation. One output binds the launcher screen at Connect; two requires exactly
+two independent, unrotated, horizontally arranged screens with qualified native
+resolutions. The selected count and identities remain fixed through login and
+reconnect. This is an uninstalled development candidate; live dual-display
+acceptance and P2/P4 hardware gates remain open.
+
+## Display and window contract
+
+The client records native display UUID/ID, configuration generation, logical
+bounds, current mode/backing dimensions, refresh, rotation and native resolution.
+These records exist only in memory. A random local handle crosses QML; physical
+identities never enter settings, logs or a new service. The authentication request
+is bound to that handle, and cancellation retires it.
+
+Checks run before the credential dialog, before PAM, after PAM, at Session
+initialization and reconnect, on display events and every two seconds while
+streaming. Native reconfiguration callbacks record changes even if a monitor is
+unplugged and restored between reads. SDL display IDs are resolved from unique
+complete geometry after native identity verification; enumeration order cannot
+select an output. Unsupported counts, mirroring, rotation, ambiguous identity or
+geometry and unsupported native resolutions fail explicitly before login.
+
+Two Mac windows use borderless fullscreen in the current desktop space. The
+session toolbar toggles both between that layout and separate windowed views;
+both retain their own canvas crop. The native green button is disabled for this
+pair because it would move only one window into a fullscreen Space. One-output
+sessions retain the existing native fullscreen behavior. No display mode is
+changed by assigned-session startup.
+
+Both windows are placed before either is shown. Either window's close request
+ends the session, including during reconnect. Minimize/restore applies to both;
+a failed grouped operation ends the session. Display removal, replacement, mode
+change or a window moving to another output uses the existing input/transport
+cleanup path. Scale/size changes on either surface recreate the Metal renderer.
+The primary owns the toolbar, while mouse, pen and reserved-key routing use the
+shared two-output layout. Real Spaces, focus, minimize/restore and input behavior
+still require attended qualification.
 
 ## Renderer behavior
 
@@ -81,19 +114,33 @@ No host connection, input capture, permission change or installation is part of
 these tests. Hosted CI has not run for this slice. Local compile and GPU checks
 cannot pass the one/two-display hardware gates or the sustained WAN workload.
 
-## Next integration work
+## Window and binding checks
 
-1. Bind the explicitly selected two displays to stable native display IDs before
-   login, and revalidate both before startup/reconnect. Reject unsupported display
-   counts or arrangements explicitly.
-2. Create and place native Mac presentation windows on those exact outputs.
-   Handle Spaces/fullscreen transitions, focus, toolbar ownership and close/Quit
-   for both; never hide one output while claiming a two-output session.
-3. Recheck both display bindings during streaming and clean up held input on
-   removal, replacement or incompatible mode changes. Verify pointer, pen and
-   reserved-key routing across the output seam.
-4. Qualify the combined 7680-wide decode path, both physical ten-bit surfaces,
-   4K60 throughput, color, output timing and real input using the exact candidate.
+```sh
+# Synthetic selection, identity/mode change and SDL mapping tests; also in CI.
+bash scripts/test/check-macos-display-binding.sh "$PRIVATE_OUTPUT"
 
+# Adds actual native identity reads and hidden, non-activating window placement.
+bash scripts/test/check-macos-display-binding.sh "$PRIVATE_NATIVE_OUTPUT" --native
+```
+
+The window slice passes 20 QtTest results for selection, replacement, mode,
+rotation, mirror, layout and reordered/ambiguous SDL mapping. The native fixture passes 92 checks for exact frame placement and repeated borderless/windowed transitions,
+including prevention of independent fullscreen Spaces. Its windows remain hidden
+on the available display: it is not a physical two-display or active-session test.
+139 QML results include display loss before credentials, before submission and
+during PAM, plus retained two-output selection through successful preparation.
+
+## Next qualification work
+
+1. Exercise the exact candidate on two physical displays: both primary choices,
+   unequal scaling, fullscreen/windowed, Spaces, focus, minimize/restore, close,
+   startup cancellation, display removal/replacement and reconnect.
+2. Verify pointer, pen and reserved-key routing across the output seam and held
+   input cleanup on each failure. Native fixtures do not inject real input.
+3. Qualify the combined 7680-wide decode path, both physical ten-bit surfaces,
+   4K60 throughput, color, output timing and real editing workloads.
+
+Trusted studio setup and product distribution remain independent coding work.
 See the [P3/P4 checklist](teraguchi-p3-p4.md). Physical testing and the deferred
-operator session remain separate from this local renderer checkpoint.
+operator session remain separate from this local window checkpoint.
