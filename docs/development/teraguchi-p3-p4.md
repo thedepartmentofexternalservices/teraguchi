@@ -77,9 +77,11 @@ code behavior; they do not establish live access or physical video qualification
   [guest sharing draft and offline allow/deny cases](teraguchi-guest-access-policy.md).
   TCP/UDP 28989, packaged firewall consistency and source drift are checked.
   The draft has not been merged, validated by Tailscale or deployed.
-- [ ] Establish workstation-specific HTTPS certificate trust before pilot PAM
-  credentials. The inherited certificate-profile check does not pin a host;
-  a trusted bootstrap/rotation path and credential-nondisclosure tests are needed.
+- [x] Add [workstation-specific HTTPS trust](teraguchi-host-trust.md) from signed
+  setup and verify before every assigned PAM/token request. 21 local TLS cases
+  prove rejection and credential nondisclosure, including rotation and reconnect.
+- [ ] Qualify administrator-supplied host bindings, trusted setup delivery and
+  actual certificate rotation using the exact client before pilot PAM credentials.
   Retain the pinned host's IPv4-only QUIC limitation in guest qualification.
 - [ ] Check assignment, certificate trust, PAM account authentication, and
   exclusive seat ownership separately. Test second-identity denial, expired
@@ -133,8 +135,8 @@ Offline P3 work cannot satisfy these gates. Builder provisioning remains paused.
 The [integrated development picker](teraguchi-tailscale-workstations.md) now reaches
 native login and Session execution with permission onboarding and bound one/two
 Mac outputs. Signed studio setup is implemented locally. Next independent coding:
-workstation-specific HTTPS trust and credential-nondisclosure tests, then product
-distribution identity/build-manifest checks. Endpoint inventory and the offline
+product distribution identity/build-manifest checks. Workstation-specific HTTPS
+trust and synthetic credential-nondisclosure tests now pass locally. Endpoint inventory and the offline
 guest policy draft are prepared; full-policy and external-guest acceptance remain.
 Physical Mac
 window/input qualification and P2 hardware limits remain explicit; this slice

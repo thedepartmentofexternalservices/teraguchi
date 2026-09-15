@@ -27,6 +27,8 @@ REVIEWED_FILES = {
           "protocol/plank-transport/src/lib.rs"},
     "apps/client": {"app/backend/nvhttp.cpp", "app/backend/computermanager.cpp",
                     "app/backend/teraguchi/tailscaleworkstations.cpp",
+                    "app/backend/teraguchi/hosttrust.h", "app/backend/teraguchi/studiosetup.h",
+                    "app/backend/teraguchi/studiosetup.cpp",
                     "app/gui/computermodel.cpp", "app/settings/plankclientpolicy.h",
                     "app/settings/plankclientpolicy.cpp", "app/streaming/session.cpp"},
     "apps/host/linux": {"src/nvhttp.cpp", "src/nvhttp.h", "src/config.cpp",

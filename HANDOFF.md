@@ -11,7 +11,7 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
-Current client gitlink: `c30f0477d5e271da9af524970c89861da10011af` on `codex/assignment-refresh`.
+Current client gitlink: `9a7f6937741dfefbd9fd03c30c72240c60ffeb8f` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).
@@ -47,14 +47,21 @@ worker tests pass, along with the complete build and startup smoke. Unsigned dev
 rejected by key-configured builds. No production key or product identity has
 been selected. The [guest policy preparation](docs/development/teraguchi-guest-access-policy.md)
 now records the pinned TCP/UDP 28989 path, a guest-only draft, native policy test
-examples and 19 source digests. 18 offline regressions and source/package checks
+examples and 22 source digests. 18 offline regressions and source/package checks
 pass. Hosted CI includes the regression suite but has not run. No live policy was
-validated or changed. Source review found a P3 blocker: HTTPS/PAM accepts the
-PLANK certificate profile without a persistent workstation-specific pin. Next:
-trusted host-certificate bootstrap/rotation and credential-nondisclosure tests,
-then distribution identity/build-manifest checks. The host's IPv4-only QUIC
-listener also limits guest qualification. Physical client/guest/permission qualification,
-the installed client, host, builder state and postponed soak are unchanged.
+validated or changed. [Workstation-specific host trust](docs/development/teraguchi-host-trust.md) now closes
+the inherited certificate-profile gap in the assigned entry. Signed version-2
+setup binds node/host IDs to approved leaf fingerprints; fresh HTTPS requests
+verify before username/password/token transmission. PAM, Session and reconnect
+retain that trust. 21 real-NvHTTP loopback cases pass, including swapped/expired
+certificates, redirect canaries, rotation and an unpinned negative control. 25
+setup results, three key-removal results, 28 provider results, 147 QML results,
+42 network-denied screens, the full Mac build and blank-settings smoke pass.
+Real administrator bindings, production key custody and rotation remain open.
+Next: distribution identity/build-manifest and rollback preparation. The host's
+IPv4-only QUIC listener still limits guest qualification. Physical client/guest/
+permission qualification, the installed client, host, builder state and postponed
+soak are unchanged.
 
 ## Teraguchi macOS workstation interface
 

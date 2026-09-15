@@ -35,6 +35,7 @@ TestCase {
         QtObject {
             property int requests: 0
             property bool hostVerified: true
+            property string trustError: ""
             property bool canPrepare: false
             property int sessions: 0
             property QtObject session: QtObject {}
@@ -56,6 +57,7 @@ TestCase {
             function cancelAssignedDisplays(token) { if (token === displayToken) { displayToken = ""; displayCancellations++; } }
             function prepareAssignedTarget(provider, nodeId) { return canPrepare; }
             function assignedLoginTarget(provider, nodeId) {
+                if (trustError) return {trustError: trustError};
                 if (!hostVerified) return ({});
                 var peer = provider.resolve(nodeId);
                 return {id: peer.id, address: peer.address, identity: peer.identity, computerId: "bookmark-a", hostId: "host-a", status: "ready"};
@@ -83,6 +85,15 @@ TestCase {
         flow.refresh();
         provider.catalogReady(provider.requestToken, provider.entries, 30000);
         flow.selectWorkstation("node-a");
+    }
+    function test_missingHostTrustBlocksCredentialsAndReleasesDisplays() {
+        computers.trustError = "Import current studio setup";
+        flow.begin(false);
+        compare(credentialsSpy.count, 0);
+        compare(computers.requests, 0);
+        compare(computers.displayToken, "");
+        compare(login.target, null);
+        compare(flow.problemTitle, "Workstation verification needed");
     }
     function test_credentialDialogClearsPasswordAndCancelsNativeRequest() {
         var dialog = createTemporaryObject(dialogType, tests, {flow: flow, login: login});

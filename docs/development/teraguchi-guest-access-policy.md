@@ -9,8 +9,8 @@ installed application changed. P4 entry remains closed.
 The [inventory](../../tests/tailscale/endpoint-inventory.json) records source
 digests and these reviewed revisions:
 
-- Root baseline: `e96ed37fe8030a29020b1f044d59a55ec9b4dd7a`.
-- Client: `c30f0477d5e271da9af524970c89861da10011af`.
+- Root baseline: `d1722b9ea0c2ee2664234ac6acceeaad19f6119b`.
+- Client: `9a7f6937741dfefbd9fd03c30c72240c60ffeb8f`.
 - Linux host: `9329784ac41f50cbec0c9d76badfd22227ec5e5f`.
 - Kymux: `912ece5c64787997f978673ca60d313898a3548c`.
 
@@ -90,7 +90,7 @@ python3 -B scripts/test/check-tailscale-policy.py --host-source "$PINNED_HOST_SO
 Use a local checkout at the recorded host pin when the host submodule is
 unpopulated. The guard never clones, fetches, initializes submodules or calls
 Tailscale. It checks the draft, packaged host/firewalld ports, product gitlinks
-and 19 reviewed source-file digests. A changed pin or reviewed file requires
+and 22 reviewed source-file digests. A changed pin or reviewed file requires
 another inventory. The root revision is the review baseline; later
 documentation-only root commits can pass with those source files unchanged.
 
@@ -118,17 +118,17 @@ device tests below establish share visibility and revocation.
 | Studio setup | Build-pinned signature, validity and exact DNS suffix | Trusted distribution, production key custody and rotation |
 | Assignment | Fresh account/node/address match from the local network map | External guest visibility and actual removal timing |
 | Network | Draft permits the two PLANK protocol/port pairs | Full-policy validation, live connections and host firewall enforcement |
-| Host certificate | TLS 1.3 and PLANK certificate profile; QUIC fingerprint from HTTPS launch | Workstation-specific HTTPS trust before credentials; replacement tests |
+| Host certificate | TLS 1.3 and PLANK certificate profile; QUIC fingerprint from HTTPS launch | Signed workstation bindings and pre-credential checks implemented; real bootstrap/rotation qualification remains |
 | PAM account | Request-scoped conversation and cancellation | Real FreeIPA/PAM policy, account expiry and denial |
 | Seat ownership | Assigned sessions disable takeover and retain host admission | Second identity denied without eviction; same identity reconnect and expiry |
 
-The HTTPS certificate issue is a **P3 pilot blocker**. `NvHTTP::handleSslErrors`
-accepts specified trust/name errors for a currently valid self-signed RSA
-certificate of the required shape. `postPlankJson` uses that policy for PAM;
-there is no persistent workstation-specific pin in that path. Node and host
-UUID checks do not supply cryptographic trust. The signed studio suffix also
-does not bind a host certificate. Establish a trusted pin/bootstrap and rotation
-path before pilot credentials. This slice leaves runtime TLS unchanged.
+The inherited HTTPS certificate-profile gap found during this inventory is now
+closed locally for the assigned entry by [signed host trust](teraguchi-host-trust.md).
+Every assigned PAM/token request verifies the workstation certificate before
+HTTP data, with synthetic swap/expiry/reconnect tests. The ordinary PLANK entry
+retains its inherited policy. Real administrator-supplied bindings, trusted setup
+delivery and certificate rotation remain P3 gates. UUID and DNS suffix checks
+alone still do not establish cryptographic host trust.
 
 ## Prepared live cases
 

@@ -5,7 +5,7 @@
   "sources": [
     {
       "path": ".",
-      "commit": "e96ed37fe8030a29020b1f044d59a55ec9b4dd7a",
+      "commit": "d1722b9ea0c2ee2664234ac6acceeaad19f6119b",
       "sha256": {
         "packaging/host/linux/config/plank-host.conf": "7f22d36efa8186b992aedb978ae55c08e27adf580552cd7b8fda5c8457ba62ec",
         "packaging/host/linux/firewalld/plank.xml": "c1ebd7f084437197b5722313ec7204852ebd97923863646ab865221a9a7b2e1f",
@@ -16,15 +16,18 @@
     },
     {
       "path": "apps/client",
-      "commit": "c30f0477d5e271da9af524970c89861da10011af",
+      "commit": "9a7f6937741dfefbd9fd03c30c72240c60ffeb8f",
       "sha256": {
-        "app/backend/nvhttp.cpp": "b645bc4ea66e39839794ccd3f7351aeaa21bcf0c4ea2d6a349346f31f7183344",
-        "app/backend/computermanager.cpp": "d36689ad334302037a3c593dc19d9da338e603a2ddb783975e94d7e6f93e6e62",
+        "app/backend/nvhttp.cpp": "ad793c34677f85946b4be04b43d7d7a10d7c833420a7c80e610ad2a82505c4bf",
+        "app/backend/computermanager.cpp": "3a8f8de6d650b1357f7973e68f3d6a2a4b64e1565acf7eadf3bf2f8dca7eb17d",
         "app/backend/teraguchi/tailscaleworkstations.cpp": "bb67846a187b100ad5500adeb70454cd9c70bac5235d38ac26116e432b3ec5db",
-        "app/gui/computermodel.cpp": "a7c6ea4f27b1bb36c4b28cce1a6b413c7cb96c9313db7191862138a38a37cc3c",
+        "app/gui/computermodel.cpp": "1dbbabb0eeac4535ecbf7e340e76876cb5a4aaf01bf5fdf61106305de5f5a676",
         "app/settings/plankclientpolicy.h": "597abdd5c33f4f5a87b6cc09749c815fe70c616b483de13c1ab1a5136ec4c46f",
         "app/settings/plankclientpolicy.cpp": "fc5248e1e07a4b2677341313f77441920fd0d8f54e2b9d43a25b1314e2be8145",
-        "app/streaming/session.cpp": "1ff9056c8793850f76504cbfc6f6d6e984bf73708dbcb2a74d133964312f5fc3"
+        "app/streaming/session.cpp": "763dbeb3828b6c2f251d6f6ac65a8df22ff55bcdb38fc1026baaebb8156936e8",
+        "app/backend/teraguchi/hosttrust.h": "5d3f3117e5211c9fa554cb2cda0a336603d1c99a3dfcd8539905b8420eaf4732",
+        "app/backend/teraguchi/studiosetup.h": "672b5019899bdaaa6f20a0fb95b925592127d5da6f9eb687c31026a3f3bbdaa6",
+        "app/backend/teraguchi/studiosetup.cpp": "10b72f3ea9cd7d9ca32cd500b9847b351540e5d24dd30c6686fc8cfeff989120"
       }
     },
     {

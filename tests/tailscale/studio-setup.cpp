@@ -1,5 +1,7 @@
 #include <QtTest>
 #include <QJsonObject>
+#include <QJsonArray>
+#include "hosttrust.h"
 #include <QJsonDocument>
 #include <QTemporaryDir>
 #include <QFile>
@@ -138,6 +140,67 @@ private slots:
         QCOMPARE(TeraguchiStudio::pinnedPublicKey(),buildKey); // Runtime environment is not a trust input.
         QString error;
         QVERIFY(TeraguchiStudio::verify(envelope.readAll(),expected,now,&error).revision);
+    }
+    QJsonObject trustedPayload(int revision = 1) {
+        auto content = payload(revision); content["version"] = 2;
+        content["workstations"] = QJsonArray{QJsonObject{
+            {"node_id", "node-a"}, {"host_id", "host-a"},
+            {"certificate_sha256", QJsonArray{QString(64,'a'), QString(64,'b')}}}};
+        return content;
+    }
+    void trustedWorkstationAndRotation() {
+        QString error;
+        const auto profile = TeraguchiStudio::verify(sign(trustedPayload()), publicKey, now, &error);
+        QVERIFY2(profile.revision, qPrintable(error));
+        auto setup = std::make_shared<TeraguchiStudio::Permit>();
+        setup->profile = profile; setup->admittedAt = now;
+        TeraguchiStudio::HostTrust trust{setup,"node-a","host-a","192.0.2.10",28989};
+        QVERIFY(trust.valid()); QVERIFY(trust.permits(QUrl("https://192.0.2.10:28989/plank/auth/start")));
+        QVERIFY(trust.accepts(QByteArray::fromHex(QByteArray(64,'a'))));
+        QVERIFY(trust.accepts(QByteArray::fromHex(QByteArray(64,'b'))));
+        QVERIFY(!trust.accepts(QByteArray::fromHex(QByteArray(64,'c'))));
+        for (const auto& url : {"http://192.0.2.10:28989/", "https://192.0.2.11:28989/",
+                "https://192.0.2.10:22/", "https://user@192.0.2.10:28989/", "https://host.example.com:28989/"})
+            QVERIFY(!trust.permits(QUrl(url)));
+        auto wrong = trust; wrong.nodeId = "node-b"; QVERIFY(!wrong.valid());
+        wrong = trust; wrong.hostId = "host-b"; QVERIFY(!wrong.valid());
+        setup->development = true; QVERIFY(!trust.valid()); setup->development = false;
+        setup->profile.expires = now; QVERIFY(!trust.valid());
+        QTemporaryDir dir;
+        StudioSetup stored(publicKey, dir.filePath("saved/setup.json"), [this]{return now;});
+        QVERIFY(stored.importFile(file(dir, sign(trustedPayload(3)))));
+        auto rotated = trustedPayload(4);
+        auto entries = rotated["workstations"].toArray(); auto host = entries[0].toObject();
+        host["certificate_sha256"] = QJsonArray{QString(64,'b')}; entries[0] = host; rotated["workstations"] = entries;
+        QVERIFY(stored.importFile(file(dir, sign(rotated))));
+        QVERIFY(!stored.importFile(file(dir, sign(trustedPayload(3)))));
+        TeraguchiStudio::HostTrust current{stored.permit(),"node-a","host-a","192.0.2.10",28989};
+        QVERIFY(!current.accepts(QByteArray::fromHex(QByteArray(64,'a'))));
+        QVERIFY(current.accepts(QByteArray::fromHex(QByteArray(64,'b'))));
+    }
+    void invalidWorkstationBindings() {
+        QString error;
+        const auto reject = [&](QJsonObject content) {
+            return !TeraguchiStudio::verify(sign(content), publicKey, now, &error).revision;
+        };
+        for (const auto& value : {QJsonValue(), QJsonValue(QJsonArray()), QJsonValue("host")}) {
+            auto content = trustedPayload(); content["workstations"] = value; QVERIFY(reject(content));
+        }
+        const auto valid = trustedPayload()["workstations"].toArray()[0].toObject();
+        for (const auto& change : {QJsonObject{{"node_id","node-a\n"}}, QJsonObject{{"host_id",""}},
+                QJsonObject{{"address","192.0.2.10"}}, QJsonObject{{"certificate_sha256",QJsonArray{QString(64,'A')}}},
+                QJsonObject{{"certificate_sha256",QJsonArray{QString(64,'a'),QString(64,'a')}}},
+                QJsonObject{{"certificate_sha256",QJsonArray{QString(64,'a'),QString(64,'b'),QString(64,'c')}}}}) {
+            auto host = valid;
+            for(auto it = change.begin(); it != change.end(); ++it) host[it.key()] = it.value();
+            auto content = trustedPayload(); content["workstations"] = QJsonArray{host}; QVERIFY(reject(content));
+        }
+        auto other = valid; other["node_id"]="node-b"; other["host_id"]="host-b";
+        auto content=trustedPayload(); content["workstations"]=QJsonArray{valid,other}; QVERIFY(reject(content));
+        content=trustedPayload(); content["workstations"]=QJsonArray{valid,valid}; QVERIFY(reject(content));
+        content=trustedPayload(); content["version"]=1; QVERIFY(reject(content));
+        auto setup=std::make_shared<TeraguchiStudio::Permit>(); setup->profile=TeraguchiStudio::verify(sign(payload()),publicKey,now,&error); setup->admittedAt=now;
+        TeraguchiStudio::HostTrust legacy{setup,"node-a","host-a","192.0.2.10",28989}; QVERIFY(!legacy.valid());
     }
     void noKeyCannotImport() {
         QTemporaryDir dir; StudioSetup setup({},dir.filePath("setup.json"),[this]{return now;});

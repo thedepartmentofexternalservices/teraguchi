@@ -61,8 +61,8 @@ session consumes them. Cancellation discards that result under the same mutex
 used to publish it. An in-flight PAM call may finish, but its result cannot
 populate a bookmark or complete a later login. Closing the credential dialog
 clears its fields; application Quit retires all pending results.
-These checks preserve PLANK's existing TLS policy; a UUID is not a substitute
-for a cryptographic certificate pin or distribution trust.
+Assigned requests now use [signed workstation certificate trust](teraguchi-host-trust.md)
+before transmitting credentials or tokens. A UUID alone cannot supply this trust.
 
 ## Runtime limits
 
@@ -89,8 +89,8 @@ video/seat attestations from a bookmark or from a successful PAM response.
 Each assigned Session owns its authenticated computer snapshot. Polling cannot
 redirect its address or replace its host identity. Reconnect uses the same
 snapshot, requires a fresh background assignment check, and rechecks the saved
-PLANK host UUID before sending credentials. Existing certificate policy remains
-in force; UUID matching does not replace certificate trust.
+PLANK host UUID before sending credentials. The same immutable signed workstation trust is retained across reconnect;
+UUID matching remains an additional check.
 
 The worker reads every ten seconds with the same bounded native provider.
 Confirmed account change, sign-out, node removal or address replacement requests
@@ -166,8 +166,9 @@ actual session cleanup, and clean-Mac onboarding require the scoped live tests.
 ## Next integration gate
 
 Native Mac two-output presentation and signed studio setup are implemented
-locally. Establish workstation-specific HTTPS trust before pilot credentials;
-see the [endpoint inventory and guest policy draft](teraguchi-guest-access-policy.md).
+locally. Workstation-specific HTTPS trust and local credential-nondisclosure
+checks now pass; qualify real administrator-supplied bindings before pilot credentials.
+See the [endpoint inventory and guest policy draft](teraguchi-guest-access-policy.md).
 Stable product identity, trusted distribution, clean-Mac permissions and live
 revocation qualification remain open. Then
 use a real external shared-user Mac to prove one-machine visibility, credentials,

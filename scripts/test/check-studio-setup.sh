@@ -27,7 +27,8 @@ assert len(public)==44 and public[:12].hex()=='302a300506032b6570032100'
 (out/'fixture-public.hex').write_text(public[-32:].hex())
 now=datetime.now(timezone.utc).replace(microsecond=0)
 iso=lambda d:d.strftime('%Y-%m-%dT%H:%M:%SZ')
-profile={'version':1,'revision':1,'label':'Example Studio','dns_suffix':'studio-example.ts.net','issued_at':iso(now-timedelta(seconds=60)),'expires_at':iso(now+timedelta(hours=1))}
+profile={'version':2,'revision':1,'label':'Example Studio','dns_suffix':'studio-example.ts.net','issued_at':iso(now-timedelta(seconds=60)),'expires_at':iso(now+timedelta(hours=1))}
+profile['workstations']=[{'node_id':'node-a','host_id':'host-a','certificate_sha256':['a'*64,'b'*64]}]
 (out/'profile.json').write_text(json.dumps(profile))
 signed=out/'fixture.teraguchi-studio'
 if signed.exists(): signed.unlink()

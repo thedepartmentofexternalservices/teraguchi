@@ -31,15 +31,34 @@ def payload(path):
     if len(raw) > 4096:
         raise ValueError('Profile too large')
     obj = json.loads(raw, object_pairs_hook=unique)
-    if not isinstance(obj, dict) or set(obj) != FIELDS:
+    fields = FIELDS | {'workstations'} if isinstance(obj, dict) and obj.get('version') == 2 else FIELDS
+    if not isinstance(obj, dict) or set(obj) != fields:
         raise ValueError('Unsupported profile fields')
-    if type(obj['version']) is not int or obj['version'] != 1 or type(obj['revision']) is not int or not 1 <= obj['revision'] <= 2147483647:
+    if type(obj['version']) is not int or obj['version'] not in (1, 2) or type(obj['revision']) is not int or not 1 <= obj['revision'] <= 2147483647:
         raise ValueError('Invalid version/revision')
     label, suffix = obj['label'], obj['dns_suffix']
     if not isinstance(label, str) or not label or len(label.encode('utf-16-le')) // 2 > 80 or label != label.strip() or re.search(r'[\x00-\x1f\x7f<>]', label):
         raise ValueError('Invalid studio label')
     if not isinstance(suffix, str) or not re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.ts\.net', suffix):
         raise ValueError('Invalid exact Tailscale suffix')
+    if obj['version'] == 2:
+        entries = obj['workstations']
+        if not isinstance(entries, list) or not 1 <= len(entries) <= 8:
+            raise ValueError('Expected one to eight trusted workstations')
+        nodes, hosts, pins = set(), set(), set()
+        for entry in entries:
+            if not isinstance(entry, dict) or set(entry) != {'node_id', 'host_id', 'certificate_sha256'}:
+                raise ValueError('Invalid workstation fields')
+            node, host, certificates = entry['node_id'], entry['host_id'], entry['certificate_sha256']
+            if any(not isinstance(value, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', value) for value in (node, host)):
+                raise ValueError('Invalid workstation identifier')
+            if node in nodes or host in hosts or not isinstance(certificates, list) or not 1 <= len(certificates) <= 2:
+                raise ValueError('Duplicate workstation or invalid certificate list')
+            nodes.add(node); hosts.add(host)
+            for pin in certificates:
+                if not isinstance(pin, str) or not re.fullmatch(r'[0-9a-f]{64}', pin) or pin in pins:
+                    raise ValueError('Invalid or reused certificate fingerprint')
+                pins.add(pin)
     dates = []
     for key in ('issued_at', 'expires_at'):
         date = datetime.strptime(obj[key], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)

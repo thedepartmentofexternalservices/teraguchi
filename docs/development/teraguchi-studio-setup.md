@@ -34,12 +34,24 @@ canonical base64. The payload is compact, sorted-key JSON with these fields:
 
 | Field | Meaning |
 | --- | --- |
-| `version` | Integer `1` |
+| `version` | Integer `2` for trusted workstation login; legacy `1` supports discovery only |
 | `revision` | Increasing positive integer, at most 2147483647 |
 | `label` | Plain studio name, at most 80 UTF-16 code units |
 | `dns_suffix` | Exact lowercase Tailscale suffix, such as `studio-example.ts.net` |
 | `issued_at` | UTC timestamp in `YYYY-MM-DDTHH:MM:SSZ` form |
 | `expires_at` | UTC timestamp, after issuance and at most 90 days later |
+| `workstations` | Version 2: one to eight signed node/host/certificate bindings |
+
+Version 2 adds workstation trust inside the existing version-1 signed envelope
+domain. Each entry has exactly `node_id`, `host_id`, and `certificate_sha256`.
+The identifiers are case-sensitive, 1–64 ASCII letters/digits/underscores/hyphens.
+Fingerprints are one or two distinct lowercase SHA-256 hashes of the DER leaf
+certificate. Duplicate nodes, host IDs or reused certificates across nodes are
+rejected. There are no addresses, passwords or invitation links in this list.
+Include only the workstations intended for this setup delivery; the list grants
+no Tailscale assignment. See [host trust and rotation](teraguchi-host-trust.md).
+Legacy version-1 and unsigned development setup can still discover peers, but
+assigned login now requires version-2 workstation trust.
 
 The Ed25519 signature covers the exact bytes
 `Teraguchi studio setup v1\n` followed by the payload bytes. The whole file is
@@ -121,6 +133,7 @@ installation and permission persistence still need qualification before delivery
 
 ```sh
 bash scripts/test/check-studio-setup.sh "$PRIVATE_SETUP_OUTPUT"
+bash scripts/test/check-host-trust.sh "$PRIVATE_TLS_OUTPUT"
 bash scripts/test/check-tailscale-workstations.sh "$PRIVATE_PROVIDER_OUTPUT"
 bash scripts/test/check-workstation-ui.sh "$PRIVATE_UI_OUTPUT"
 ```
@@ -135,11 +148,13 @@ fixture build is rebuilt with its key removed to detect stale compiled trust.
 No test contacts Tailscale, captures input, changes permissions, signs an app or
 installs a candidate. See the [P3/P4 checklist](teraguchi-p3-p4.md) for remaining gates.
 
-Local results: 23 setup QtTest results, three retained-build key-removal results,
-28 provider/worker results and 146 QML results pass. Forty-two network-denied
+Local results: 25 setup QtTest results, three retained-build key-removal results,
+28 provider/worker results and 147 QML results pass. Forty-two network-denied
 simulated screens render, including setup needed/verified/expired states. Text
 and layout were reviewed; offscreen rendering does not qualify native control
 painting. The complete arm64/macOS 26 client build, uninstalled blank-settings
 startup/invalid-argument smoke and eight native Quit scenarios also pass. The
-candidate has no production studio key, and no live signed-setup session or
+candidate has no production studio key. 21 loopback TLS cases exercise the real
+NvHTTP path with synthetic credentials, including an unpinned negative control.
+No live signed-setup session or
 clean-Mac installation was exercised.
