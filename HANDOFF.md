@@ -11,15 +11,21 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
-The operator confirmed a pen-only alignment bug with Flame's four Tablet Margins
-at 5%; setting them to zero restored alignment. The Mac client showed the local
-pointer while the host applied Wacom Area cropping. A client repair now connects
-Mac pen ownership to the existing host-position cursor channel and an
-input-transparent native overlay. See [the input checkpoint](docs/development/teraguchi-macos-input.md#mac-pen-cursor-and-flame-margins).
-The zero-margin workaround is confirmed; the nonzero-margin repair still needs
-an installed-candidate physical check. No host settings were changed by the agent.
+The installed Mac cursor candidate at root `879e90c` / client `6267acf7`
+**failed** its physical test with Flame Tablet Margins at 5%. The operator sees
+one stationary cursor on the target while the click lands elsewhere. Setting
+all four margins to zero is the confirmed temporary workaround. Read-only host
+samples show the virtual tablet axes and X pointer follow the configured 5%
+crop. The exact divergence remains unresolved; offline cursor checks do not
+qualify the live path.
 
-The onboarding pilot is now installed from root `fd5e9c3` and client
+An opt-in diagnostic build records up to 15 seconds of pen/mouse coordinates,
+host cursor position, window mapping and cursor ownership in the existing
+private client log. It changes no coordinate or input behavior. Installation
+and a physical trace are pending. See [the input checkpoint](docs/development/teraguchi-macos-input.md#mac-pen-cursor-and-flame-margins).
+No host settings were changed by the agent.
+
+The preceding onboarding pilot was installed from root `fd5e9c3` and client
 `5955945b`. Its bundled setup loaded automatically, and the live list contains
 only the configured workstation. Settings and the separate Mac input dialog
 were visually checked in the installed app. Fresh portable startup, saved setup,

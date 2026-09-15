@@ -86,6 +86,32 @@ margins, hover/click near the center and all edges, test a pressure stroke,
 switch to a real mouse and back, visit local controls, refocus, then repeat
 with paired outputs.
 
+### Nonzero-margin live failure and diagnostic follow-up
+
+The installed candidate at root `879e90c` / client `6267acf7` failed at 5%:
+the operator sees one cursor which stays on target while the click lands
+elsewhere. Zero margins remain the only confirmed workaround. Read-only host
+samples confirm the X pointer tracks the configured Wacom crop, including edge
+clamping. A private isolated cursor-consumer harness passed 21 checks, but uses
+stubbed pen initialization and does not reproduce the live failure. The cause
+is unresolved; the local-pointer explanation above was the repair hypothesis,
+not an established complete diagnosis.
+
+Set `PLANK_PEN_CURSOR_DIAGNOSTICS=1` during qmake/build only for a local diagnostic
+candidate. The default build excludes this code. For each input-handler instance,
+the first accepted pen packet starts a 15-second window, limited to ten numeric
+coordinate records per second. Records include the latest normalized pen point,
+action, real mouse event counts and point, host cursor point, mapped window point,
+and ownership/visibility state. Pen-triggered records still appear if host cursor
+updates are absent. Samples are asynchronous; timestamps do not imply individual
+packet acknowledgement. The trace uses the existing private client log and does
+not include keyboard text or artwork. Keep those logs outside Git.
+
+This instrumentation changes no input routing or coordinate mapping. The next
+physical check must compare a hover and harmless selection with 5% margins and
+inspect cursor ownership before choosing another repair. The diagnostic build
+is not a qualified fix or an artist-distribution candidate.
+
 ## Host pressure gate found during review
 
 The reviewed Linux Host is
