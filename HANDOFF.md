@@ -35,9 +35,12 @@ the cursor before the replacement Metal view is appended, so video covers the
 cursor despite valid parent attachment. The Mac overlay now restores its sibling
 order when dispatching updates. The new regression fails before the repair and
 all 43 native checks pass afterward. A visible local Metal fixture confirms the
-replacement cursor is drawn over video. Candidate packaging/installation and
-physical 5% alignment remain pending; this does not resolve the separate margin
-state discrepancy by itself.
+replacement cursor is drawn over video. The clean candidate at root `478690d` /
+client `293b4a08` is installed locally. All 107 Mach-O/signature/path checks and
+packaged setup/startup/restart/Quit checks pass. Diagnostic coordinate logging is
+absent. Pilot is reopened for operator-owned input-grant renewal; physical cursor
+visibility and 5% alignment remain pending. This does not resolve the separate
+margin state discrepancy by itself.
 
 The preceding onboarding pilot was installed from root `fd5e9c3` and client
 `5955945b`. Its bundled setup loaded automatically, and the live list contains
