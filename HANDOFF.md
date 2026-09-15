@@ -2,38 +2,41 @@
 
 Read AGENTS.md and the platform build runbook before work.
 
-## Teraguchi workstation picker preview
+## Teraguchi Coolant workstation picker
 
-Local branch `codex/workstation-picker` starts at root
-`22745871f88fcf50cdf0a6d9f867433f5cbcf5eb` and client
-`22985f9df115702aadc10f1ff79be43f957dd21a`. Its client gitlink is
-`601982d84f8e76cad6128fdf4763fef68379e359`. Host, transport and other recursive
-pins are unchanged. P3 interface preparation has begun; P2 qualification stays
-open. The separate Linux input candidate below has not been promoted.
+Local branch `codex/coolant-workstation-ui` starts at root
+`1201dd8de4db701e75c595a58559b44e7d036b99` and client
+`601982d84f8e76cad6128fdf4763fef68379e359`. Its client gitlink is
+`ca7e87cf7181dba49715554b378d75a3f242aae3`. Host, transport and other recursive pins
+are unchanged. The Linux input candidate remains separate and unpromoted.
 
-The reusable QML workstation list and connection flow are compiled only into
-an offline preview. The normal client resource manifest and `main.qml` are
-unchanged. The preview uses sample assigned workstations, denies network
-requests, has no credentials or saved settings, and starts no stream or input
-capture. It covers one/two displays, unavailable or occupied seats, exact-format
-rejection, cancellation, interrupted connections and explicit reconnect.
-Read [the scope, tests and adapter boundary](docs/development/teraguchi-workstation-ui.md).
+The native QML preview now follows the supplied 1986 Studios Coolant design
+system: ink/paper contrast, Archivo display type, indexed workstations, square
+one/two-screen selectors, cyan selection/focus and monochrome primary actions.
+The source README/CSS override a stale orange reference in the design skill.
+Alan's attribution remains visible. Fonts use the installed development faces
+with explicit fallbacks; packaging fonts/licenses is still required for clean
+Mac consistency. Read [the design and adapter boundary](docs/development/teraguchi-workstation-ui.md).
 
-The standalone arm64 preview build passes on the development Mac with Qt6.10.2.
-41 behavior/UI cases plus QtTest setup/cleanup pass (43 results). Both negative
-controls are rejected; network denial, 15 offscreen renders and 12 CI tests pass.
-Normal and compact ready/error/recovery screens were visually checked. The
-compiler/QML check is not a full Client release build, physical presentation
-acceptance or live authentication test. Hosted CI wiring is added but unrun.
-The source and recovery bundles remain local; nothing has been published or
-installed. No host was accessed or changed and no GUI was left running.
+The standalone arm64 build passes with Qt 6.10.2 on Mac Studio M2 Ultra,
+macOS 26.5.2 (25F84). 43 behavior/UI cases plus QtTest setup/cleanup pass
+(45 results), along with network denial and 15 offscreen renders. Compact
+scrollbar placement, scrolling to details, keyboard display selection and
+selection locking are checked. Ready/error/recovery screens were visually
+inspected. Existing connection flow logic and CI wiring are unchanged.
 
-Next: connect the view to authoritative assignment and existing PLANK
-login/session APIs, preserving certificate/seat/exact-video checks and stale
-callback cancellation. Add refresh failure/freshness behavior before live use.
-Keep permission grants, physical input/display tests and recovery qualification
-for an agreed operator session. Do not infer access or occupancy from public
-host metadata, and do not replace the installed client to bypass P2 gates.
+This is still an offline preview with permanent simulation labeling. It has no
+live discovery, credentials, saved settings, stream or input forwarding. Normal
+client resources and `main.qml` are unchanged. No full release build, hosted CI,
+physical output acceptance or live authentication test is claimed. Source and
+recovery bundles remain local; nothing is published or installed. No host was
+accessed or changed and no GUI was left running. P2 hardware gates remain open.
+
+Next: review the Coolant direction, then connect the view to authoritative
+assignment and existing PLANK login/session APIs, preserving certificate, seat,
+exact-video and stale-callback checks. Add refresh failure/freshness handling
+before live use. Physical input/display and recovery qualification still need
+an agreed operator session. Do not replace the installed client to bypass P2.
 
 ## Teraguchi Linux input preparation
 

@@ -493,6 +493,51 @@ TestCase {
         compare(controller.phase, "checking");
         compare(controller.displayCount, 2);
     }
+    function test_uiCompactCanScrollToDetails() {
+        var view = pickerComponent.createObject(tests, {
+            flow: controller,
+            width: 860,
+            height: 574
+        });
+        activeView = view;
+        waitForRendering(view);
+        var scroll = findChild(view, "connectionScroll");
+        var bar = findChild(view, "connectionScrollBar");
+        verify(scroll.contentHeight > scroll.availableHeight);
+        verify(bar.height > 100);
+        var corner = bar.mapToItem(scroll, 0, 0);
+        compare(corner.x + bar.width, scroll.width);
+        compare(corner.y, scroll.topPadding);
+        // Exercise the scrollbar itself, not a direct contentY assignment.
+        bar.forceActiveFocus();
+        for (var step = 0; step < 12; ++step)
+            keyClick(Qt.Key_Down);
+        waitForRendering(view);
+        var details = findChild(view, "detailsButton");
+        corner = details.mapToItem(scroll, 0, 0);
+        verify(corner.y >= 0 && corner.y + details.height <= scroll.height);
+        mouseClick(details);
+        verify(view.detailsOpen);
+    }
+    function test_uiDisplayChoiceKeyboardAndSessionLock() {
+        var view = pickerComponent.createObject(tests, {
+            flow: controller,
+            width: 1120,
+            height: 690
+        });
+        activeView = view;
+        waitForRendering(view);
+        var dual = findChild(view, "display-2");
+        dual.forceActiveFocus();
+        keyClick(Qt.Key_Space);
+        compare(controller.displayCount, 2);
+        verify(dual.selected);
+        controller.begin(false);
+        verify(!dual.enabled);
+        verify(dual.selected);
+        verify(!findChild(view, "display-1").selected);
+        compare(controller.displayCount, 2);
+    }
     function test_uiUnavailableAndKeyboardActivation() {
         var view = pickerComponent.createObject(tests, {
             flow: controller,

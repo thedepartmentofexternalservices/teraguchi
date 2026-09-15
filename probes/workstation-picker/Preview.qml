@@ -12,7 +12,10 @@ ApplicationWindow {
     minimumWidth: 860
     minimumHeight: 680
     title: "Teraguchi · Interface preview"
-    color: "#171B1D"
+    color: theme.canvas
+    TeraguchiTheme {
+        id: theme
+    }
 
     WorkstationFlow {
         id: previewFlow
@@ -136,14 +139,15 @@ ApplicationWindow {
         Rectangle {
             Layout.fillWidth: true
             implicitHeight: 42
-            color: "#344238"
+            color: "#F5F4F1"
             RowLayout {
                 anchors.fill: parent
                 anchors.leftMargin: 30
                 anchors.rightMargin: 30
                 Label {
                     text: "INTERFACE PREVIEW"
-                    color: "#D4E4D7"
+                    color: "#0A0A0A"
+                    font.family: theme.sans
                     font.pixelSize: 10
                     font.weight: Font.Bold
                     font.letterSpacing: 1
@@ -151,12 +155,13 @@ ApplicationWindow {
                 Rectangle {
                     width: 1
                     height: 14
-                    color: "#65766B"
+                    color: "#8C8A85"
                 }
                 Label {
                     Layout.fillWidth: true
                     text: "Sample workstations. No network connection, video, or input forwarding."
-                    color: "#D4E4D7"
+                    color: "#0A0A0A"
+                    font.family: theme.sans
                     font.pixelSize: 11
                     elide: Text.ElideRight
                 }
@@ -170,7 +175,7 @@ ApplicationWindow {
         Rectangle {
             Layout.fillWidth: true
             implicitHeight: 64
-            color: "#202629"
+            color: "#141414"
             RowLayout {
                 anchors.fill: parent
                 anchors.leftMargin: 30
@@ -178,7 +183,8 @@ ApplicationWindow {
                 spacing: 12
                 Label {
                     text: "SIMULATE"
-                    color: "#B3BCBF"
+                    color: "#C9C7C1"
+                    font.family: theme.sans
                     font.pixelSize: 10
                     font.letterSpacing: 1
                 }
@@ -192,15 +198,16 @@ ApplicationWindow {
                     }
                     Accessible.name: "Preview scenario"
                     background: Rectangle {
-                        radius: 5
-                        color: "#293136"
-                        border.color: scenarios.activeFocus ? "#C0DFC8" : "#404A4F"
+                        radius: 0
+                        color: "#0A0A0A"
+                        border.color: scenarios.activeFocus ? "#0099AF" : "#4A4845"
                     }
                     contentItem: Text {
                         leftPadding: 12
                         rightPadding: 26
                         text: scenarios.displayText
-                        color: "#F0EEE7"
+                        color: "#FFFFFF"
+                        font.family: theme.sans
                         font.pixelSize: 12
                         verticalAlignment: Text.AlignVCenter
                         elide: Text.ElideRight
