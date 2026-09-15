@@ -58,7 +58,16 @@ certificates, redirect canaries, rotation and an unpinned negative control. 25
 setup results, three key-removal results, 28 provider results, 147 QML results,
 42 network-denied screens, the full Mac build and blank-settings smoke pass.
 Real administrator bindings, production key custody and rotation remain open.
-Next: distribution identity/build-manifest and rollback preparation. The host's
+[Offline release verification](docs/development/teraguchi-client-release.md) now
+binds exact collected DMG bytes/source pins to separately signed release metadata,
+identity policy and monotonic authorization history. Fresh signed rollback must
+match the retained previous package and exact current digest. 25 real-Ed25519
+synthetic-package tests pass, including both CLIs, replay/downgrade rejection and
+unchanged history. Receipts explicitly perform no installation or Apple trust
+checks. Product identity, production keys, actual bundle/build-key attestation,
+native installer integration and clean-Mac recovery remain open. Next independent
+slice: support/repair guidance, bounded diagnostic export and P4 evidence planning.
+The host's
 IPv4-only QUIC listener still limits guest qualification. Physical client/guest/
 permission qualification, the installed client, host, builder state and postponed
 soak are unchanged.

@@ -31,6 +31,8 @@ Shared wire contracts live in [protocol](../protocol/). Current work belongs in
   local share discovery, native PAM handoff, test evidence, and remaining UI gates.
 - [Workstation certificate trust](development/teraguchi-host-trust.md): signed
   node/host bindings, pre-credential TLS checks, rotation and local adversarial tests.
+- [Client release verification](development/teraguchi-client-release.md): offline
+  package metadata, exact-byte checks and fresh rollback authorization preparation.
 - [Guest access policy preparation](development/teraguchi-guest-access-policy.md):
   pinned endpoint inventory, offline sharing draft, certificate trust gap and live cases.
 - [P3/P4 implementation order](development/teraguchi-p3-p4.md): current coding

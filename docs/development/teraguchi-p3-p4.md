@@ -93,9 +93,14 @@ code behavior; they do not establish live access or physical video qualification
 
 - [ ] Extend the existing Mac DMG/build manifest path for the chosen product
   identity. Retain exact root/client pins, package hash, signer, and version.
-- [ ] Add fail-closed update verification: modified package, wrong signer,
-  expired/replayed manifest, and downgrade rejection. Keep installation outside
-  an active session; retain a verified previous version for rollback.
+- [x] Add [offline signed release verification](teraguchi-client-release.md):
+  exact collector provenance/package bytes, identity policy, expired/replayed
+  metadata, downgrade rejection and fresh exact rollback authorization.
+  25 synthetic signing/verification tests pass; receipts never install or alter
+  history and explicitly leave Apple signature/notarization checks unperformed.
+- [ ] Integrate verification with actual bundle/build-key attestation and a
+  native installer. Establish authoritative idle state, durable accepted-version
+  history and retained-package recovery; reverify at use before installation.
 - [ ] Prepare actionable support messages and a bounded diagnostic export that
   excludes credentials, artwork, keystrokes, pen coordinates, and identities.
 - [ ] Qualify signing, notarization, clean install, permission persistence,
@@ -135,9 +140,10 @@ Offline P3 work cannot satisfy these gates. Builder provisioning remains paused.
 The [integrated development picker](teraguchi-tailscale-workstations.md) now reaches
 native login and Session execution with permission onboarding and bound one/two
 Mac outputs. Signed studio setup is implemented locally. Next independent coding:
-product distribution identity/build-manifest checks. Workstation-specific HTTPS
-trust and synthetic credential-nondisclosure tests now pass locally. Endpoint inventory and the offline
-guest policy draft are prepared; full-policy and external-guest acceptance remain.
-Physical Mac
-window/input qualification and P2 hardware limits remain explicit; this slice
-does not complete P3 or enter P4.
+support/repair guidance and bounded diagnostic export, followed by P4 evidence
+manifest and transport-counter inventory. Workstation-specific HTTPS trust and
+offline signed package/rollback verification now pass locally. Product identity,
+production keys, actual bundle attestation and installer integration remain open.
+Endpoint inventory and the guest policy draft are prepared; full-policy and
+external-guest acceptance remain. Physical Mac window/input qualification and
+P2 hardware limits remain explicit; this work does not complete P3 or enter P4.
