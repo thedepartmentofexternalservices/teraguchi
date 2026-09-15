@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import socket
 import ssl
 import subprocess
 import tempfile
@@ -22,7 +23,8 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     args = parser.parse_args()
     os.umask(0o077)
-    modes = ('success', 'wrong-pin', 'unknown-host', 'expired-setup', 'development',
+    modes = ('transport-refused', 'transport-timeout', 'cancel-before-handshake',
+             'success', 'wrong-pin', 'unknown-host', 'expired-setup', 'development',
              'wrong-port', 'redirect-auth', 'swap-before-password', 'swap-before-token',
              'rotation-overlap', 'rotation-removed', 'bad-profile', 'tls12',
              'expiry-during-auth', 'cancel-during-auth', 'oversized', 'malformed',
@@ -48,6 +50,48 @@ def main():
             marker = directory / 'boundary'
             marker.unlink(missing_ok=True)
             password, token = secrets.token_urlsafe(24), secrets.token_urlsafe(24)
+            if mode in ('transport-refused', 'transport-timeout', 'cancel-before-handshake'):
+                # Hold the port without a listener, or accept TCP without TLS.
+                # No HTTP request or credential may reach this unavailable worker.
+                with socket.socket() as unavailable:
+                    unavailable.bind(('127.0.0.1', 0))
+                    stop = threading.Event()
+                    received = bytearray()
+                    worker = None
+                    if mode != 'transport-refused':
+                        unavailable.listen(1)
+                        unavailable.settimeout(10)
+                        def hold_handshake():
+                            with unavailable.accept()[0] as peer:
+                                peer.settimeout(0.1)
+                                marker.write_text('ready')
+                                while not stop.is_set():
+                                    try:
+                                        data = peer.recv(4096)
+                                        if not data: break
+                                        received.extend(data)
+                                    except socket.timeout:
+                                        continue
+                                    except (ConnectionResetError, OSError):
+                                        break
+                        worker = threading.Thread(target=hold_handshake)
+                        worker.start()
+                    try:
+                        result = subprocess.run([str(args.client)], text=True, capture_output=True, timeout=10,
+                            input=json.dumps({'mode': mode, 'port': unavailable.getsockname()[1],
+                                              'pins': [pins[1]], 'password': password, 'token': token,
+                                              'boundary_file': str(marker)}))
+                    finally:
+                        stop.set()
+                        if worker: worker.join()
+                    output = result.stdout + result.stderr
+                    (args.output / f'probe-{mode}.txt').write_text(output)
+                    if result.returncode or any(value in output for value in (password, token, 'synthetic-artist')):
+                        raise RuntimeError(f'{mode}: incorrect failure classification or diagnostic leak')
+                    if any(value in received for value in (b'GET ', b'POST ', password.encode(), token.encode())):
+                        raise RuntimeError(f'{mode}: HTTP data sent before TLS verification')
+                    print(f'{mode}=pass credential_requests=0')
+                continue
             requests, canary_requests, faults = [], [], []
             context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
             context.minimum_version = context.maximum_version = (
@@ -161,7 +205,7 @@ def main():
                 target.shutdown(); canary.shutdown()
                 target_thread.join(); canary_thread.join()
                 target.server_close(); canary.server_close()
-    print('host_trust_loopback=pass cases=21 negative_unpinned_control=observed')
+    print(f'host_trust_loopback=pass cases={len(modes)} negative_unpinned_control=observed')
 
 
 if __name__ == '__main__':

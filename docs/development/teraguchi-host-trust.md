@@ -43,6 +43,13 @@ assignment/cancellation checks. Permission, display, seat and strict-video
 checks remain separate. The ordinary PLANK entry keeps its inherited TLS path;
 this qualification applies to the explicit assigned-workstation entry.
 
+A worker restarting for a display change can refuse or time out before sending
+a certificate. With a still-valid setup/assignment and no TLS rejection, those
+failures retain their network-error type so the existing bounded startup wait
+can retry. Certificate/profile failures and expired or cancelled permission
+remain trust denials. This distinction sends no HTTP data before verification
+and does not extend the retry window.
+
 ## Administrator bootstrap and rotation
 
 Prepare bindings through an independently trusted administrator channel: retain
@@ -91,18 +98,30 @@ bash scripts/test/check-workstation-ui.sh "$PRIVATE_UI_OUTPUT"
 ```
 
 The production NvHTTP code runs against synthetic loopback HTTPS servers with
-fresh test certificates and fake credentials. 21 cases pass: success; wrong pin,
+fresh test certificates and fake credentials. 24 cases pass: success; wrong pin,
 node, port and setup; development setup; certificate/setup expiry; TLS 1.2 and
 invalid certificate profile; certificate swaps before password, token use and
 reconnect; authorized overlap and retired-pin denial; cancellation; redirects
-at PAM and bearer-token routes; malformed/oversized replies. Redirect canaries
+at PAM and bearer-token routes; malformed/oversized replies; connection refusal,
+pre-certificate timeout and cancellation during that timeout. The transport
+cases require a network exception, while all trust cases require a rejection.
+The pre-certificate peers receive no HTTP data or credentials. A baseline run
+reproduces the incorrect trust rejection for a refused connection. Redirect canaries
 receive no requests. The deliberately unpinned control receives fake credentials,
 proving the server-side request oracle detects the missing check.
 
-25 native setup results, three retained-build key-removal results, 28 provider
+The initial qualification also recorded 25 native setup results,
+three retained-build key-removal results, 28 provider
 results and 147 QML results pass. The complete arm64/macOS 26 client builds with
 no production studio key. Forty-two network-denied synthetic UI screens render;
 blank-settings startup/invalid-argument/idle-Quit smoke passes. These results do
 not qualify installed credentials, live PAM/FreeIPA, share revocation, physical
-input/video, package signing or artist readiness. No host, share, policy,
-permission or installed application changed.
+input/video, package signing or artist readiness. Those local checks changed no
+host, share, policy, permission or installed application.
+
+The later supervised headless pilot reached a live desktop and recovered through
+the login-to-user-desktop transition. Logs attest a single 3840x2160x60 stream,
+native 10-bit capture, HEVC 4:4:4 and hardware decoding; the operator confirmed
+the desktop works. Machine-specific evidence is retained privately. The new
+network-error classification passed the loopback suite but has not replaced the
+running pilot or been qualified against a fresh live display transition.

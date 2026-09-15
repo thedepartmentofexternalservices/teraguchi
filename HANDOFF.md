@@ -11,12 +11,26 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
+The supervised pilot now reaches a working headless desktop, confirmed by the
+operator. The single-output stream reports 3840x2160x60, native 10-bit capture,
+HEVC 4:4:4 and hardware decoding, with automatic login-to-desktop reconnection.
+Private machine notes hold the configuration, recovery and session evidence.
+Preserve the active session and installed client's working permission identity.
+
+The first display-mode transition exposed a startup retry bug: a worker refusing
+connections before presenting a certificate was reported as a trust rejection.
+The client now preserves network errors for that bounded retry while rejecting
+certificate/setup failures. All 24 loopback cases pass; the baseline reproduces
+the failure. This source fix is saved for the next pilot build, not installed or
+live-qualified. Physical Flame interaction, tablet behavior, dual output, WAN
+and sustained-session qualification remain open.
+
 The pilot connection check exposed a headless-display diagnostic gap. The
 client still rejects a host with no active outputs, but now names that condition
 and retains the sign-in error in the picker instead of replacing it with a
 generic connection failure. 17 native topology results and 159 QML results pass;
-negative controls reproduce the old message loss. This source repair does not
-provision a host display or qualify a live connection. It has not replaced the
+negative controls reproduce the old message loss. These parser/UI tests do not
+provision a host display or qualify a live connection. The repair has not replaced the
 installed pilot; preserve that bundle's newly working permission identity.
 
 Local pilot permission repair adds explicit, individually scoped OS requests.
@@ -32,7 +46,7 @@ real native-provider-to-QML regression reproduces the failure before the fix;
 all 29 native provider/worker results pass afterward. This is discovery repair,
 not live login, video, input, or external-guest qualification.
 
-Current client gitlink: `bec0c076057d4e3842b679e8e62cfecd88562019` on `codex/assignment-refresh`.
+Current client gitlink: `e111a58dc0dc0f35bd6e1a353299c00183d19de6` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).

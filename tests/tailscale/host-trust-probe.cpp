@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     if (mode == "wrong-port") trust->port = port == 65535 ? 65534 : port + 1;
     bool permitted = true;
     QTimer boundary;
-    if (mode == "expiry-during-auth" || mode == "cancel-during-auth") {
+    if (mode == "expiry-during-auth" || mode == "cancel-during-auth" || mode == "cancel-before-handshake") {
         QObject::connect(&boundary, &QTimer::timeout, &app, [&] {
             if (!QFile::exists(values.value("boundary_file").toString())) return;
             if (mode == "expiry-during-auth") setup->profile.expires = QDateTime::currentSecsSinceEpoch();
@@ -43,7 +43,12 @@ int main(int argc, char** argv)
     NvHTTP http(NvAddress("127.0.0.1", static_cast<quint16>(port)));
     if (mode != "negative-unpinned") http.setHostTrust(trust, [&] { return permitted; });
     const bool success = mode == "success" || mode == "rotation-overlap" || mode == "negative-unpinned";
+    const bool unavailable = mode == "transport-refused" || mode == "transport-timeout";
     try {
+        if (unavailable || mode == "cancel-before-handshake") {
+            http.getServerInfo(NvHTTP::NVLL_NONE, true);
+            return 1;
+        }
         const auto token = http.authenticate("synthetic-artist", values.value("password").toString());
         if (token != values.value("token").toString()) return 1;
         http.getAppList();
@@ -56,9 +61,9 @@ int main(int argc, char** argv)
         }
         if (!success) return 1;
     } catch (const GfeHttpResponseException&) {
-        if (success) return 1;
+        if (success || unavailable) return 1;
     } catch (const QtNetworkReplyException&) {
-        if (success) return 1;
+        if (!unavailable) return 1; // Trust rejection must never become a retryable outage.
     }
     std::puts("host_trust_probe=pass");
     return 0;
