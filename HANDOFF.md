@@ -11,7 +11,14 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
-Current client gitlink: `e4527a0ef0de82491c2b9dab2c5062f8c657f689` on `codex/assignment-refresh`.
+The first authorized local pilot exposed a native assignment-list integration
+bug: QVariantList signals arrive in QML as a sequence rather than a JavaScript
+Array. The adapter now normalizes that list before the flow validates it. A
+real native-provider-to-QML regression reproduces the failure before the fix;
+all 29 native provider/worker results pass afterward. This is discovery repair,
+not live login, video, input, or external-guest qualification.
+
+Current client gitlink: `89e3425babfb3c15c259ef4ec0510bd314e547fc` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).

@@ -7,6 +7,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSignalSpy>
+#include <QQmlComponent>
+#include <QQmlContext>
+#include <QQmlEngine>
 #include <QTest>
 
 namespace {
@@ -30,6 +33,23 @@ TailscaleWorkstations::Snapshot parse(const QJsonObject& value)
 class ProviderTests : public QObject {
     Q_OBJECT
 private slots:
+    void nativeCatalogReachesQml() {
+        TailscaleWorkstations provider(QCoreApplication::applicationFilePath(), {"--fixture", "success"}, nullptr);
+        provider.setStudioDnsSuffix("studio-example.ts.net");
+        QQmlEngine engine;
+        engine.rootContext()->setContextProperty("nativeProvider", &provider);
+        QQmlComponent component(&engine, QUrl::fromLocalFile(QFINDTESTDATA("native-assignments.qml")));
+        std::unique_ptr<QObject> root(component.create());
+        QVERIFY2(root, qPrintable(component.errorString()));
+        auto* flow = root->findChild<QObject*>("flow");
+        QVERIFY(flow);
+        QVERIFY(QMetaObject::invokeMethod(flow, "refresh"));
+        QTRY_VERIFY(provider.fresh());
+        QVERIFY(flow->property("catalogFresh").toBool());
+        QCOMPARE(root->property("workstationCount").toInt(), 1);
+        flow->setProperty("selectedId", "node-a");
+        QVERIFY(flow->property("canConnect").toBool());
+    }
     void workerChecksWithoutUiLoop()
     {
         auto snapshot = TailscaleWorkstations::parseStatus(QJsonDocument(status()).toJson(), "studio-example.ts.net");
