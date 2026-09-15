@@ -91,6 +91,19 @@ private slots:
             QCOMPARE(windowed.width(), display.bounds.width()*4/5);
         }
     }
+    void systemUiFollowsPairFocusAndVisibility() {
+        using MacPresentationWindows::needsHiddenSystemUi;
+        const SDL_WindowFlags focused = SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_BORDERLESS;
+        const SDL_WindowFlags unfocused = SDL_WINDOW_BORDERLESS;
+        QVERIFY(needsHiddenSystemUi(true, focused, unfocused));
+        QVERIFY(needsHiddenSystemUi(true, unfocused, focused));
+        QVERIFY(!needsHiddenSystemUi(false, focused, unfocused));
+        QVERIFY(!needsHiddenSystemUi(true, unfocused, unfocused));
+        for (const auto unavailable : {SDL_WINDOW_HIDDEN, SDL_WINDOW_MINIMIZED}) {
+            QVERIFY(!needsHiddenSystemUi(true, focused | unavailable, unfocused));
+            QVERIFY(!needsHiddenSystemUi(true, focused, unfocused | unavailable));
+        }
+    }
 };
 QTEST_GUILESS_MAIN(DisplayTests)
 #include "macos-display-binding.moc"

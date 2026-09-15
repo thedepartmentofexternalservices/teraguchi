@@ -11,6 +11,13 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
+The first dual-output pilot exposed macOS menu-bar/Dock interference at the
+Linux screen edge. A session-scoped presentation repair now hides those controls
+only while the visible fullscreen pair has focus and restores the prior state
+on focus loss, minimize, windowed mode and cleanup. App switching and Force Quit
+remain available. 21 display tests and 142 hidden native checks pass. The updated
+pilot still needs an installed top-edge and focus/cleanup check.
+
 The supervised pilot now reaches a working headless desktop, confirmed by the
 operator. The single-output stream reports 3840x2160x60, native 10-bit capture,
 HEVC 4:4:4 and hardware decoding, with automatic login-to-desktop reconnection.
@@ -46,7 +53,7 @@ real native-provider-to-QML regression reproduces the failure before the fix;
 all 29 native provider/worker results pass afterward. This is discovery repair,
 not live login, video, input, or external-guest qualification.
 
-Current client gitlink: `e111a58dc0dc0f35bd6e1a353299c00183d19de6` on `codex/assignment-refresh`.
+Current client gitlink: `e405dfeb3999ddab89d26347e6e3a3ba89b30ebe` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).

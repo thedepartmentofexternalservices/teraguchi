@@ -11,6 +11,33 @@ int main() {
         [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
         SDL_SetHint(SDL_HINT_MAC_BACKGROUND_APP, "1");
         CHECK(SDL_Init(SDL_INIT_VIDEO));
+        // Exercise real AppKit options in this prohibited/background app; the
+        // foreground application's menu bar and Dock are never changed.
+        const auto originalOptions = NSApp.presentationOptions;
+        const NSApplicationPresentationOptions baselines[] = {NSApplicationPresentationDefault,
+            NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar};
+        for (const auto baseline : baselines) {
+            NSApp.presentationOptions = baseline;
+            {
+                MacPresentationWindows::SystemUiScope chrome;
+                CHECK(chrome.setActive(false));
+                CHECK(NSApp.presentationOptions == baseline);
+                for (int transition = 0; transition < 3; ++transition) {
+                    CHECK(chrome.setActive(true));
+                    CHECK(NSApp.presentationOptions & NSApplicationPresentationHideMenuBar);
+                    CHECK(NSApp.presentationOptions & NSApplicationPresentationHideDock);
+                    CHECK(!(NSApp.presentationOptions & (NSApplicationPresentationAutoHideMenuBar |
+                        NSApplicationPresentationAutoHideDock | NSApplicationPresentationDisableProcessSwitching |
+                        NSApplicationPresentationDisableForceQuit)));
+                    CHECK(chrome.setActive(true));
+                    CHECK(chrome.setActive(false));
+                    CHECK(NSApp.presentationOptions == baseline);
+                }
+                CHECK(chrome.setActive(true));
+            }
+            CHECK(NSApp.presentationOptions == baseline); // early return / disconnect cleanup
+        }
+        NSApp.presentationOptions = originalOptions;
         const auto inventory = MacDisplayBinding::read();
         CHECK(MacDisplayBinding::validInventory(inventory));
         // Read actual identity/modes without emitting or persisting them.

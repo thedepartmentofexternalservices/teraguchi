@@ -10,8 +10,8 @@ The explicit development picker now connects this renderer to native Mac window
 creation. One output binds the launcher screen at Connect; two requires exactly
 two independent, unrotated, horizontally arranged screens with qualified native
 resolutions. The selected count and identities remain fixed through login and
-reconnect. This is an uninstalled development candidate; live dual-display
-acceptance and P2/P4 hardware gates remain open.
+reconnect. The supervised pilot has streamed two 3840x2160 outputs, but full
+dual-display acceptance and P2/P4 hardware gates remain open.
 
 ## Display and window contract
 
@@ -35,6 +35,14 @@ both retain their own canvas crop. The native green button is disabled for this
 pair because it would move only one window into a fullscreen Space. One-output
 sessions retain the existing native fullscreen behavior. No display mode is
 changed by assigned-session startup.
+
+While the fullscreen pair is visible and either window has input focus, the
+session hides the macOS menu bar and Dock completely so Linux receives the
+screen edges. Auto-hide would still reveal macOS controls on hover. The
+[AppKit presentation options](https://developer.apple.com/documentation/appkit/nsapplication/presentationoptions-swift.struct)
+are scoped to the client process; app switching and Force Quit remain available.
+Focus loss, either window minimizing/hiding, windowed mode and session cleanup
+restore the previous options. No global Dock or menu-bar preference changes.
 
 Both windows are placed before either is shown. Either window's close request
 ends the session, including during reconnect. Minimize/restore applies to both;
@@ -124,12 +132,21 @@ bash scripts/test/check-macos-display-binding.sh "$PRIVATE_OUTPUT"
 bash scripts/test/check-macos-display-binding.sh "$PRIVATE_NATIVE_OUTPUT" --native
 ```
 
-The window slice passes 20 QtTest results for selection, replacement, mode,
-rotation, mirror, layout and reordered/ambiguous SDL mapping. The native fixture passes 92 checks for exact frame placement and repeated borderless/windowed transitions,
-including prevention of independent fullscreen Spaces. Its windows remain hidden
+The window slice passes 21 QtTest results for selection, replacement, mode,
+rotation, mirror, layout, reordered/ambiguous SDL mapping and system-UI handling
+for either focused output, focus loss, hidden/minimized outputs and windowed mode.
+The native fixture passes 142 checks for exact frame placement, repeated
+borderless/windowed transitions and prevention of independent fullscreen Spaces.
+It also exercises actual AppKit option changes, repeated entry/exit and scope
+cleanup from both normal and auto-hidden baselines in a background process.
+Its windows remain hidden
 on the available display: it is not a physical two-display or active-session test.
 139 QML results include display loss before credentials, before submission and
 during PAM, plus retained two-output selection through successful preparation.
+
+The first live dual-output pilot exposed the missing menu-bar/Dock suppression.
+That repair passes these local checks; top-edge access and restoring the Mac UI
+still need verification in the updated installed candidate.
 
 ## Next qualification work
 
