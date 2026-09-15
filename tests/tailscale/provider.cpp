@@ -1,5 +1,6 @@
 #include "tailscaleworkstations.h"
 #include "assignmenttarget.h"
+#include "assignmentwatch.h"
 #include <QCoreApplication>
 #include <QFile>
 #include <QJsonArray>
@@ -29,6 +30,52 @@ TailscaleWorkstations::Snapshot parse(const QJsonObject& value)
 class ProviderTests : public QObject {
     Q_OBJECT
 private slots:
+    void workerChecksWithoutUiLoop()
+    {
+        auto snapshot = TailscaleWorkstations::parseStatus(QJsonDocument(status()).toJson(), "studio-example.ts.net");
+        QVariantMap target{{"id", "node-a"}, {"address", "100.100.1.1"}, {"identity", snapshot.identity}};
+        AssignmentWatch watch("studio-example.ts.net", target, 0,
+                              QCoreApplication::applicationFilePath(), {"--fixture", "success"});
+        watch.start();
+        for (int i = 0; i < 100 && !watch.permitsConnection(); ++i) QThread::msleep(20);
+        const bool refreshed = watch.permitsConnection();
+        watch.quit(); QVERIFY(watch.wait(2000));
+        QVERIFY(refreshed);
+    }
+    void workerRemovalWithoutUiLoop()
+    {
+        QVariantMap target{{"id", "removed-node"}, {"address", "100.100.1.1"}, {"identity", "old-account"}};
+        AssignmentWatch watch("studio-example.ts.net", target, 30000,
+                              QCoreApplication::applicationFilePath(), {"--fixture", "success"});
+        std::atomic_bool removed{false};
+        QObject::connect(&watch, &AssignmentWatch::assignmentRemoved, &watch,
+                         [&] { removed.store(true); }, Qt::DirectConnection);
+        watch.start();
+        for (int i = 0; i < 100 && !removed.load(); ++i) QThread::msleep(20);
+        watch.quit(); QVERIFY(watch.wait(2000));
+        QVERIFY(removed.load()); QVERIFY(!watch.permitsConnection());
+    }
+    void streamingAssignmentBinding()
+    {
+        QVariantMap expected{{"id", "node-a"}, {"identity", "account-a"}, {"address", "100.100.1.1"}};
+        QVariantList entries{QVariantMap{{"id", "node-a"}, {"address", "100.100.1.1"}, {"status", "ready"}}};
+        QVERIFY(AssignmentWatch::sameAssignment(expected, "account-a", entries));
+        QVERIFY(!AssignmentWatch::sameAssignment(expected, "account-b", entries));
+        QVERIFY(!AssignmentWatch::sameAssignment(expected, "account-a", {}));
+        entries[0] = QVariantMap{{"id", "node-a"}, {"address", "100.100.1.2"}};
+        QVERIFY(!AssignmentWatch::sameAssignment(expected, "account-a", entries));
+        entries[0] = QVariantMap{{"id", "node-a"}, {"address", "100.100.1.1"}, {"status", "offline"}};
+        QVERIFY(AssignmentWatch::sameAssignment(expected, "account-a", entries)); // Offline is not revocation.
+        QVERIFY(!AssignmentWatch::sameAssignment({}, "account-a", entries));
+    }
+    void streamingAssignmentExpiresWithoutUiTimers()
+    {
+        AssignmentWatch watch("studio-example.ts.net", {}, 20);
+        QVERIFY(watch.permitsConnection());
+        QThread::msleep(30); // No Qt event-loop pumping.
+        QVERIFY(!watch.permitsConnection());
+    }
+
     void loginTargetBinding() {
         QVariantMap expected{{"id", "node-a"}, {"identity", "account-a"}, {"computerId", "bookmark-a"},
                              {"hostId", "host-a"}, {"address", "100.100.1.1"}, {"status", "ready"}};

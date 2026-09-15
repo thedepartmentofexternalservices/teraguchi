@@ -52,6 +52,8 @@ case $role in
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-client-keyboard.sh" "$PLANK_WORK_ROOT/keyboard-input"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-tailscale-workstations.sh" "$PLANK_WORK_ROOT/tailscale-workstations"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-workstation-ui.sh" "$PLANK_WORK_ROOT/workstation-ui"
+    PLANK_CLIENT_EXECUTABLE="$client_build/app/plank-client.app/Contents/MacOS/plank-client" \
+      bash "$PLANK_SOURCE_ROOT/scripts/test/check-workstation-client.sh" "$PLANK_WORK_ROOT/workstation-client"
     ;;
   *) exit 2 ;;
 esac

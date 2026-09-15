@@ -11,3 +11,6 @@ macx {
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 26.0
     QMAKE_CXXFLAGS += -include arm_acle.h
 }
+
+HEADERS += ../../apps/client/app/backend/teraguchi/assignmentwatch.h
+SOURCES += ../../apps/client/app/backend/teraguchi/assignmentwatch.cpp

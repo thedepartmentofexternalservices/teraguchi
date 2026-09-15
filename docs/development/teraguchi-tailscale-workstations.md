@@ -10,7 +10,8 @@ the studio tailnet, create accounts, or call the administrator API.
 The studio's exact Tailscale DNS suffix is a setup input supplied through trusted
 studio configuration. It identifies the studio within the artist's peer list;
 it grants no network access. There is no per-artist assignment database or
-embedded token. Shipping a trusted configuration/bootstrap is still P3 work.
+embedded token. The development launcher accepts this value explicitly; shipping a trusted
+configuration/bootstrap is still P3 work.
 Do not learn this suffix from an arbitrary peer or accept a wildcard.
 
 Tailscale sharing omits studio tags, and `ShareeNode` describes the reverse
@@ -36,6 +37,10 @@ Sources: [sharing](https://tailscale.com/docs/features/sharing),
 - `ComputerModel`: resolves the current Tailscale node to a verified Linux PLANK
   bookmark, performs the existing TLS/PAM login, and creates a strict-video
   Session with takeover disabled. It never retains a view row across login.
+- `AssignedLoginDialog.qml`, `WorkstationSession.qml`, and `WorkstationWindow.qml`:
+  development launcher, credentials, native session execution and deferred cleanup.
+- `AssignmentWatch`: a separate event-loop worker that continues checking local
+  Tailscale state while SDL owns the Mac UI thread.
 
 The picker initially lists permitted studio node candidates. Selecting Connect
 can prepare a normal bookmark at that node's Tailscale address. Existing bookmark
@@ -47,7 +52,11 @@ running another service fails this check. Preparation is bounded to ten seconds.
 Login binds the Tailscale account, stable node ID, current endpoint, bookmark ID,
 and PLANK host UUID. Native authentication checks the selected endpoint and host
 UUID again before sending credentials and before retaining the reply. PAM
-requests have distinct IDs, so a cancelled request cannot complete a later one.
+requests have distinct IDs and own their result/credentials until the selected
+session consumes them. Cancellation discards that result under the same mutex
+used to publish it. An in-flight PAM call may finish, but its result cannot
+populate a bookmark or complete a later login. Closing the credential dialog
+clears its fields; application Quit retires all pending results.
 These checks preserve PLANK's existing TLS policy; a UUID is not a substitute
 for a cryptographic certificate pin or distribution trust.
 
@@ -66,11 +75,56 @@ an established session; an accepted snapshot removing its assignment requests
 disconnect. Actual access enforcement remains Tailscale plus host session policy.
 The parent must execute those cleanup requests, not merely hide the workstation.
 
-`sessionPrepared` is **not** a connected or video-qualified event. The parent
-still owns Session execution, selected physical-display binding, reconnect,
-close/Quit cancellation, and `readyForDeletion`. The new components are included
-in the client resources and the provider is registered with QML, but `main.qml`
-has not switched to this interface. End-to-end onboarding remains unfinished.
+`sessionPrepared` is **not** a connected or video-qualified event. The native
+Session checks admission, performs the existing transport negotiation, and
+initializes the real renderer before emitting `presentationReady`. This event
+means runtime initialization succeeded, not that a frame was physically presented
+or that the Mac has passed hardware qualification. The picker does not fabricate
+video/seat attestations from a bookmark or from a successful PAM response.
+
+Each assigned Session owns its authenticated computer snapshot. Polling cannot
+redirect its address or replace its host identity. Reconnect uses the same
+snapshot, requires a fresh background assignment check, and rechecks the saved
+PLANK host UUID before sending credentials. Existing certificate policy remains
+in force; UUID matching does not replace certificate trust.
+
+The worker reads every ten seconds with the same bounded native provider.
+Confirmed account change, sign-out, node removal or address replacement requests
+disconnect through a sticky per-session flag. Failed reads and offline status
+prevent new/reconnect attempts without treating them as confirmed removal.
+Tailscale still enforces network revocation. The UI cache may expire during a
+long native display transition; the native worker then owns the freshness gate.
+Its worker/process are stopped before Session execution returns.
+
+Cancel and close request native cleanup. The UI retains the Session until both
+`exec()` has returned and `readyForDeletion` has arrived, and blocks a second
+connection during cleanup. Native streaming/reconnect continues through PLANK's
+existing SDL controls. Qt close/Quit and terminal termination exit through the
+normal cleanup path. Real active-session cancellation still needs live testing.
+
+## Development entry and display limit
+
+The ordinary client entry stays available. A strict Mac development build can
+open the integrated picker with a trusted launcher:
+
+```sh
+"$PLANK_CLIENT_EXECUTABLE" --workstations --studio-dns-suffix "$STUDIO_TAILSCALE_DNS_SUFFIX"
+```
+
+Omitting the suffix opens the setup-needed state without running Tailscale.
+Wildcards, malformed suffixes, and combining this entry with a stream command
+are rejected. The picker uses a separate `Teraguchi Development` settings
+namespace and disables mDNS. It does not edit the installed PLANK bookmark
+profile. This explicit launcher input is not a signed configuration distributor.
+
+One display binds to the physical screen containing the launcher window at
+session start; only that output participates in host layout resolution. Losing
+or moving off the selected output closes the assigned session. Existing bookmark
+layout choices are not overwritten. **Two-display Mac sessions are rejected
+before credentials** and again at the native boundary. The inherited two-output
+presentation implementation is Wayland-only. Adding and qualifying native Mac
+two-output presentation is still required for the dual-display P3/P4 target.
+No one-output fallback satisfies a two-output request.
 
 ## Validation
 
@@ -79,6 +133,8 @@ Run with the retained Qt 6.10.2 toolchain:
 ```sh
 bash scripts/test/check-tailscale-workstations.sh "$PRIVATE_TAILSCALE_OUTPUT"
 bash scripts/test/check-workstation-ui.sh "$PRIVATE_UI_OUTPUT"
+PLANK_CLIENT_EXECUTABLE="$BUILT_CLIENT_EXECUTABLE" \
+  bash scripts/test/check-workstation-client.sh "$PRIVATE_CLIENT_SMOKE_OUTPUT"
 ```
 
 Native tests exercise the production parser/process reader and login-handle
@@ -96,25 +152,29 @@ actual session cleanup, and clean-Mac onboarding require the scoped live tests.
 
 ## Next integration gate
 
-Connect these components to the production credential dialog and Session
-presentation while preserving selected physical displays and lifecycle cleanup.
-Provide trusted studio configuration through setup. Then use a real external
-shared-user Mac to prove one-machine visibility, login, removal, and seat denial.
+Implement native Mac two-output presentation and explicit permission onboarding;
+provide trusted studio setup and stable product identity for distribution. Then
+use a real external shared-user Mac to prove one-machine visibility, credentials,
+certificate handling, removal, active-session cleanup, reconnect and seat denial.
 Do not broaden tailnet membership or add a separate assignment service to make
-these tests easier. Keep strict capture and the existing working installation.
+these tests easier. Preserve strict capture and the working installation.
 
 ### Local checkpoint
 
 The development client builds for arm64/macOS 26 with Qt 6.10.2 and the retained
-pinned dependencies. It reports `1.0.103-assignment-refresh` in an offscreen
-version launch. The native provider suite passes 23 results; the combined QML
-suite passes 111, including setup/cleanup. Strict video admission and frame
-metadata regressions pass. The preview blocks network requests and renders 32
-simulated screens. Offscreen captures verify layout only; native control pixel
-qualification remains the prior evidence.
+pinned dependencies. Native tests pass 27 results, including background refresh
+and removal while the UI event loop is not pumped. The QML suite passes 124
+results, including credential clearing, cancellation, cleanup ordering and
+selected-display rejection. Strict video admission/frame metadata and all eight
+native Quit scenarios pass, including their negative controls.
 
-The compiled provider also parsed the installed local Tailscale CLI successfully.
-That check sent no host probe or login request and exposed counts only. Raw
-logs and exact source/binary receipts are retained in the private audit store.
+The actual uninstalled client smoke test uses blank portable settings, an absent
+studio suffix and an offscreen window. It rejects invalid setup arguments and
+checks QML startup plus idle terminal Quit. It grants no OS permissions and
+contacts no workstation. Native controls and physical presentation are not
+qualified by these headless tests. The Mac CI entry includes the new smoke test;
+hosted CI has not run for this slice.
+
 No app installation, permission grant, Tailscale share/policy edit, or host change
-occurred. Hosted CI and external guest/live PAM tests have not run for this slice.
+occurred. Exact source/binary receipts, test logs and recovery bundles belong in
+the private audit store. Live guest/PAM/session gates remain open.

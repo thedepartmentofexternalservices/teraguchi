@@ -27,22 +27,29 @@ requires the P2 hardware gates and P3 access/distribution controls.
   host identity without retaining an index. Offline tests cover changed handles,
   sign-out, old replies, and cancellation. Live certificate/host-change behavior
   remains part of the integration gate.
-- [ ] Wire the picker to existing trusted authentication and `Session` lifecycle.
-  Preserve certificate checks, strict video admission, input cleanup, and
-  `readyForDeletion`. `StreamSegue.qml` currently owns the lifecycle and an
-  active-session takeover dialog; the artist picker must not inherit takeover.
-  Occupancy is an explicit failure, never permission to evict another artist.
-- [ ] Handle close/Quit during login, checks, startup, streaming, and reconnect.
-  Prove resource cleanup independently of the view rejecting stale callbacks.
+- [x] Wire the development picker to existing TLS/PAM and native `Session`
+  execution. Use request-scoped authentication, a session-owned target snapshot,
+  background assignment checking and takeover denial. Preserve strict video
+  admission and wait for `readyForDeletion` plus return from `exec()`.
+- [x] Add cancellation/cleanup handling for login, startup, disconnect and Quit;
+  exercise model lifetime ordering, idle application Quit and the native SDL Quit
+  bridge locally. Real active-session cleanup remains a live gate.
+- [ ] Implement and qualify native Mac two-output presentation. The current
+  integrated entry binds one physical output and explicitly rejects two before
+  credentials. It does not silently select one or span two onto one surface.
+- [ ] Qualify the exact integrated candidate with external guest sharing, live
+  PAM, startup cancellation, display loss, reconnect, revocation and seat denial.
 
-The completed items are presentation code, not authenticated assignment or
-session integration. The current production `main.qml` still uses the existing
-interface. No session attestations may be fabricated to connect the new UI.
+The explicit `--workstations` development entry is integrated and uses separate
+settings. Ordinary launch retains the existing interface. Local tests establish
+code behavior; they do not establish live access or physical video qualification.
 
 ### 2. Build resumable onboarding
 
-- [ ] Add prerequisite states for Tailscale availability, sign-in/share
-  acceptance, assigned workstation visibility, and Mac permissions.
+- [x] Add prerequisite states for Tailscale availability, sign-in/share
+  acceptance and assigned workstation visibility. Trusted setup currently comes
+  from an explicit development launcher argument.
+- [ ] Add Mac permission onboarding and trusted distributable studio setup.
 - [ ] Reuse the candidate's non-prompting permission checks. Open the normal
   system settings flow only after user action; support cancel, return, retry,
   missing tablet/display, and permission loss with clear next actions.
@@ -105,8 +112,8 @@ Offline P3 work cannot satisfy these gates. Builder provisioning remains paused.
 
 ## Next coding slice
 
-The [Tailscale provider and native login handoff](teraguchi-tailscale-workstations.md)
-are implemented as development components. Next, connect the production credential
-dialog and Session presentation, including selected-display and lifecycle handling. Keep network discovery fixtures separate from trusted
-assignment fixtures. Do not enable the new production UI until the bridge's
-negative cases and lifetime/cancellation tests pass.
+The [integrated development picker](teraguchi-tailscale-workstations.md) now reaches
+native login and Session execution. Next: native Mac two-output presentation,
+permission onboarding, and trusted configuration/product identity. Then prepare
+external guest and exact-candidate live acceptance. Keep P2 hardware limits and
+the deferred operator work explicit; this slice does not complete P3 or enter P4.

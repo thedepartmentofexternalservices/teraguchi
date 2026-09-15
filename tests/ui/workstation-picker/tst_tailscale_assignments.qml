@@ -39,6 +39,10 @@ TestCase {
             property int sessions: 0
             property QtObject session: QtObject {}
             signal assignedAuthenticationCompleted(string requestId, string computerId, var error)
+            property int cancellations: 0
+            function cancelAssignedAuthentication(id) { cancellations++; }
+            property string displayError: ""
+            function assignedDisplayError(displays) { return displayError; }
             function prepareAssignedTarget(provider, nodeId) { return canPrepare; }
             function assignedLoginTarget(provider, nodeId) {
                 if (!hostVerified) return ({});
@@ -52,6 +56,7 @@ TestCase {
             function createAssignedSession(provider, target) { sessions++; return session; }
         }
     }
+    Component { id: dialogType; AssignedLoginDialog {} }
     Component { id: loginType; TailscaleLogin {} }
     SignalSpy { id: credentialsSpy; target: tests.login; signalName: "credentialsRequested" }
     SignalSpy { id: sessionSpy; target: tests.login; signalName: "sessionPrepared" }
@@ -67,6 +72,30 @@ TestCase {
         flow.refresh();
         provider.catalogReady(provider.requestToken, provider.entries, 30000);
         flow.selectWorkstation("node-a");
+    }
+    function test_credentialDialogClearsPasswordAndCancelsNativeRequest() {
+        var dialog = createTemporaryObject(dialogType, tests, {flow: flow, login: login});
+        flow.begin(false);
+        tryCompare(dialog, "visible", true);
+        var username = findChild(dialog, "assignedUsername");
+        var password = findChild(dialog, "assignedPassword");
+        username.text = "example-artist"; password.text = "synthetic-test-value";
+        dialog.submit();
+        compare(password.text, "");
+        compare(computers.requests, 1);
+        dialog.reject();
+        compare(computers.cancellations, 1);
+        compare(login.requestId, "");
+        compare(username.text, "");
+    }
+    function test_twoDisplaysAreExplicitlyRejectedBeforeLogin() {
+        computers.displayError = "Two displays unavailable";
+        flow.chooseDisplays(2);
+        flow.begin(false);
+        compare(credentialsSpy.count, 0);
+        compare(computers.requests, 0);
+        compare(flow.displayCount, 2);
+        compare(flow.problemTitle, "Selected displays unavailable");
     }
     function test_dispatchesCurrentTargetWithoutAttestations() {
         flow.begin(false);

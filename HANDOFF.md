@@ -11,14 +11,16 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
-Current client gitlink: `a354a8c3db1ad7a9f59cbd2298f7e0524f3f054e` on `codex/assignment-refresh`.
+Current client gitlink: `e937b435e46d29793286dc649ab71e6f8d6e9ac1` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).
 The `codex/assignment-refresh` development slice adds bounded assignment-cache
 freshness and asynchronous refresh handling to the offline picker. The native local Tailscale provider and scoped PAM/Session handoff now compile;
 see [the integration boundary](docs/development/teraguchi-tailscale-workstations.md).
-Production credential-dialog, display binding, and Session lifecycle wiring remain pending. The installed client,
+The explicit development picker now wires credentials, one-output binding and
+native Session cleanup. Two-output Mac presentation, permission onboarding and
+live guest/session qualification remain pending. The installed client,
 host, builder state, and postponed soak are unchanged.
 
 ## Teraguchi macOS workstation interface
