@@ -64,6 +64,22 @@ int main()
     CHECK(rgba[6 * row + 6] == 255 && rgba[6 * row + 7] == 255);
     CHECK(rgba[3] == 0); // Preserve transparency, not a cursor-shaped rectangle.
     CFRelease(data);
+    // Metal renderer reset destroys its old view, then creates the replacement
+    // after the cursor-parent refresh. Same parent identity does not imply the
+    // cursor is still above video. Keep its image/position across the reorder.
+    SDL_Metal_DestroyView(videoView);
+    videoView = SDL_Metal_CreateView(first);
+    CHECK(videoView != nullptr);
+    CHECK(parent.subviews.lastObject != overlay);
+    CHECK(cursor->isAttachedTo(first));
+    cursor->dispatchPending();
+    CHECK(parent.subviews.lastObject == overlay);
+    CHECK(!overlay.hidden && shape.contents == (__bridge id)pixels);
+    CHECK(shape.position.x == 666 && shape.position.y == 65);
+    CHECK(NSApp.keyWindow == keyWindow && !parent.window.visible);
+    cursor->dispatchPending(); // No repeated reorder or duplicate child.
+    CHECK(parent.subviews.count == originalChildren + 1);
+
     // The input sample was (0.8, 0.2), but the host reports (3200, 360)
     // after a 5%-per-edge driver crop. Place the pointer at the host hit target.
     QPointF point;

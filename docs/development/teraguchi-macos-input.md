@@ -121,6 +121,24 @@ resumable session; reconnect-induced recreation or stale Flame device state is
 a hypothesis, not an established cause. The diagnostic build is not a qualified
 fix or an artist-distribution candidate.
 
+### Cursor covered after Metal renderer reset
+
+The live log showed cursor-parent refresh before the replacement Metal renderer
+was created. SDL appends the new opaque Metal view above existing siblings;
+`isAttachedTo()` still returned true because the content view did not change.
+Thus cursor ownership correctly hid the Mac pointer while video covered the
+replacement cursor. Earlier tests created Metal before the cursor and missed
+this reset order.
+
+`MacTabletCursor::dispatchPending()` now restores the cursor as the top sibling
+only when another view was appended above it. It preserves image, hotspot,
+position and visibility, without ordering or focusing the OS window. A regression
+recreates Metal after the cursor, fails on the preceding source, and passes with
+the fix. All 43 hidden checks pass. A separate visible local fixture renders a
+red cursor square over continuously presented Metal video after this ordering;
+visual inspection confirmed the square appears. This is local rendering evidence,
+not physical Wacom, Flame margin, or WAN acceptance.
+
 ## Host pressure gate found during review
 
 The reviewed Linux Host is

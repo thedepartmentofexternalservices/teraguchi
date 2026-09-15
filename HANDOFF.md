@@ -30,6 +30,15 @@ Flame still showed 5% margins while a host read showed the full tablet area;
 this mismatch does not mean the operator changed preferences to zero. See [the input checkpoint](docs/development/teraguchi-macos-input.md#mac-pen-cursor-and-flame-margins).
 No host settings were changed by the agent.
 
+The disappearing cursor now has a reproduced local cause: renderer reset refreshes
+the cursor before the replacement Metal view is appended, so video covers the
+cursor despite valid parent attachment. The Mac overlay now restores its sibling
+order when dispatching updates. The new regression fails before the repair and
+all 43 native checks pass afterward. A visible local Metal fixture confirms the
+replacement cursor is drawn over video. Candidate packaging/installation and
+physical 5% alignment remain pending; this does not resolve the separate margin
+state discrepancy by itself.
+
 The preceding onboarding pilot was installed from root `fd5e9c3` and client
 `5955945b`. Its bundled setup loaded automatically, and the live list contains
 only the configured workstation. Settings and the separate Mac input dialog
