@@ -20,8 +20,17 @@ mkdir -p "$output/build"
     "$qtbin/qmake" "$source_root/probes/workstation-picker/preview.pro"
     make -j4
 ) > "$output/build.log" 2>&1
-"$qtbin/qmltestrunner" -input "$source_root/tests/ui/workstation-picker" \
-    -o "$output/qml-tests.txt,txt" > "$output/qml-runner.log" 2>&1
+python3 - "$qtbin/qmltestrunner" "$source_root/tests/ui/workstation-picker" "$output" <<'PYTEST'
+from pathlib import Path
+import subprocess
+import sys
+
+runner, tests, output = sys.argv[1:]
+out = Path(output)
+with (out / 'qml-runner.log').open('w') as log:
+    subprocess.run([runner, '-input', tests, '-o', str(out / 'qml-tests.txt') + ',txt'],
+                   stdout=log, stderr=subprocess.STDOUT, timeout=60, check=True)
+PYTEST
 "$output/build/teraguchi-ui-preview" --verify-network-block > "$output/network-block.log" 2>&1
 python3 - "$output" <<'PY'
 import hashlib
@@ -38,9 +47,10 @@ if any('QWARN' in line and 'qt.qpa.fonts:' not in line for line in log.splitline
     raise SystemExit('Unexpected Qt/QML warning; inspect private test log.')
 scenarios = ('ready', 'offline', 'occupied', 'incompatible', 'empty', 'connected',
              'interrupted', 'display-mismatch', 'source-depth', 'permissions',
-             'seat-race', 'connection-failure')
+             'seat-race', 'connection-failure', 'power-off', 'power-standby',
+             'power-unknown', 'power-starting', 'power-unavailable', 'power-no-access', 'power-stale')
 captures = []
-for compact, states in ((False, scenarios), (True, ('ready', 'display-mismatch', 'interrupted'))):
+for compact, states in ((False, scenarios), (True, ('ready', 'display-mismatch', 'interrupted', 'power-off', 'power-unknown', 'power-starting'))):
     for state in states:
         name = state + ('-compact' if compact else '')
         image = out / (name + '.png')
@@ -55,5 +65,5 @@ summary = {'kind': 'offline-ui-preview', 'network_block': 'passed',
            'captures': captures, 'hardware_qualified': False, 'installed': False}
 (out / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
 print(summary['qt_tests'])
-print('Network requests blocked; 15 simulated screens rendered. No workstation connected.')
+print(f"Network requests blocked; {len(captures)} simulated screens rendered. No workstation connected.")
 PY

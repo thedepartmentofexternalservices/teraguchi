@@ -1,6 +1,7 @@
 <RCC>
   <qresource prefix="/preview">
     <file alias="Preview.qml">Preview.qml</file>
+    <file alias="PreviewPower.qml">PreviewPower.qml</file>
   </qresource>
   <qresource prefix="/teraguchi">
     <file alias="WorkstationFlow.qml">../../apps/client/app/gui/teraguchi/WorkstationFlow.qml</file>

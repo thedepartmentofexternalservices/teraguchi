@@ -2,41 +2,43 @@
 
 Read AGENTS.md and the platform build runbook before work.
 
-## Teraguchi Coolant workstation picker
+## Teraguchi optional studio power preview
 
-Local branch `codex/coolant-workstation-ui` starts at root
-`1201dd8de4db701e75c595a58559b44e7d036b99` and client
-`601982d84f8e76cad6128fdf4763fef68379e359`. Its client gitlink is
-`ca7e87cf7181dba49715554b378d75a3f242aae3`. Host, transport and other recursive pins
-are unchanged. The Linux input candidate remains separate and unpromoted.
+Local branch `codex/optional-workstation-power` starts at root
+`4ca62c81ef66d54af7e76eef46a0114ce7ef3db8` and client
+`ca7e87cf7181dba49715554b378d75a3f242aae3`. The client gitlink is
+`48568fa23314eb74daa40cee3695cbc81514bdb8`, containing the smaller wordmark and optional power
+presentation. Host, transport and other
+recursive pins are unchanged. The Linux input candidate is still unpromoted.
 
-The native QML preview now follows the supplied 1986 Studios Coolant design
-system: ink/paper contrast, Archivo display type, indexed workstations, square
-one/two-screen selectors, cyan selection/focus and monochrome primary actions.
-The source README/CSS override a stale orange reference in the design skill.
-Alan's attribution remains visible. Fonts use the installed development faces
-with explicit fallbacks; packaging fonts/licenses is still required for clean
-Mac consistency. Read [the design and adapter boundary](docs/development/teraguchi-workstation-ui.md).
+The header wordmark is reduced to 22 px (20 px compact). An administrator-enabled
+studio adapter can expose power status and Power on; the default is absent.
+The offline harness simulates seven assigned workstations and off, verified
+standby, unknown, starting, unavailable, denied and stale states. Outlet power
+is separate from machine/connection status. Unknown or stale evidence cannot
+permit a cycle. Read [the provider and private-service plan](docs/development/teraguchi-studio-power.md).
 
-The standalone arm64 build passes with Qt 6.10.2 on Mac Studio M2 Ultra,
-macOS 26.5.2 (25F84). 43 behavior/UI cases plus QtTest setup/cleanup pass
-(45 results), along with network denial and 15 offscreen renders. Compact
-scrollbar placement, scrolling to details, keyboard display selection and
-selection locking are checked. Ready/error/recovery screens were visually
-inspected. Existing connection flow logic and CI wiring are unchanged.
+The local bot source already supplies outlet status and on/cycle operations.
+Live integration still requires an always-on authenticated studio service,
+assignment checks, durable jobs, cross-caller locking, safe off-state evidence
+and a qualified controller trust/configuration path. The client must not send
+Slack commands or hold power-strip credentials. The inherited Relay wake path
+is unchanged. Public code contains only generic presentation and mock scenarios.
 
-This is still an offline preview with permanent simulation labeling. It has no
-live discovery, credentials, saved settings, stream or input forwarding. Normal
-client resources and `main.qml` are unchanged. No full release build, hosted CI,
-physical output acceptance or live authentication test is claimed. Source and
-recovery bundles remain local; nothing is published or installed. No host was
-accessed or changed and no GUI was left running. P2 hardware gates remain open.
+The arm64 preview build passes with Qt 6.10.2 on Mac Studio M2 Ultra,
+macOS 26.5.2 (25F84). 68 QtTest results pass, with network denial and 25 offscreen
+renders. Normal and compact screens were visually inspected. This is not a
+live service, full release build, physical test or power-control qualification.
+No installed app, workstation or power strip was accessed or changed. No Slack
+message was sent, no service deployed, and nothing published. Private evidence
+and recovery bundles record exact source commits. P2 gates remain open.
 
-Next: review the Coolant direction, then connect the view to authoritative
-assignment and existing PLANK login/session APIs, preserving certificate, seat,
-exact-video and stale-callback checks. Add refresh failure/freshness handling
-before live use. Physical input/display and recovery qualification still need
-an agreed operator session. Do not replace the installed client to bypass P2.
+Next: build and test the private power-service core against a fake controller,
+then add read-only authenticated status before enabling starts. Pilot any live
+power change only on the previously authorized test workstation, with agreed
+operator attendance and verified recovery. Do not infer permission to power the
+whole fleet from inventory or UI fixtures. Preserve the strict session-adapter,
+native capture, physical input/display and recovery qualification requirements.
 
 ## Teraguchi Linux input preparation
 

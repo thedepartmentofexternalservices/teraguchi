@@ -60,7 +60,8 @@ int main(int argc, char** argv) {
         return app.exec();
     }
     const QStringList scenarios {"ready", "offline", "occupied", "incompatible", "empty", "connected",
-                                 "interrupted", "display-mismatch", "source-depth", "permissions", "seat-race", "connection-failure"};
+                                 "interrupted", "display-mismatch", "source-depth", "permissions", "seat-race", "connection-failure",
+                                 "power-off", "power-standby", "power-unknown", "power-starting", "power-unavailable", "power-no-access", "power-stale"};
     if (!scenarios.contains(parser.value("scenario"))) return 2;
     OfflineFactory network;
     QQmlApplicationEngine engine;

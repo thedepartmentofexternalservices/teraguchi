@@ -15,6 +15,8 @@
   the uninstalled pressure/keypad dependency candidate and draft modifier checks.
   [Workstation picker preview](development/teraguchi-workstation-ui.md) covers
   the first P3 Qt interface, offline interaction tests and live-adapter boundary.
+  [Optional studio power](development/teraguchi-studio-power.md) covers managed
+  power-on controls, status uncertainty and the private service implementation order.
 - [Security](security/): threat models and security-focused contracts.
   [Private information policy](security/private-information.md) defines the
   boundary between public development material and private operational notes.

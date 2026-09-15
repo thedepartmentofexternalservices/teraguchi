@@ -20,13 +20,19 @@ ApplicationWindow {
     WorkstationFlow {
         id: previewFlow
     }
+    PreviewPower {
+        id: previewPower
+        flow: previewFlow
+        enabled: preview.scenario.indexOf("power-") === 0
+        scenario: preview.scenario
+    }
     property int pendingCheck: 0
     property int pendingConnection: 0
     property int requestedDisplays: 1
     property string scenario: initialScenario
 
     function sampleHosts() {
-        return [
+        var hosts = [
             {
                 id: "studio-a",
                 name: "Studio A",
@@ -52,8 +58,37 @@ ApplicationWindow {
                 status: "incompatible"
             }
         ];
+        if (previewPower.enabled) {
+            hosts[0].status = "offline";
+            hosts.push({
+                id: "studio-e",
+                name: "Studio E",
+                assigned: true,
+                status: "offline"
+            });
+            hosts.push({
+                id: "studio-f",
+                name: "Studio F",
+                assigned: true,
+                status: "ready"
+            });
+            hosts.push({
+                id: "studio-g",
+                name: "Studio G",
+                assigned: true,
+                status: "offline"
+            });
+        }
+        if (previewPower.readyId) {
+            hosts.forEach(function (host) {
+                if (host.id === previewPower.readyId)
+                    host.status = "ready";
+            });
+        }
+        return hosts;
     }
     function reset() {
+        previewPower.reset();
         checkTimer.stop();
         connectTimer.stop();
         if (previewFlow.busy)
@@ -171,6 +206,7 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             flow: previewFlow
+            studioPower: previewPower
         }
         Rectangle {
             Layout.fillWidth: true
@@ -191,10 +227,12 @@ ApplicationWindow {
                 ComboBox {
                     id: scenarios
                     Layout.preferredWidth: 230
-                    model: ["Normal connection", "Workstation becomes occupied", "Missing Mac permissions", "Missing selected display", "8-bit capture source", "Connection fails"]
+                    model: ["Normal connection", "Workstation becomes occupied", "Missing Mac permissions", "Missing selected display", "8-bit capture source", "Connection fails", "Power: outlet off", "Power: verified standby", "Power: unknown", "Power: starting", "Power: unavailable", "Power: no permission", "Power: stale status"]
+                    property var presetKeys: ["ready", "seat-race", "permissions", "display-mismatch", "source-depth", "connection-failure", "power-off", "power-standby", "power-unknown", "power-starting", "power-unavailable", "power-no-access", "power-stale"]
+                    currentIndex: Math.max(0, presetKeys.indexOf(preview.scenario))
                     onActivated: {
+                        scenario = presetKeys[currentIndex];
                         reset();
-                        scenario = ["ready", "seat-race", "permissions", "display-mismatch", "source-depth", "connection-failure"][currentIndex];
                     }
                     Accessible.name: "Preview scenario"
                     background: Rectangle {

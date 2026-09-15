@@ -26,12 +26,14 @@ synchronous callbacks from its cancellation handler. Occupancy or assignment cha
 during a check stop it. A dropped connection requires explicit reconnect with
 the same display selection. Failed reconnect keeps a return/disconnect action.
 Disconnect is explained separately from logging out inside Rocky. No takeover,
-logout, restart or power action exists in the presentation API.
+logout, restart or power action exists in the connection-flow API. A separate,
+optional studio provider supplies the proposed power-on interface described in
+[studio power integration](teraguchi-studio-power.md).
 
 ## Design and interaction
 
 The current design adapts the **1986 Studios Coolant** system to native Qt/QML:
-ink/paper contrast, square controls, a larger Archivo Black wordmark, indexed
+ink/paper contrast, square controls, a compact Archivo Black wordmark, indexed
 workstations, and outlined one/two-display cards. Cyan marks selection and
 keyboard focus. Lime and azure support status labels; words carry the meaning
 independently of color. Primary buttons invert black/white on hover. No imagery,
@@ -117,10 +119,11 @@ assignment removal, selected display preservation, explicit reconnect,
 disconnect semantics, mouse clicks, keyboard activation and compact action
 visibility. Screens are rendered at 1120×790 and 860×680. Qt's first font lookup
 emits a platform notice; no QML type or binding warning is accepted by the runner.
-The Coolant revision passes 43 behavior/UI cases, plus QtTest setup and cleanup
-(45 results). Added cases exercise scrolling to compact-window details and
-keyboard activation of the display cards while preserving the locked selection.
-Network denial and 15 rendered screens also pass. Normal and compact ready,
+The current revision passes 68 QtTest results including both suites' setup and
+cleanup. Added cases cover optional power eligibility, uncertainty, freshness,
+duplicate clicks, assignment changes and simulated boot completion. Compact
+scrolling, display keyboard activation and locked selection remain covered.
+Network denial and 25 rendered screens also pass. Normal and compact ready,
 error and recovery screens were visually inspected. The preceding candidate's
 stale-request/display-count negative controls and 12 CI policy/context tests
 remain applicable; flow logic and CI wiring did not change in this visual
