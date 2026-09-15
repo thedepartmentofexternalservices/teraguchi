@@ -146,7 +146,7 @@ class GuestPolicyTests(unittest.TestCase):
         inventory = guard.read_json(ROOT / guard.INVENTORY)
         guard.validate_inventory(inventory)
         self.assertEqual(PORT, inventory["base_port"])
-        self.assertEqual(22, sum(len(entry["sha256"]) for entry in inventory["sources"]))
+        self.assertEqual(24, sum(len(entry["sha256"]) for entry in inventory["sources"]))
 
     def test_inventory_cannot_omit_or_redirect_sources(self):
         inventory = guard.read_json(ROOT / guard.INVENTORY)

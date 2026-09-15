@@ -33,6 +33,8 @@ Shared wire contracts live in [protocol](../protocol/). Current work belongs in
   node/host bindings, pre-credential TLS checks, rotation and local adversarial tests.
 - [Client release verification](development/teraguchi-client-release.md): offline
   package metadata, exact-byte checks and fresh rollback authorization preparation.
+- [Help and support reports](development/teraguchi-support.md): tablet/display
+  repair guidance and a bounded, private launcher-status export.
 - [Guest access policy preparation](development/teraguchi-guest-access-policy.md):
   pinned endpoint inventory, offline sharing draft, certificate trust gap and live cases.
 - [P3/P4 implementation order](development/teraguchi-p3-p4.md): current coding

@@ -14,6 +14,7 @@
 #include <QQuickWindow>
 #include <QStyleHints>
 #include <QTimer>
+#include "../../apps/client/app/backend/teraguchi/supportdiagnostics.h"
 
 class BlockedReply final : public QNetworkReply {
 public:
@@ -66,7 +67,8 @@ int main(int argc, char** argv) {
     }
     const QStringList scenarios {"studio-needed", "studio-ready", "studio-expired", "permission-panel-needed", "permission-setup-needed", "permission-setup-allowed", "assignment-stale", "assignment-refreshing", "assignment-failure", "ready", "offline", "occupied", "incompatible", "empty", "connected",
                                  "interrupted", "display-mismatch", "source-depth", "permissions", "seat-race", "connection-failure",
-                                 "power-off", "power-standby", "power-unknown", "power-starting", "power-unavailable", "power-no-access", "power-stale"};
+                                 "power-off", "power-standby", "power-unknown", "power-starting", "power-unavailable", "power-no-access", "power-stale",
+                                 "support-displays", "support-tablet", "support-access", "support-report"};
     if (!scenarios.contains(parser.value("scenario"))) return 2;
     OfflineFactory network;
     QQmlApplicationEngine engine;
@@ -74,6 +76,11 @@ int main(int argc, char** argv) {
     bool qmlWarnings = false;
     QObject::connect(&engine, &QQmlEngine::warnings, &app, [&](const QList<QQmlError>&) { qmlWarnings = true; });
     engine.rootContext()->setContextProperty("initialScenario", parser.value("scenario"));
+    engine.rootContext()->setContextProperty("supportSampleReport", QString::fromUtf8(SupportDiagnostics::serialize(
+        {{"studio_setup", "ready"}, {"tailscale", "ready"}, {"phase", "blocked"}, {"issue", "displays"},
+         {"selected_displays", 2}, {"catalog_fresh", true}, {"catalog_refreshing", false}, {"runtime_pending", false},
+         {"workstation", "ready"}, {"permissions_checked", true}, {"permissions_supported", true},
+         {"accessibility", true}, {"input_monitoring", true}}, "1.2.3-preview", "26.0")));
     engine.rootContext()->setContextProperty("previewWidth", parser.isSet("compact") ? 780 : 940);
     engine.rootContext()->setContextProperty("previewHeight", parser.isSet("compact") ? 570 : 650);
     engine.load(QUrl(QStringLiteral("qrc:/preview/Preview.qml")));

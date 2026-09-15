@@ -11,7 +11,7 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
-Current client gitlink: `9a7f6937741dfefbd9fd03c30c72240c60ffeb8f` on `codex/assignment-refresh`.
+Current client gitlink: `e4527a0ef0de82491c2b9dab2c5062f8c657f689` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).
@@ -65,9 +65,16 @@ match the retained previous package and exact current digest. 25 real-Ed25519
 synthetic-package tests pass, including both CLIs, replay/downgrade rejection and
 unchanged history. Receipts explicitly perform no installation or Apple trust
 checks. Product identity, production keys, actual bundle/build-key attestation,
-native installer integration and clean-Mac recovery remain open. Next independent
-slice: support/repair guidance, bounded diagnostic export and P4 evidence planning.
-The host's
+native installer integration and clean-Mac recovery remain open.
+[Help and private support reports](docs/development/teraguchi-support.md) now add
+tablet/display repair guidance, permission review and preview-before-save status
+export. The fixed native schema excludes logs, identities and input/artwork;
+owner-only files are saved and revealed only by explicit actions. 16 native
+QtTest results, 156 QML results, 49 offline captures and seven native Mac help
+captures pass. The complete Mac build, startup/idle Quit smoke and 12 CI tests
+pass. Physical tablet/display and video checks remain explicitly untested in
+reports. Next independent slice: private P4 evidence manifest and transport-counter
+inventory. The host's
 IPv4-only QUIC listener still limits guest qualification. Physical client/guest/
 permission qualification, the installed client, host, builder state and postponed
 soak are unchanged.

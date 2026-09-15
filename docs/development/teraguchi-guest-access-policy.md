@@ -10,7 +10,7 @@ The [inventory](../../tests/tailscale/endpoint-inventory.json) records source
 digests and these reviewed revisions:
 
 - Root baseline: `d1722b9ea0c2ee2664234ac6acceeaad19f6119b`.
-- Client: `9a7f6937741dfefbd9fd03c30c72240c60ffeb8f`.
+- Client: `e4527a0ef0de82491c2b9dab2c5062f8c657f689`.
 - Linux host: `9329784ac41f50cbec0c9d76badfd22227ec5e5f`.
 - Kymux: `912ece5c64787997f978673ca60d313898a3548c`.
 
@@ -90,7 +90,8 @@ python3 -B scripts/test/check-tailscale-policy.py --host-source "$PINNED_HOST_SO
 Use a local checkout at the recorded host pin when the host submodule is
 unpopulated. The guard never clones, fetches, initializes submodules or calls
 Tailscale. It checks the draft, packaged host/firewalld ports, product gitlinks
-and 22 reviewed source-file digests. A changed pin or reviewed file requires
+and 24 reviewed source-file digests, including the support export's fixed local
+folder opener. The export adds no remote endpoint. A changed pin or reviewed file requires
 another inventory. The root revision is the review baseline; later
 documentation-only root commits can pass with those source files unchanged.
 

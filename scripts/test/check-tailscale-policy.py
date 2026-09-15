@@ -29,6 +29,7 @@ REVIEWED_FILES = {
                     "app/backend/teraguchi/tailscaleworkstations.cpp",
                     "app/backend/teraguchi/hosttrust.h", "app/backend/teraguchi/studiosetup.h",
                     "app/backend/teraguchi/studiosetup.cpp",
+                    "app/backend/teraguchi/supportdiagnostics.h", "app/backend/teraguchi/supportdiagnostics.cpp",
                     "app/gui/computermodel.cpp", "app/settings/plankclientpolicy.h",
                     "app/settings/plankclientpolicy.cpp", "app/streaming/session.cpp"},
     "apps/host/linux": {"src/nvhttp.cpp", "src/nvhttp.h", "src/config.cpp",

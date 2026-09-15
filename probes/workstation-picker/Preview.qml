@@ -47,6 +47,21 @@ ApplicationWindow {
         property string message: state === "expired" ? "Studio setup has expired. Import a new file from your administrator." : ""
     }
     MacPermissionsDialog { id: permissionsDialog; permissions: previewPermissions }
+    QtObject {
+        id: previewDiagnostics
+        property string preview: ""
+        property bool saved: false
+        property string message: ""
+        function prepare(state) { previewDiagnostics.preview = supportSampleReport; previewDiagnostics.message = ""; }
+        function save() { previewDiagnostics.message = "Preview only. Report saving is disabled."; return false; }
+        function showFolder() { return false; }
+    }
+    SupportDialog {
+        id: supportDialog
+        flow: previewFlow; diagnostics: previewDiagnostics; permissions: previewPermissions
+        studioState: "ready"; tailscaleState: "ready"
+        onReviewPermissionsRequested: permissionsDialog.open()
+    }
     property int pendingCheck: 0
     property int pendingConnection: 0
     property int requestedDisplays: 1
@@ -180,6 +195,11 @@ ApplicationWindow {
     Component.onCompleted: {
         reset();
         if (scenario.indexOf("permission-setup-") === 0) permissionsDialog.open();
+        if (scenario.indexOf("support-") === 0) {
+            supportDialog.open();
+            supportDialog.topicIndex = scenario === "support-tablet" ? 1 : scenario === "support-access" ? 2 : scenario === "support-report" ? 4 : 0;
+            if (scenario === "support-report") supportDialog.prepareReport();
+        }
         if (scenario === "studio-needed") {
             previewFlow.selectedId = "";
             previewFlow.setWorkstations([]);
@@ -224,6 +244,7 @@ ApplicationWindow {
             Layout.fillHeight: true
             flow: previewFlow
             studioPower: previewPower
+            onHelpRequested: supportDialog.open()
         }
         Rectangle {
             Layout.fillWidth: true

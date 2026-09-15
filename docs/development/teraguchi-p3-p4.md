@@ -64,7 +64,8 @@ code behavior; they do not establish live access or physical video qualification
   provider/PAM/session expiry checks. No production key is configured yet.
 - [ ] Deliver trusted client/setup through the chosen distribution channel and
   qualify clean-Mac import, repair, expiry and key rotation.
-- [ ] Add missing tablet/display repair guidance.
+- [x] Add [tablet/display repair guidance](teraguchi-support.md), with explicit
+  display selection and a link to the existing permission review dialog.
 - [ ] Decide stable product bundle IDs before permission qualification.
   Keep the diagnostic app's grants separate from product grants.
 - [x] Exercise permission cancellation, retry and loss offline, including loss
@@ -101,8 +102,10 @@ code behavior; they do not establish live access or physical video qualification
 - [ ] Integrate verification with actual bundle/build-key attestation and a
   native installer. Establish authoritative idle state, durable accepted-version
   history and retained-package recovery; reverify at use before installation.
-- [ ] Prepare actionable support messages and a bounded diagnostic export that
-  excludes credentials, artwork, keystrokes, pen coordinates, and identities.
+- [x] Add [Help and private support reports](teraguchi-support.md): explicit
+  preview/save/reveal, a fixed status schema and owner-only files. No logs,
+  credentials, artwork, keystrokes, pen samples or identities are exported.
+- [ ] Qualify repair guidance and report sharing with a clean-Mac pilot user.
 - [ ] Qualify signing, notarization, clean install, permission persistence,
   cancellation, update, and rollback using the exact candidate. Signing and
   installation are separate from an offline compile/package-content check.
@@ -140,8 +143,8 @@ Offline P3 work cannot satisfy these gates. Builder provisioning remains paused.
 The [integrated development picker](teraguchi-tailscale-workstations.md) now reaches
 native login and Session execution with permission onboarding and bound one/two
 Mac outputs. Signed studio setup is implemented locally. Next independent coding:
-support/repair guidance and bounded diagnostic export, followed by P4 evidence
-manifest and transport-counter inventory. Workstation-specific HTTPS trust and
+P4 evidence manifest and transport-counter inventory. Help, tablet/display repair
+guidance and private status export are implemented locally. Workstation-specific HTTPS trust and
 offline signed package/rollback verification now pass locally. Product identity,
 production keys, actual bundle attestation and installer integration remain open.
 Endpoint inventory and the guest policy draft are prepared; full-policy and
