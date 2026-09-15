@@ -1,5 +1,13 @@
 # Teraguchi handoff — 2026-09-15
 
+## Later session update
+
+Read the [development resume plan](teraguchi-resume-plan.md) first. Local physical
+diagnostics and short installed-session checks have completed with the limits
+recorded there. The 30-minute stability test and builder setup are paused. The
+plan corrects source-provenance and pressure claims and supersedes the initial
+operator-test sequence below. No product candidate was installed in this session.
+
 ## Resume here
 
 The operator accepted the macOS interface as good enough for now. Pause visual

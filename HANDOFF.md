@@ -4,7 +4,10 @@ Read AGENTS.md and the platform build runbook before work.
 
 The operator accepted the macOS UI and requested publication and a new-task
 handoff on 2026-09-15. Start with the [current handoff](docs/development/teraguchi-handoff.md).
-Physical testing has not resumed.
+Physical input diagnostics and short operator session checks have now run.
+Start with the [development resume plan](docs/development/teraguchi-resume-plan.md)
+for their scope, the source-provenance correction, deferred stability check and
+paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## Teraguchi macOS workstation interface
 
