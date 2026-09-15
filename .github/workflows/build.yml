@@ -37,6 +37,8 @@ jobs:
           persist-credentials: false
       - run: python3 -m unittest discover -s tests/ci -v
       - run: python3 -m unittest discover -s tests/input -p 'test_flame_modifier_profile.py' -v
+      - name: Check offline guest policy draft
+        run: python3 -B -m unittest discover -s tests/tailscale -p 'test_guest_policy.py' -v
       - run: bash scripts/test/check-decode-contract.sh "$RUNNER_TEMP/decode-contract"
       - name: Check client compatibility and package gates
         run: |

@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "base_port": 28989,
+  "scope": "Offline source review of the Linux host / assigned Mac client path. No live endpoint or Tailscale validation.",
+  "sources": [
+    {
+      "path": ".",
+      "commit": "e96ed37fe8030a29020b1f044d59a55ec9b4dd7a",
+      "sha256": {
+        "packaging/host/linux/config/plank-host.conf": "7f22d36efa8186b992aedb978ae55c08e27adf580552cd7b8fda5c8457ba62ec",
+        "packaging/host/linux/firewalld/plank.xml": "c1ebd7f084437197b5722313ec7204852ebd97923863646ab865221a9a7b2e1f",
+        "protocol/plank-transport/src/native.rs": "a0981e80e8b7828591e284bcdf60b57f00c554e508b134daf1e3b8b70a9d98a2",
+        "protocol/plank-transport/src/native_ffi.rs": "6ab122976f6d02cb6bd0e06d91261e2e780a968c930817e8159f4e11f4ea8311",
+        "protocol/plank-transport/src/lib.rs": "c5cd7068f4e431b8c67f18e9d1b1812ebddac3405e17c785b2d1618ca5c9f528"
+      }
+    },
+    {
+      "path": "apps/client",
+      "commit": "c30f0477d5e271da9af524970c89861da10011af",
+      "sha256": {
+        "app/backend/nvhttp.cpp": "b645bc4ea66e39839794ccd3f7351aeaa21bcf0c4ea2d6a349346f31f7183344",
+        "app/backend/computermanager.cpp": "d36689ad334302037a3c593dc19d9da338e603a2ddb783975e94d7e6f93e6e62",
+        "app/backend/teraguchi/tailscaleworkstations.cpp": "bb67846a187b100ad5500adeb70454cd9c70bac5235d38ac26116e432b3ec5db",
+        "app/gui/computermodel.cpp": "a7c6ea4f27b1bb36c4b28cce1a6b413c7cb96c9313db7191862138a38a37cc3c",
+        "app/settings/plankclientpolicy.h": "597abdd5c33f4f5a87b6cc09749c815fe70c616b483de13c1ab1a5136ec4c46f",
+        "app/settings/plankclientpolicy.cpp": "fc5248e1e07a4b2677341313f77441920fd0d8f54e2b9d43a25b1314e2be8145",
+        "app/streaming/session.cpp": "1ff9056c8793850f76504cbfc6f6d6e984bf73708dbcb2a74d133964312f5fc3"
+      }
+    },
+    {
+      "path": "apps/host/linux",
+      "commit": "9329784ac41f50cbec0c9d76badfd22227ec5e5f",
+      "sha256": {
+        "src/nvhttp.cpp": "5a5fd148271b9adb4211b291a97432f47193b767a950bb1db6ff23f9757956c6",
+        "src/nvhttp.h": "69562f885446b5e6e3ec180e26bb085be5c58ba798bdff96b218f00e19686aa0",
+        "src/config.cpp": "b5e607377939540c40407fdde220d7ca920b76bae1a62302eb516337802f6505",
+        "src/network.cpp": "4f8f041924ad4b741b2038dbec4f1d1f4c9652884d761f6ac1d5d5c29c46e8e5",
+        "src/auth/pam_broker.cpp": "c88d0edecf0650a5924c7da0a2649bfac47eb6d877f6fb79a88bb55dc1cda427",
+        "src/session/host_supervisor.cpp": "d1208e9537e00ebd737559c10f89968216c829d4859915eb2e0ba11447f8242a"
+      }
+    },
+    {
+      "path": "third_party/kyber-kymux",
+      "commit": "912ece5c64787997f978673ca60d313898a3548c",
+      "sha256": {
+        "kynet/src/driver/quinn.rs": "5de466fc41e8b31cfa7599d5506441f87d6090ef1b68e4e36a31d943eb0f64e8"
+      }
+    }
+  ]
+}

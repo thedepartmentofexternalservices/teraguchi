@@ -73,9 +73,14 @@ code behavior; they do not establish live access or physical video qualification
 
 ### 3. Close access and ownership controls
 
-- [ ] Inventory the endpoints used by the pinned PLANK path and prepare a
-  deny-by-default sharing policy with offline allow/deny cases. Do not copy
-  the old Phase 0 transport ports into a deployed policy.
+- [x] Inventory the pinned PLANK endpoints and prepare a
+  [guest sharing draft and offline allow/deny cases](teraguchi-guest-access-policy.md).
+  TCP/UDP 28989, packaged firewall consistency and source drift are checked.
+  The draft has not been merged, validated by Tailscale or deployed.
+- [ ] Establish workstation-specific HTTPS certificate trust before pilot PAM
+  credentials. The inherited certificate-profile check does not pin a host;
+  a trusted bootstrap/rotation path and credential-nondisclosure tests are needed.
+  Retain the pinned host's IPv4-only QUIC limitation in guest qualification.
 - [ ] Check assignment, certificate trust, PAM account authentication, and
   exclusive seat ownership separately. Test second-identity denial, expired
   sessions, same-identity reconnect, and revocation.
@@ -128,7 +133,9 @@ Offline P3 work cannot satisfy these gates. Builder provisioning remains paused.
 The [integrated development picker](teraguchi-tailscale-workstations.md) now reaches
 native login and Session execution with permission onboarding and bound one/two
 Mac outputs. Signed studio setup is implemented locally. Next independent coding:
-product distribution identity/build-manifest checks and endpoint/access-policy
-inventory, followed by external-guest acceptance cases. Physical Mac
+workstation-specific HTTPS trust and credential-nondisclosure tests, then product
+distribution identity/build-manifest checks. Endpoint inventory and the offline
+guest policy draft are prepared; full-policy and external-guest acceptance remain.
+Physical Mac
 window/input qualification and P2 hardware limits remain explicit; this slice
 does not complete P3 or enter P4.

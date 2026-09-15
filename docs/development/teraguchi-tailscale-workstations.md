@@ -10,8 +10,9 @@ the studio tailnet, create accounts, or call the administrator API.
 The studio's exact Tailscale DNS suffix is a setup input supplied through trusted
 studio configuration. It identifies the studio within the artist's peer list;
 it grants no network access. There is no per-artist assignment database or
-embedded token. The development launcher accepts this value explicitly; shipping a trusted
-configuration/bootstrap is still P3 work.
+embedded token. The development launcher accepts this value explicitly; signed
+setup import is also implemented. Trusted distribution and production key
+custody remain P3 work.
 Do not learn this suffix from an arbitrary peer or accept a wildcard.
 
 Tailscale sharing omits studio tags, and `ShareeNode` describes the reverse
@@ -164,9 +165,11 @@ actual session cleanup, and clean-Mac onboarding require the scoped live tests.
 
 ## Next integration gate
 
-Implement native Mac two-output presentation; provide trusted studio setup and
-stable product identity for distribution. Permission onboarding is integrated
-but still needs clean-Mac and live revocation qualification. Then
+Native Mac two-output presentation and signed studio setup are implemented
+locally. Establish workstation-specific HTTPS trust before pilot credentials;
+see the [endpoint inventory and guest policy draft](teraguchi-guest-access-policy.md).
+Stable product identity, trusted distribution, clean-Mac permissions and live
+revocation qualification remain open. Then
 use a real external shared-user Mac to prove one-machine visibility, credentials,
 certificate handling, removal, active-session cleanup, reconnect and seat denial.
 Do not broaden tailnet membership or add a separate assignment service to make

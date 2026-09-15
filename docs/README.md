@@ -29,5 +29,7 @@ Shared wire contracts live in [protocol](../protocol/). Current work belongs in
 
 - [Tailscale shared workstations](development/teraguchi-tailscale-workstations.md):
   local share discovery, native PAM handoff, test evidence, and remaining UI gates.
+- [Guest access policy preparation](development/teraguchi-guest-access-policy.md):
+  pinned endpoint inventory, offline sharing draft, certificate trust gap and live cases.
 - [P3/P4 implementation order](development/teraguchi-p3-p4.md): current coding
   priorities and the live gates before the WAN pilot.

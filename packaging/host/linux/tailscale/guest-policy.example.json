@@ -1,0 +1,11 @@
+{
+  "acls": [],
+  "grants": [
+    {
+      "src": ["autogroup:shared"],
+      "dst": ["*"],
+      "ip": ["tcp:28989", "udp:28989"]
+    }
+  ],
+  "ssh": []
+}

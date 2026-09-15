@@ -45,8 +45,15 @@ that setup; expiry closes the session through input cleanup. The import panel
 provides repair states. 23 setup tests, three key-removal checks and 28 provider/
 worker tests pass, along with the complete build and startup smoke. Unsigned development setup is explicitly labelled and
 rejected by key-configured builds. No production key or product identity has
-been selected. Next: distribution identity/build-manifest checks and
-endpoint/access-policy inventory. Physical client/guest/permission qualification,
+been selected. The [guest policy preparation](docs/development/teraguchi-guest-access-policy.md)
+now records the pinned TCP/UDP 28989 path, a guest-only draft, native policy test
+examples and 19 source digests. 18 offline regressions and source/package checks
+pass. Hosted CI includes the regression suite but has not run. No live policy was
+validated or changed. Source review found a P3 blocker: HTTPS/PAM accepts the
+PLANK certificate profile without a persistent workstation-specific pin. Next:
+trusted host-certificate bootstrap/rotation and credential-nondisclosure tests,
+then distribution identity/build-manifest checks. The host's IPv4-only QUIC
+listener also limits guest qualification. Physical client/guest/permission qualification,
 the installed client, host, builder state and postponed soak are unchanged.
 
 ## Teraguchi macOS workstation interface
