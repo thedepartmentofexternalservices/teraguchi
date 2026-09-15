@@ -2,6 +2,10 @@
 
 Read AGENTS.md and the platform build runbook before work.
 
+The operator accepted the macOS UI and requested publication and a new-task
+handoff on 2026-09-15. Start with the [current handoff](docs/development/teraguchi-handoff.md).
+Physical testing has not resumed.
+
 ## Teraguchi macOS workstation interface
 
 Local branch `codex/macos-workstation-ui` starts at root
@@ -27,8 +31,8 @@ reviewed. The separate preview opens briefly and exits; it captures its own
 window without screen recording. Exact commits and private evidence hashes are
 retained with verified Git recovery bundles.
 
-No installed client, host or power strip changed. No live power service is built,
-no Slack command was sent, and nothing is published. The connection-flow model
+No installed client, host or power strip changed. No live power service is built and no Slack command was sent. These candidates
+are being preserved on development branches; publication does not deploy them. The connection-flow model
 and its strict checks are unchanged. Physical display/input, accessibility,
 production lifecycle/resource integration and clean-Mac packaging remain open.
 
