@@ -15,21 +15,25 @@ The first dual-output pilot exposed macOS menu-bar/Dock interference at the
 Linux screen edge. A session-scoped presentation repair now hides those controls
 only while the visible fullscreen pair has focus and restores the prior state
 on focus loss, minimize, windowed mode and cleanup. App switching and Force Quit
-remain available. 21 display tests and 142 hidden native checks pass. The updated
-pilot still needs an installed top-edge and focus/cleanup check.
+remain available. 21 display tests, 142 hidden native checks, eight Quit scenarios
+and packaged startup smoke pass. The updated local pilot is installed from root
+`fff0818` and the client gitlink below. It needs renewed operator input grants
+after the ad-hoc signature changed, then a live top-edge and focus/cleanup check.
 
 The supervised pilot now reaches a working headless desktop, confirmed by the
 operator. The single-output stream reports 3840x2160x60, native 10-bit capture,
 HEVC 4:4:4 and hardware decoding, with automatic login-to-desktop reconnection.
 Private machine notes hold the configuration, recovery and session evidence.
-Preserve the active session and installed client's working permission identity.
+The operator subsequently ended that session; the previous working pilot is
+retained privately for recovery.
 
 The first display-mode transition exposed a startup retry bug: a worker refusing
 connections before presenting a certificate was reported as a trust rejection.
 The client now preserves network errors for that bounded retry while rejecting
 certificate/setup failures. All 24 loopback cases pass; the baseline reproduces
-the failure. This source fix is saved for the next pilot build, not installed or
-live-qualified. Physical Flame interaction, tablet behavior, dual output, WAN
+the failure. The repair is included in the updated installed pilot and still
+needs a fresh live startup check. Physical Flame interaction, tablet behavior,
+dual-output acceptance, WAN
 and sustained-session qualification remain open.
 
 The pilot connection check exposed a headless-display diagnostic gap. The
@@ -37,8 +41,8 @@ client still rejects a host with no active outputs, but now names that condition
 and retains the sign-in error in the picker instead of replacing it with a
 generic connection failure. 17 native topology results and 159 QML results pass;
 negative controls reproduce the old message loss. These parser/UI tests do not
-provision a host display or qualify a live connection. The repair has not replaced the
-installed pilot; preserve that bundle's newly working permission identity.
+provision a host display or qualify a live connection. This diagnostic repair is
+also included in the updated installed pilot.
 
 Local pilot permission repair adds explicit, individually scoped OS requests.
 Startup and session checks remain non-prompting. Pilot packaging must declare

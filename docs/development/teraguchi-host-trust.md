@@ -123,5 +123,5 @@ The later supervised headless pilot reached a live desktop and recovered through
 the login-to-user-desktop transition. Logs attest a single 3840x2160x60 stream,
 native 10-bit capture, HEVC 4:4:4 and hardware decoding; the operator confirmed
 the desktop works. Machine-specific evidence is retained privately. The new
-network-error classification passed the loopback suite but has not replaced the
-running pilot or been qualified against a fresh live display transition.
+network-error classification passed the loopback suite and is included in the
+updated installed pilot. A fresh live display transition remains unqualified.
