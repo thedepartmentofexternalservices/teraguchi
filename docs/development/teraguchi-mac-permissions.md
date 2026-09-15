@@ -1,8 +1,9 @@
 # Mac permission onboarding
 
 The `--workstations` development picker now checks Accessibility and Input
-Monitoring for the running client. A status panel explains what is missing;
-Review permissions opens a dialog with separate statuses, explicit System
+Monitoring for the running client. The main screen shows a notice only when
+Mac input needs setup; completed status and **Review permissions…** live in
+**Settings…**. Review opens a bounded, scrollable dialog with separate statuses, explicit System
 Settings actions, a manual navigation route, and Check again. Closing the dialog
 preserves the workstation and selected display count. Granting access never
 starts a connection automatically.

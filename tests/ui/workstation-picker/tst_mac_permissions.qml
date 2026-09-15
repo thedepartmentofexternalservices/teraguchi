@@ -5,6 +5,9 @@ import "../../../apps/client/app/gui/teraguchi"
 TestCase {
     id: tests
     name: "MacPermissions"
+    width: 780; height: 560
+    visible: true
+    when: windowShown
     property var flow
     property var provider
     property var gate
@@ -45,6 +48,7 @@ TestCase {
         dialog.open();
         tryCompare(dialog, "visible", true);
         verify(provider.reads > 0); compare(provider.opens, 0);
+        verify(dialog.height <= tests.height - 32);
         compare(provider.requests.length, 0);
         compare(flow.phase, "idle"); compare(flow.displayCount, 2);
         dialog.reject(); compare(flow.selectedId, "node-a");

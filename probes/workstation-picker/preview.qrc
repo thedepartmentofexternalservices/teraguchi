@@ -4,6 +4,8 @@
     <file alias="PreviewPower.qml">PreviewPower.qml</file>
   </qresource>
   <qresource prefix="/teraguchi">
+    <file alias="WorkstationHome.qml">../../apps/client/app/gui/teraguchi/WorkstationHome.qml</file>
+    <file alias="WorkstationSettings.qml">../../apps/client/app/gui/teraguchi/WorkstationSettings.qml</file>
     <file alias="StudioSetupPanel.qml">../../apps/client/app/gui/teraguchi/StudioSetupPanel.qml</file>
     <file alias="MacPermissionsPanel.qml">../../apps/client/app/gui/teraguchi/MacPermissionsPanel.qml</file>
     <file alias="MacPermissionsDialog.qml">../../apps/client/app/gui/teraguchi/MacPermissionsDialog.qml</file>

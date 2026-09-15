@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
         QTimer::singleShot(1000, &app, [&] { app.exit(6); });
         return app.exec();
     }
-    const QStringList scenarios {"studio-needed", "studio-ready", "studio-expired", "permission-panel-needed", "permission-setup-needed", "permission-setup-allowed", "assignment-stale", "assignment-refreshing", "assignment-failure", "ready", "offline", "occupied", "incompatible", "empty", "connected",
+    const QStringList scenarios {"settings", "studio-needed", "studio-ready", "studio-expired", "permission-panel-needed", "permission-setup-needed", "permission-setup-allowed", "assignment-stale", "assignment-refreshing", "assignment-failure", "ready", "offline", "occupied", "incompatible", "empty", "connected",
                                  "interrupted", "display-mismatch", "source-depth", "permissions", "seat-race", "connection-failure",
                                  "power-off", "power-standby", "power-unknown", "power-starting", "power-unavailable", "power-no-access", "power-stale",
                                  "support-displays", "support-tablet", "support-access", "support-report"};

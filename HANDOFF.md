@@ -11,14 +11,23 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
+The operator confirmed the dual-output top-edge repair works, then requested
+simpler onboarding. The current slice puts import and Mac input review in
+Settings, keeps the studio name in the header and shows only the next required
+repair notice. Mac packages can carry verified signed setup for automatic
+first-use import or a newer-revision update. The picker and background worker
+intersect Tailscale peers with signed trusted node IDs. No new assignment service
+or tailnet changes are involved. 29 setup results, three key-removal results, 30 provider results, seven
+packaging tests, 166 QML results and 52 network-denied captures pass; installation and clean-artist qualification are recorded separately.
+
 The first dual-output pilot exposed macOS menu-bar/Dock interference at the
 Linux screen edge. A session-scoped presentation repair now hides those controls
 only while the visible fullscreen pair has focus and restores the prior state
 on focus loss, minimize, windowed mode and cleanup. App switching and Force Quit
 remain available. 21 display tests, 142 hidden native checks, eight Quit scenarios
 and packaged startup smoke pass. The updated local pilot is installed from root
-`fff0818` and the client gitlink below. It needs renewed operator input grants
-after the ad-hoc signature changed, then a live top-edge and focus/cleanup check.
+`fff0818` and the client gitlink below. The operator renewed input grants after the ad-hoc signature changed and
+confirmed the live top-edge repair. Broader focus/cleanup acceptance remains open.
 
 The supervised pilot now reaches a working headless desktop, confirmed by the
 operator. The single-output stream reports 3840x2160x60, native 10-bit capture,
@@ -57,7 +66,7 @@ real native-provider-to-QML regression reproduces the failure before the fix;
 all 29 native provider/worker results pass afterward. This is discovery repair,
 not live login, video, input, or external-guest qualification.
 
-Current client gitlink: `e405dfeb3999ddab89d26347e6e3a3ba89b30ebe` on `codex/assignment-refresh`.
+Current client gitlink: `5955945b9840e5c144d618af5d5fb3053024e1b5` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).

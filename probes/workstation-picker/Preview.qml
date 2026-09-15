@@ -30,8 +30,8 @@ ApplicationWindow {
         id: previewPermissions
         property bool checked: true
         property bool supported: true
-        property bool accessibility: preview.scenario === "permission-setup-allowed"
-        property bool inputMonitoring: preview.scenario === "permission-setup-allowed"
+        property bool accessibility: !["permission-panel-needed", "permission-setup-needed"].includes(preview.scenario)
+        property bool inputMonitoring: accessibility
         readonly property bool ready: accessibility && inputMonitoring
         property string applicationName: "Example Client"
         function refresh() { return ready; }
@@ -40,13 +40,19 @@ ApplicationWindow {
     }
     QtObject {
         id: previewSetup
-        property string state: preview.scenario === "studio-ready" ? "ready" : preview.scenario === "studio-expired" ? "expired" : "needed"
+        property string state: preview.scenario === "studio-needed" ? "needed" : preview.scenario === "studio-expired" ? "expired" : "ready"
         property string label: "Example Studio"
         property bool ready: state === "ready"
         property bool canImport: true
         property string message: state === "expired" ? "Studio setup has expired. Import a new file from your administrator." : ""
     }
     MacPermissionsDialog { id: permissionsDialog; permissions: previewPermissions }
+    WorkstationSettings {
+        id: settingsDialog
+        studioSetup: previewSetup
+        permissions: previewPermissions
+        onPermissionsRequested: permissionsDialog.open()
+    }
     QtObject {
         id: previewDiagnostics
         property string preview: ""
@@ -194,6 +200,7 @@ ApplicationWindow {
     }
     Component.onCompleted: {
         reset();
+        if (scenario === "settings" || scenario === "studio-expired") settingsDialog.open();
         if (scenario.indexOf("permission-setup-") === 0) permissionsDialog.open();
         if (scenario.indexOf("support-") === 0) {
             supportDialog.open();
@@ -227,24 +234,17 @@ ApplicationWindow {
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
-        StudioSetupPanel {
-            Layout.fillWidth: true
-            Layout.margins: 12
-            setup: previewSetup
-            visible: preview.scenario.indexOf("studio-") === 0
-        }
-        MacPermissionsPanel {
-            Layout.fillWidth: true
-            permissions: previewPermissions
-            visible: preview.scenario.indexOf("permission-") === 0
-            onReviewRequested: permissionsDialog.open()
-        }
-        WorkstationPicker {
+        WorkstationHome {
             Layout.fillWidth: true
             Layout.fillHeight: true
             flow: previewFlow
+            studioSetup: previewSetup
+            permissions: previewPermissions
+            tailscaleState: "ready"
             studioPower: previewPower
             onHelpRequested: supportDialog.open()
+            onSettingsRequested: settingsDialog.open()
+            onPermissionsRequested: permissionsDialog.open()
         }
         Rectangle {
             Layout.fillWidth: true

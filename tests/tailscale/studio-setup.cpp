@@ -178,6 +178,66 @@ private slots:
         QVERIFY(!current.accepts(QByteArray::fromHex(QByteArray(64,'a'))));
         QVERIFY(current.accepts(QByteArray::fromHex(QByteArray(64,'b'))));
     }
+    void bundledSetupBootstrapsAndPersists() {
+        QTemporaryDir dir;
+        const auto bundle = file(dir, sign(trustedPayload())).toLocalFile();
+        const auto storage = dir.filePath("data/studio.json");
+        StudioSetup setup(publicKey, storage, [this]{return now;}, nullptr, bundle);
+        QVERIFY(setup.ready()); QCOMPARE(setup.label(), QString("Example Studio"));
+        QVERIFY(setup.permit()->profile.workstations.contains("node-a"));
+        QVERIFY(QFile::exists(storage));
+        QVERIFY(!(QFile::permissions(storage) & (QFile::ReadGroup | QFile::ReadOther)));
+        QFile::remove(bundle);
+        StudioSetup reopened(publicKey, storage, [this]{return now;}, nullptr, bundle);
+        QVERIFY(reopened.ready());
+    }
+    void bundledUpdatePreservesNewerManualSetup() {
+        QTemporaryDir dir; const auto storage = dir.filePath("data/studio.json");
+        const auto bundle = file(dir, sign(trustedPayload(2))).toLocalFile();
+        StudioSetup first(publicKey, storage, [this]{return now;}, nullptr, bundle);
+        QVERIFY(first.ready());
+        file(dir, sign(trustedPayload(3)));
+        StudioSetup upgraded(publicKey, storage, [this]{return now;}, nullptr, bundle);
+        QCOMPARE(upgraded.permit()->profile.revision, 3);
+        file(dir, sign(trustedPayload(2)));
+        StudioSetup older(publicKey, storage, [this]{return now;}, nullptr, bundle);
+        QCOMPARE(older.permit()->profile.revision, 3);
+        auto conflict = trustedPayload(3); conflict["label"] = "Conflicting Studio";
+        file(dir, sign(conflict));
+        StudioSetup conflicting(publicKey, storage, [this]{return now;}, nullptr, bundle);
+        QCOMPARE(conflicting.label(), QString("Example Studio"));
+        QVERIFY(!conflicting.message().isEmpty());
+    }
+    void invalidBundlesCannotBootstrap() {
+        QTemporaryDir dir;
+        const auto bundle = file(dir, sign(trustedPayload())).toLocalFile();
+        StudioSetup noKey({}, dir.filePath("none.json"), [this]{return now;}, nullptr, bundle);
+        QVERIFY(!noKey.ready());
+        StudioSetup wrongKey(QByteArray(32,'x'), dir.filePath("wrong.json"), [this]{return now;}, nullptr, bundle);
+        QVERIFY(!wrongKey.ready()); QVERIFY(!QFile::exists(dir.filePath("wrong.json")));
+        for (const auto& bytes : {QByteArray("corrupt"), sign(payload())}) {
+            file(dir, bytes);
+            StudioSetup rejected(publicKey, dir.filePath("invalid.json"), [this]{return now;}, nullptr, bundle);
+            QVERIFY(!rejected.ready()); QVERIFY(!QFile::exists(dir.filePath("invalid.json")));
+        }
+        file(dir, sign(trustedPayload()));
+        StudioSetup expired(publicKey, dir.filePath("expired.json"), [this]{return now+7200;}, nullptr, bundle);
+        QVERIFY(!expired.ready()); QVERIFY(!QFile::exists(dir.filePath("expired.json")));
+    }
+    void bundleCannotResetExpiredOrDamagedHistory() {
+        QTemporaryDir dir; const auto storage = dir.filePath("data/studio.json");
+        const auto bundle = file(dir, sign(trustedPayload(5))).toLocalFile();
+        StudioSetup initial(publicKey, storage, [this]{return now;}, nullptr, bundle);
+        QVERIFY(initial.ready());
+        auto older = trustedPayload(4);
+        older["expires_at"] = QDateTime::fromSecsSinceEpoch(now+10000,Qt::UTC).toString("yyyy-MM-ddTHH:mm:ss'Z'");
+        file(dir, sign(older));
+        StudioSetup expired(publicKey, storage, [this]{return now+7200;}, nullptr, bundle);
+        QVERIFY(!expired.ready()); QCOMPARE(expired.state(), QString("expired"));
+        QFile damaged(storage); QVERIFY(damaged.open(QIODevice::WriteOnly)); damaged.write("damaged"); damaged.close();
+        StudioSetup invalid(publicKey, storage, [this]{return now;}, nullptr, bundle);
+        QVERIFY(!invalid.ready()); QCOMPARE(invalid.state(), QString("invalid"));
+    }
     void invalidWorkstationBindings() {
         QString error;
         const auto reject = [&](QJsonObject content) {

@@ -1,19 +1,22 @@
 # Signed studio setup
 
-The development picker now imports a signed studio setup file, verifies it with
-a public key pinned into the client, saves it privately and rechecks it on each
-launch. Artists still accept an individual Tailscale machine-share invitation
+A configured Mac app can include its signed studio setup. The client verifies
+it with a public key pinned into the executable, saves it privately and rechecks
+it on each launch. Manual import remains available in Settings for repair. Artists still accept an individual Tailscale machine-share invitation
 and authenticate to their workstation through the existing TLS/PAM path.
 Setup neither grants a share nor creates an account, seat or server connection.
 
 ## Artist flow
 
-1. Open the configured client’s workstation picker.
-2. Click **Import setup…** and select the `.teraguchi-studio` file supplied by
-   the studio administrator. A verified studio name appears after successful
-   validation and saving.
-3. Accept the workstation invitation in Tailscale, sign in with that account,
-   refresh the list and connect to the selected workstation.
+1. Install and open the studio-configured client. Its included setup is verified
+   automatically; the studio name appears in the compact header.
+2. Accept the workstation invitation in Tailscale and sign in with that account.
+3. Follow the Mac input notice if permissions are needed, then choose a workstation.
+
+Ready clients show neither an import panel nor a completed-permissions banner on
+the main screen. **Settings…** contains studio setup/import and Mac input review.
+Only the next required setup or repair step appears above the workstation list.
+The same configured app serves the studio's artists; there is no per-artist file.
 
 Import is disabled while login/session cleanup is pending. An invalid import
 shows an error and preserves the last valid setup. Missing, expired or invalid
@@ -23,9 +26,9 @@ connects a workstation, accepts an invitation or changes Mac permissions.
 The explicit development entry remains `--workstations`. A local signed file
 can also be imported with `--workstations --studio-config "$STUDIO_SETUP_FILE"`;
 that path must be absolute. An explicit failed CLI import exits without falling
-back to saved setup. Ordinary PLANK startup is unchanged. Product naming,
-default launch behavior, bundle IDs and signed/notarized distribution remain a
-separate release slice; this implementation is not a production distributor.
+back to saved setup. Unconfigured PLANK startup is unchanged. A bundled setup enables the existing
+Mac picker-default bundle flag. Stable product identity and signed/notarized
+distribution remain a separate release slice; this implementation is not a production distributor.
 
 ## File and trust contract
 
@@ -34,7 +37,7 @@ canonical base64. The payload is compact, sorted-key JSON with these fields:
 
 | Field | Meaning |
 | --- | --- |
-| `version` | Integer `2` for trusted workstation login; legacy `1` supports discovery only |
+| `version` | Integer `2` for trusted workstation login; legacy `1` contains no trusted workstation catalog |
 | `revision` | Increasing positive integer, at most 2147483647 |
 | `label` | Plain studio name, at most 80 UTF-16 code units |
 | `dns_suffix` | Exact lowercase Tailscale suffix, such as `studio-example.ts.net` |
@@ -50,8 +53,10 @@ certificate. Duplicate nodes, host IDs or reused certificates across nodes are
 rejected. There are no addresses, passwords or invitation links in this list.
 Include only the workstations intended for this setup delivery; the list grants
 no Tailscale assignment. See [host trust and rotation](teraguchi-host-trust.md).
-Legacy version-1 and unsigned development setup can still discover peers, but
-assigned login now requires version-2 workstation trust.
+The visible list is the intersection of this catalog and the current Tailscale
+peer view, after the exact DNS-suffix check. Setup cannot make an unshared host
+appear. Legacy version-1 setup produces an empty trusted list; the explicit
+unsigned development mode retains suffix-only discovery and cannot authorize login.
 
 The Ed25519 signature covers the exact bytes
 `Teraguchi studio setup v1\n` followed by the payload bytes. The whole file is
@@ -80,6 +85,14 @@ client, provide notarization, or implement the later package-update verifier.
 A key rotation requires a new configured client and a setup signed by that key.
 
 ## Persistence and session enforcement
+
+At startup, the Mac client also checks
+`Contents/Resources/studio-setup.teraguchi-studio`. A valid version-2 bundle can
+initialize an empty store or advance an older saved revision. An identical or
+older bundle leaves saved setup unchanged; conflicts and invalid/expired bundles
+cannot replace a valid saved record. Damaged saved records require explicit
+repair because their revision floor is unknown. A new app package does not reset
+setup expiry or downgrade a newer manual import. There is no network setup updater.
 
 The client atomically saves the original signed envelope in its application-data
 folder as `studio-setup.json`, with owner-only permissions. Portable test mode
@@ -129,6 +142,17 @@ key in `PLANK_STUDIO_CONFIG_PUBLIC_KEY`. Stable product identity, private-key
 custody, Developer ID signing, notarization, transfer verification, clean-Mac
 installation and permission persistence still need qualification before delivery.
 
+### Include setup in the Mac package
+
+Set `PLANK_STUDIO_SETUP_FILE` to the absolute signed file path when running
+`build-macos-client-dmg.sh`. Before app signing, `stage-studio-setup.py` verifies
+its version, validity and signature against the build's generated public-key
+header, then includes it as a signed app resource and enables picker startup.
+An omitted input removes any retained bundled setup from the new staging tree.
+The helper only operates on a new package tree outside Git; never edit an
+installed or already-signed app to insert configuration. Private setup and signing
+keys stay outside the repository. Setup contains public trust bindings, not secrets.
+
 ## Local verification
 
 ```sh
@@ -158,3 +182,11 @@ candidate has no production studio key. 21 loopback TLS cases exercise the real
 NvHTTP path with synthetic credentials, including an unpinned negative control.
 No live signed-setup session or
 clean-Mac installation was exercised.
+
+### Bundled-onboarding checkpoint
+
+29 native setup results and three retained-build key-removal results pass. Seven
+packaging tests reject wrong keys, tampering, expired/version-1 setup and symlinks,
+and verify that omitting setup removes a retained resource. 30 provider/worker
+results include mixed trusted/unrelated peers, missing shared peers and catalog
+removal. These synthetic checks do not qualify an external artist's clean Mac.

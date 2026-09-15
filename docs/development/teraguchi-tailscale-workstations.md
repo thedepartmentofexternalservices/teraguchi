@@ -11,14 +11,18 @@ The studio's exact Tailscale DNS suffix is a setup input supplied through truste
 studio configuration. It identifies the studio within the artist's peer list;
 it grants no network access. There is no per-artist assignment database or
 embedded token. The development launcher accepts this value explicitly; signed
-setup import is also implemented. Trusted distribution and production key
+setup import and automatic bundled setup are implemented. Trusted distribution and production key
 custody remain P3 work.
 Do not learn this suffix from an arbitrary peer or accept a wildcard.
 
 Tailscale sharing omits studio tags, and `ShareeNode` describes the reverse
 sharing direction. The provider therefore filters the current network map by
 exact studio DNS suffix and excludes reverse-share entries. It uses `ID` as the
-stable node identifier and only `TailscaleIPs` for endpoints. Hostnames, public
+stable node identifier and only `TailscaleIPs` for endpoints. Configured clients
+also require that ID in the signed version-2 workstation catalog, so unrelated
+NAS devices, servers and clients stay out of the picker. A trusted catalog entry
+absent from the Tailscale view is never added. The session assignment worker uses
+the same intersection. Hostnames, public
 endpoints, routes, tags, and online status cannot authorize a desktop session.
 
 Sources: [sharing](https://tailscale.com/docs/features/sharing),

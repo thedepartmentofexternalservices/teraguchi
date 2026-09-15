@@ -65,3 +65,8 @@ fi
     make -j4
 ) > "$output/key-removal-build.log" 2>&1
 STUDIO_SETUP_TEST_BUILD_KEY= "$output/build/studio-setup-tests" signingToolInteroperabilityAndPinnedKey -o "$output/key-removal-tests.txt,txt"
+
+# The package must carry only current setup signed for the compiled key.
+PLANK_OPENSSL="$PLANK_MAC_CLIENT_DEPS/install/bin/openssl" \
+    python3 -B "$source_root/tests/packaging/test-bundled-studio-setup.py" -v \
+    > "$output/bundled-packaging-tests.txt" 2>&1

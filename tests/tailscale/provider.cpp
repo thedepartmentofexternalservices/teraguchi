@@ -58,6 +58,7 @@ private slots:
         permit->profile.suffix = "studio-example.ts.net";
         permit->admittedAt = QDateTime::currentSecsSinceEpoch();
         permit->profile.expires = permit->admittedAt + 3600;
+        permit->profile.workstations.insert("node-a", {"host-a", {QByteArray(32,'a')}});
         AssignmentWatch watch("studio-example.ts.net", target, 0,
                               QCoreApplication::applicationFilePath(), {"--fixture", "success"}, permit);
         watch.start();
@@ -79,6 +80,24 @@ private slots:
         reader.setSessionStudioPermit(permit); reader.setStudioDnsSuffix(permit->profile.suffix);
         reader.refresh(1);
         QCOMPARE(reader.state(), QString("configuration-needed")); QVERIFY(!reader.busy());
+    }
+    void catalogIsIntersectionOfSharedAndTrustedHosts() {
+        auto permit = std::make_shared<TeraguchiStudio::Permit>();
+        permit->profile.suffix = "studio-example.ts.net";
+        permit->admittedAt = QDateTime::currentSecsSinceEpoch();
+        permit->profile.expires = permit->admittedAt + 3600;
+        permit->profile.workstations.insert("node-a", {"host-a", {QByteArray(32,'a')}});
+        permit->profile.workstations.insert("not-shared", {"host-c", {QByteArray(32,'c')}});
+        TailscaleWorkstations provider(QCoreApplication::applicationFilePath(), {"--fixture", "mixed"}, nullptr);
+        provider.setSessionStudioPermit(permit); provider.setStudioDnsSuffix(permit->profile.suffix);
+        provider.refresh(1); QTRY_VERIFY(provider.fresh());
+        QCOMPARE(provider.workstations().size(), 1);
+        QVERIFY(!provider.resolve("node-a").isEmpty());
+        QVERIFY(provider.resolve("node-b").isEmpty()); QVERIFY(provider.resolve("not-shared").isEmpty());
+        auto removed = std::make_shared<TeraguchiStudio::Permit>(*permit);
+        removed->profile.workstations.remove("node-a");
+        provider.setSessionStudioPermit(removed); provider.refresh(2); QTRY_VERIFY(provider.fresh());
+        QVERIFY(provider.workstations().isEmpty()); QCOMPARE(provider.state(), QString("no-shared-workstations"));
     }
     void workerRemovalWithoutUiLoop()
     {
@@ -228,7 +247,13 @@ int main(int argc, char** argv)
         const auto mode = app.arguments().last();
         if (mode == "failure") return 4;
         if (mode == "delayed") QTest::qSleep(200);
-        QFile out; out.open(stdout, QIODevice::WriteOnly); out.write(bytes(status())); out.close();
+        auto snapshot = status();
+        if (mode == "mixed") {
+            auto peers = snapshot["Peer"].toObject();
+            peers["nodekey:b"] = peer("node-b", "nas.studio-example.ts.net", "100.100.1.2");
+            snapshot["Peer"] = peers;
+        }
+        QFile out; out.open(stdout, QIODevice::WriteOnly); out.write(bytes(snapshot)); out.close();
         return 0;
     }
     if (app.arguments().contains("--live-check")) {

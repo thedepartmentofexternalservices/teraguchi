@@ -1,10 +1,11 @@
 # Teraguchi workstation picker preview
 
-P3 interface development can proceed while P2 hardware qualification remains
-open. This candidate adds reusable Qt/QML components and a standalone offline
-preview. It does not switch the installed client interface or connect to a host.
-Alan Latteri's PLANK remains the foundation. The existing Qt client is retained;
-there is no new browser client, Swift rewrite or transport change.
+The integrated Mac picker and its offline preview share Qt/QML components.
+The current onboarding revision moves studio setup/import and Mac input review
+into **Settings…**. The main header shows the verified studio name, and one
+notice appears only for a required setup/repair step. Ready users see the
+workstation list and connection controls without completed-onboarding panels.
+Alan Latteri's PLANK remains the foundation; transport behavior is unchanged.
 
 ## What is built
 
@@ -72,8 +73,9 @@ No live frame, measured latency or successful physical output is fabricated.
 
 ## Source and runtime boundaries
 
-Client components are under `apps/client/app/gui/teraguchi/`. They are not loaded
-by the current `main.qml` or production resource manifest. The standalone root
+Client components are under `apps/client/app/gui/teraguchi/` and included in the
+client resource manifest. The explicit workstation entry and configured Mac
+bundle default load `WorkstationWindow.qml`; the ordinary PLANK entry remains. The standalone root
 harness is under `probes/workstation-picker/`; tests are under
 `tests/ui/workstation-picker/`. Read the component README before wiring an adapter.
 
@@ -164,3 +166,11 @@ checks are cancelled on expiry, and delayed callbacks cannot start a session.
 The adapter contract and source-side freshness obligations are documented in
 the client component README. This remains an offline preview, not a source of
 authenticated assignments. Continue with the [P3/P4 checklist](teraguchi-p3-p4.md).
+
+## Current onboarding checks
+
+The local QML suite covers ready/needed states, next-step priority, Settings
+import actions, busy-state disabling and compact dialog bounds. The preview adds
+light, dark and compact Settings captures. Native Mac control pixels still need
+Cocoa inspection; offscreen captures verify layout only. Signed setup and local
+peer filtering are covered by their separate native suites.
