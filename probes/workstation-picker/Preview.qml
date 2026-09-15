@@ -38,6 +38,14 @@ ApplicationWindow {
         function openAccessibilitySettings() { return false; }
         function openInputMonitoringSettings() { return false; }
     }
+    QtObject {
+        id: previewSetup
+        property string state: preview.scenario === "studio-ready" ? "ready" : preview.scenario === "studio-expired" ? "expired" : "needed"
+        property string label: "Example Studio"
+        property bool ready: state === "ready"
+        property bool canImport: true
+        property string message: state === "expired" ? "Studio setup has expired. Import a new file from your administrator." : ""
+    }
     MacPermissionsDialog { id: permissionsDialog; permissions: previewPermissions }
     property int pendingCheck: 0
     property int pendingConnection: 0
@@ -172,6 +180,11 @@ ApplicationWindow {
     Component.onCompleted: {
         reset();
         if (scenario.indexOf("permission-setup-") === 0) permissionsDialog.open();
+        if (scenario === "studio-needed") {
+            previewFlow.selectedId = "";
+            previewFlow.setWorkstations([]);
+            previewFlow.invalidateCatalog();
+        } else if (scenario === "studio-expired") previewFlow.invalidateCatalog();
         if (scenario === "assignment-stale")
             previewFlow.invalidateCatalog();
         else if (scenario === "assignment-refreshing" || scenario === "assignment-failure")
@@ -194,6 +207,12 @@ ApplicationWindow {
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
+        StudioSetupPanel {
+            Layout.fillWidth: true
+            Layout.margins: 12
+            setup: previewSetup
+            visible: preview.scenario.indexOf("studio-") === 0
+        }
         MacPermissionsPanel {
             Layout.fillWidth: true
             permissions: previewPermissions

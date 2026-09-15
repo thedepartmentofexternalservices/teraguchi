@@ -78,6 +78,12 @@ bash "$PLANK_SOURCE_ROOT/scripts/build/build-macos-client.sh" \
   "$PLANK_SOURCE_ROOT" "$PLANK_WORK_ROOT/client-build"
 ```
 
+A configured Teraguchi workstation picker can pin a studio Ed25519 public key
+using `PLANK_STUDIO_CONFIG_PUBLIC_KEY` (64 lowercase hex characters). See
+[signed studio setup](../teraguchi-studio-setup.md). Empty input deliberately
+leaves signed setup unavailable; it must not inherit a previous retained-build
+key. This does not choose a product signing identity or authorize distribution.
+
 For a self-contained drag-to-Applications DMG, in the signing SSH session:
 
 ```bash

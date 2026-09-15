@@ -34,13 +34,31 @@ private slots:
     {
         auto snapshot = TailscaleWorkstations::parseStatus(QJsonDocument(status()).toJson(), "studio-example.ts.net");
         QVariantMap target{{"id", "node-a"}, {"address", "100.100.1.1"}, {"identity", snapshot.identity}};
+        auto permit = std::make_shared<TeraguchiStudio::Permit>();
+        permit->profile.suffix = "studio-example.ts.net";
+        permit->admittedAt = QDateTime::currentSecsSinceEpoch();
+        permit->profile.expires = permit->admittedAt + 3600;
         AssignmentWatch watch("studio-example.ts.net", target, 0,
-                              QCoreApplication::applicationFilePath(), {"--fixture", "success"});
+                              QCoreApplication::applicationFilePath(), {"--fixture", "success"}, permit);
         watch.start();
         for (int i = 0; i < 100 && !watch.permitsConnection(); ++i) QThread::msleep(20);
         const bool refreshed = watch.permitsConnection();
         watch.quit(); QVERIFY(watch.wait(2000));
         QVERIFY(refreshed);
+    }
+    void workerRejectsExpiredStudioPermit()
+    {
+        auto permit = std::make_shared<TeraguchiStudio::Permit>();
+        permit->profile.suffix = "studio-example.ts.net";
+        permit->admittedAt = QDateTime::currentSecsSinceEpoch() - 60;
+        permit->profile.expires = permit->admittedAt + 30;
+        AssignmentWatch watch("studio-example.ts.net", {}, 30000,
+                              QCoreApplication::applicationFilePath(), {"--fixture", "success"}, permit);
+        QVERIFY(!watch.permitsConnection());
+        TailscaleWorkstations reader(QCoreApplication::applicationFilePath(), {"--fixture", "success"}, nullptr);
+        reader.setSessionStudioPermit(permit); reader.setStudioDnsSuffix(permit->profile.suffix);
+        reader.refresh(1);
+        QCOMPARE(reader.state(), QString("configuration-needed")); QVERIFY(!reader.busy());
     }
     void workerRemovalWithoutUiLoop()
     {

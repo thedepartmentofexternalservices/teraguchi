@@ -114,11 +114,15 @@ open the integrated picker with a trusted launcher:
 "$PLANK_CLIENT_EXECUTABLE" --workstations --studio-dns-suffix "$STUDIO_TAILSCALE_DNS_SUFFIX"
 ```
 
-Omitting the suffix opens the setup-needed state without running Tailscale.
+Without a development suffix, the picker uses [signed studio setup](teraguchi-studio-setup.md).
+A missing/invalid/expired setup opens the repair state without running Tailscale.
 Wildcards, malformed suffixes, and combining this entry with a stream command
 are rejected. The picker uses a separate `Teraguchi Development` settings
 namespace and disables mDNS. It does not edit the installed PLANK bookmark
-profile. This explicit launcher input is not a signed configuration distributor.
+profile. The unsigned suffix override works only in builds without a studio
+verification key. Configured builds require a signed setup file and reject the
+unsigned override.
+The app distribution/signing boundary still needs qualification.
 
 One display binds to the physical screen containing the launcher when Connect
 is selected. Two requires exactly two independent, unrotated screens arranged

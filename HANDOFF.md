@@ -11,7 +11,7 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
-Current client gitlink: `d8ef18c8f4cbdcde505e73c6136fa181ed63f755` on `codex/assignment-refresh`.
+Current client gitlink: `c30f0477d5e271da9af524970c89861da10011af` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).
@@ -22,8 +22,8 @@ The explicit development picker now wires credentials, selected-output binding,
 native Session cleanup and [Mac permission onboarding](docs/development/teraguchi-mac-permissions.md).
 Non-prompting permission checks guard login, startup, reconnect and the native
 streaming loop; Settings opens only after an explicit click. The arm64/macOS 26
-build, 139 QML tests, five native permission tests, keyboard/bridge checks, strict
-video, eight Quit scenarios and actual-client startup smoke pass. Thirty-eight
+build, 146 QML tests, five native permission tests, keyboard/bridge checks, strict
+video, eight Quit scenarios and actual-client startup smoke pass. Forty-two
 network-denied simulated screens render.
 
 The [two-output Metal renderer](docs/development/teraguchi-mac-two-output.md) now
@@ -38,8 +38,16 @@ windows, keeps both crops in borderless fullscreen and windowed mode, groups
 minimize/restore and disconnects on either close or display change. 20 synthetic
 binding QtTest results, 92 hidden native placement checks and 139 QML results pass.
 Physical two-output/Spaces/focus/input and live session qualification remain open.
-Next independent work: trusted studio setup and stable distribution/product
-identity. The installed client, host, builder state and postponed soak are unchanged.
+[Signed studio setup](docs/development/teraguchi-studio-setup.md) now verifies an
+Ed25519-signed file against a build-pinned public key, saves it privately and
+rechecks it on launch. Native discovery, PAM/session handoff and reconnect retain
+that setup; expiry closes the session through input cleanup. The import panel
+provides repair states. 23 setup tests, three key-removal checks and 28 provider/
+worker tests pass, along with the complete build and startup smoke. Unsigned development setup is explicitly labelled and
+rejected by key-configured builds. No production key or product identity has
+been selected. Next: distribution identity/build-manifest checks and
+endpoint/access-policy inventory. Physical client/guest/permission qualification,
+the installed client, host, builder state and postponed soak are unchanged.
 
 ## Teraguchi macOS workstation interface
 

@@ -4,6 +4,7 @@ set -euo pipefail
 umask 077
 source_root=$(cd "$(dirname "$0")/../.." && pwd)
 output=${1:?usage: check-tailscale-workstations.sh ABSOLUTE_PRIVATE_OUTPUT}
+: "${PLANK_MAC_CLIENT_DEPS:?Set the retained Mac client dependency root}"
 : "${PLANK_QT_ROOT:?Set the pinned Qt 6.10.2 root}"
 [[ "$output" == /* ]] || exit 2
 mkdir -p "$output"

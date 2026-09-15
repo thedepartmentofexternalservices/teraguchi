@@ -50,6 +50,7 @@ case $role in
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-client-pen.sh" "$PLANK_WORK_ROOT/pen-input" \
       "$client_build/moonlight-common-c/libmoonlight-common-c.a"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-client-keyboard.sh" "$PLANK_WORK_ROOT/keyboard-input"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-studio-setup.sh" "$PLANK_WORK_ROOT/studio-setup"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-input-permissions.sh" "$PLANK_WORK_ROOT/mac-input-permissions"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-presentation.sh" "$PLANK_WORK_ROOT/mac-presentation"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-display-binding.sh" "$PLANK_WORK_ROOT/mac-display-binding"

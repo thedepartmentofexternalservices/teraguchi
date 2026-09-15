@@ -23,7 +23,11 @@ env = os.environ.copy()
 env.update(QT_QPA_PLATFORM='offscreen', QT_QUICK_BACKEND='software', QML_DISABLE_DISK_CACHE='1')
 for i, args in enumerate((['--workstations', '--studio-dns-suffix', '*.ts.net'],
                            ['--studio-dns-suffix', 'studio-example.ts.net'],
-                           ['--workstations', 'stream', 'example.invalid'])):
+                           ['--workstations', 'stream', 'example.invalid'],
+                           ['--workstations', '--studio-config', 'relative-file'],
+                           ['--studio-config', '/nonexistent/example.teraguchi-studio'],
+                           ['--workstations', '--studio-config', '/nonexistent/example.teraguchi-studio'],
+                           ['--workstations', '--studio-config', '/nonexistent/example.teraguchi-studio', '--studio-dns-suffix', 'studio-example.ts.net'])):
     with (work / f'invalid-{i}.txt').open('w') as log:
         result = subprocess.run([exe, *args], cwd=work, env=env, stdout=log,
                                 stderr=subprocess.STDOUT, timeout=10)

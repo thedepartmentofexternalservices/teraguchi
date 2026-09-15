@@ -53,14 +53,18 @@ code behavior; they do not establish live access or physical video qualification
 ### 2. Build resumable onboarding
 
 - [x] Add prerequisite states for Tailscale availability, sign-in/share
-  acceptance and assigned workstation visibility. Trusted setup currently comes
-  from an explicit development launcher argument.
+  acceptance and assigned workstation visibility.
 - [x] Add [Mac permission onboarding](teraguchi-mac-permissions.md) with separate
   Accessibility/Input Monitoring statuses and the actual running bundle name.
 - [x] Reuse the candidate's non-prompting permission checks. Open System Settings
   only after user action; support cancel, return, retry and permission loss.
   Native login, startup, reconnect and the SDL loop repeat the OS checks.
-- [ ] Add trusted distributable studio setup and missing tablet/display repair.
+- [x] Add [signed studio setup import](teraguchi-studio-setup.md), build-pinned
+  verification, private persistence, explicit repair messages, and native
+  provider/PAM/session expiry checks. No production key is configured yet.
+- [ ] Deliver trusted client/setup through the chosen distribution channel and
+  qualify clean-Mac import, repair, expiry and key rotation.
+- [ ] Add missing tablet/display repair guidance.
 - [ ] Decide stable product bundle IDs before permission qualification.
   Keep the diagnostic app's grants separate from product grants.
 - [x] Exercise permission cancellation, retry and loss offline, including loss
@@ -123,7 +127,8 @@ Offline P3 work cannot satisfy these gates. Builder provisioning remains paused.
 
 The [integrated development picker](teraguchi-tailscale-workstations.md) now reaches
 native login and Session execution with permission onboarding and bound one/two
-Mac outputs. Next independent coding: trusted studio configuration and product
-distribution identity, then the external-guest acceptance cases. Physical Mac
+Mac outputs. Signed studio setup is implemented locally. Next independent coding:
+product distribution identity/build-manifest checks and endpoint/access-policy
+inventory, followed by external-guest acceptance cases. Physical Mac
 window/input qualification and P2 hardware limits remain explicit; this slice
 does not complete P3 or enter P4.
