@@ -34,9 +34,12 @@ requires the P2 hardware gates and P3 access/distribution controls.
 - [x] Add cancellation/cleanup handling for login, startup, disconnect and Quit;
   exercise model lifetime ordering, idle application Quit and the native SDL Quit
   bridge locally. Real active-session cleanup remains a live gate.
-- [ ] Implement and qualify native Mac two-output presentation. The current
-  integrated entry binds one physical output and explicitly rejects two before
-  credentials. It does not silently select one or span two onto one surface.
+- [x] Add [two-output Metal rendering](teraguchi-mac-two-output.md) with shared
+  video/input crop geometry, ten-bit GPU checks and hidden-window resource tests.
+- [ ] Wire and qualify native Mac two-output window placement and lifecycle.
+  The integrated entry still binds one physical output and explicitly rejects
+  two before credentials. It does not silently select one or span two onto one
+  surface. Renderer tests do not establish a complete two-display session.
 - [ ] Qualify the exact integrated candidate with external guest sharing, live
   PAM, startup cancellation, display loss, reconnect, revocation and seat denial.
 
@@ -117,6 +120,7 @@ Offline P3 work cannot satisfy these gates. Builder provisioning remains paused.
 
 The [integrated development picker](teraguchi-tailscale-workstations.md) now reaches
 native login and Session execution with permission onboarding. Next: native Mac
-two-output presentation and trusted configuration/product identity. Then prepare
+two-output window placement/lifecycle and trusted configuration/product identity.
+The Metal renderer portion now has local crop and cleanup checks. Then prepare
 external guest and exact-candidate live acceptance. Keep P2 hardware limits and
 the deferred operator work explicit; this slice does not complete P3 or enter P4.

@@ -125,8 +125,9 @@ session start; only that output participates in host layout resolution. Losing
 or moving off the selected output closes the assigned session. Existing bookmark
 layout choices are not overwritten. **Two-display Mac sessions are rejected
 before credentials** and again at the native boundary. The inherited two-output
-presentation implementation is Wayland-only. Adding and qualifying native Mac
-two-output presentation is still required for the dual-display P3/P4 target.
+window placement remains Wayland-only. The [Metal renderer portion](teraguchi-mac-two-output.md)
+now supports two cropped outputs in local tests. Native Mac window lifecycle and
+physical qualification are still required for the dual-display P3/P4 target.
 No one-output fallback satisfies a two-output request.
 
 ## Validation

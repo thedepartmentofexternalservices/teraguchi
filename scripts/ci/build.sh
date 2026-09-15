@@ -51,6 +51,7 @@ case $role in
       "$client_build/moonlight-common-c/libmoonlight-common-c.a"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-client-keyboard.sh" "$PLANK_WORK_ROOT/keyboard-input"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-input-permissions.sh" "$PLANK_WORK_ROOT/mac-input-permissions"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-presentation.sh" "$PLANK_WORK_ROOT/mac-presentation"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-tailscale-workstations.sh" "$PLANK_WORK_ROOT/tailscale-workstations"
     bash "$PLANK_SOURCE_ROOT/scripts/test/check-workstation-ui.sh" "$PLANK_WORK_ROOT/workstation-ui"
     PLANK_CLIENT_EXECUTABLE="$client_build/app/plank-client.app/Contents/MacOS/plank-client" \

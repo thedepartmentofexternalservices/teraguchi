@@ -11,7 +11,7 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
-Current client gitlink: `bec2463717546d3158964d929157fc2a1495d123` on `codex/assignment-refresh`.
+Current client gitlink: `03671c6c9847615592a45d0e63397d42fb25081d` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).
@@ -24,10 +24,18 @@ Non-prompting permission checks guard login, startup, reconnect and the native
 streaming loop; Settings opens only after an explicit click. The arm64/macOS 26
 build, 135 QML tests, five native permission tests, keyboard/bridge checks, strict
 video, eight Quit scenarios and actual-client startup smoke pass. Thirty-eight
-network-denied simulated screens render. Native two-output presentation, trusted
-distribution/product identity and live guest/session/permission qualification
-remain pending. The installed client, host, builder state and postponed soak
-are unchanged.
+network-denied simulated screens render.
+
+The [two-output Metal renderer](docs/development/teraguchi-mac-two-output.md) now
+uses one decoded canvas with a crop per output. Eighteen geometry/input QtTest
+results, 31,680 ten-bit GPU channel checks and 71 production-renderer lifecycle
+checks pass locally. A deliberate uncropped negative control fails as required.
+The lifecycle fixture uses hidden, non-activating windows and synthetic software
+frames; it does not prove hardware decode or physical display behavior.
+The picker still rejects two displays until native Mac window placement and
+display-loss/fullscreen handling are wired. Trusted distribution/product
+identity and live guest/session/permission qualification also remain pending.
+The installed client, host, builder state and postponed soak are unchanged.
 
 ## Teraguchi macOS workstation interface
 
