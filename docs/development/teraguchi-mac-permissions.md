@@ -12,7 +12,10 @@ starts a connection automatically.
 `MacInputAccess::query()` reads `AXIsProcessTrusted()` and
 `CGPreflightListenEventAccess()`. The real reserved-key event tap uses this same
 check. These reads do not request access, install a tap, record input, or open
-System Settings. Only an explicit click opens one of two fixed Settings URLs.
+System Settings. Explicit Request buttons invoke `AXIsProcessTrustedWithOptions`
+with the prompt option or `CGRequestListenEventAccess` for the named permission.
+Dispatching a request does not mark access as allowed; the same OS reads remain
+authoritative. Separate explicit buttons open the two fixed Settings URLs.
 Opening Settings never changes the reported permission state.
 
 The UI refreshes on startup, return to the window, explicit retry and every two
@@ -29,16 +32,26 @@ capture. Real OS revocation timing and active-session cleanup remain live gates.
 
 ## App identity and repair
 
-The dialog names the running bundle using `CFBundleDisplayName`. The development
-build still uses PLANK's existing product bundle identity; its separate
-`Teraguchi Development` settings namespace is not a new macOS permission
-identity. Another app copy or a diagnostic tool may have different grants.
+The dialog names the running bundle using `CFBundleDisplayName`. A local pilot
+may supply a separate bundle identity during packaging. Its declared main
+executable must be the client itself, rather than a launcher that replaces
+itself with a differently signed executable. `TeraguchiWorkstationPicker=true`
+in the strict Mac bundle's Info.plist selects the picker on a no-argument launch
+without a wrapper. Explicit command-line actions are unchanged. The separate
+`Teraguchi Development` settings namespace does not establish permission
+identity. Another copy, diagnostic tool, or rebuilt ad-hoc candidate may have
+different grants.
 
 Users return from Privacy & Security and check again, or quit and reopen if
 macOS requires it. The client does not edit the TCC database, request a blanket
 grant, or infer access from a saved setting. Stable Teraguchi bundle identity,
 signing, permission persistence across updates, and clean-Mac repair still need
 distribution work and qualification with the exact candidate.
+
+If an app is absent from the list, request the named permission first; Settings
+also permits adding the exact installed copy with its Add button. An enabled
+entry for an earlier ad-hoc candidate may need to be removed and the current
+copy added by the operator. Do not reset other apps' permissions.
 
 ## Local validation
 

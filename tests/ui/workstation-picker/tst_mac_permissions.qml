@@ -23,11 +23,14 @@ TestCase {
             property string applicationName: "Example Client"
             property int reads: 0
             property int opens: 0
+            property var requests: []
             property bool openResult: true
             signal statusChanged()
             function refresh() { checked = true; reads++; statusChanged(); return ready; }
             function openAccessibilitySettings() { opens++; return openResult; }
             function openInputMonitoringSettings() { opens++; return openResult; }
+            function requestAccessibility() { requests.push("accessibility"); return openResult; }
+            function requestInputMonitoring() { requests.push("input-monitoring"); return openResult; }
         }
     }
     function init() {
@@ -42,8 +45,22 @@ TestCase {
         dialog.open();
         tryCompare(dialog, "visible", true);
         verify(provider.reads > 0); compare(provider.opens, 0);
+        compare(provider.requests.length, 0);
         compare(flow.phase, "idle"); compare(flow.displayCount, 2);
         dialog.reject(); compare(flow.selectedId, "node-a");
+    }
+    function test_requestsStayExplicitAndNeverAutoConnect() {
+        dialog.open(); tryCompare(dialog, "visible", true);
+        compare(provider.requests.length, 0);
+        dialog.requestAccess("input-monitoring");
+        compare(provider.requests, ["input-monitoring"]);
+        dialog.requestAccess("accessibility");
+        compare(provider.requests, ["input-monitoring", "accessibility"]);
+        compare(provider.opens, 0); verify(!provider.ready);
+        compare(flow.phase, "idle"); verify(!flow.sessionOpen);
+        provider.openResult = false;
+        dialog.requestAccess("input-monitoring");
+        verify(dialog.settingsError.indexOf("+ button") >= 0);
     }
     function test_settingsRequireExplicitActionAndCannotGrantAccess() {
         dialog.open(); tryCompare(dialog, "visible", true);

@@ -1,10 +1,51 @@
 #include "backend/teraguchi/macinputpermissions.h"
+#include "backend/teraguchi/macstartuparguments.h"
 #include <QSignalSpy>
 #include <QTest>
 
 class PermissionTests : public QObject {
     Q_OBJECT
 private slots:
+    void requestsAreExplicitAndDoNotImplyAccess() {
+        int opens = 0;
+        QList<MacInputPermissions::Permission> requests;
+        MacInputAccess::Status status{true, false, false};
+        MacInputPermissions permissions([&] { return status; }, [&](const QUrl&) { ++opens; return true; },
+            [&](MacInputPermissions::Permission permission) { requests.append(permission); });
+        permissions.refresh(); permissions.refresh();
+        QVERIFY(requests.isEmpty()); QCOMPARE(opens, 0);
+        QVERIFY(permissions.requestAccessibility());
+        QCOMPARE(requests, QList<MacInputPermissions::Permission>{MacInputPermissions::Permission::Accessibility});
+        QVERIFY(!permissions.accessibility()); QVERIFY(!permissions.ready());
+        QVERIFY(permissions.requestInputMonitoring());
+        QCOMPARE(requests.last(), MacInputPermissions::Permission::InputMonitoring);
+        QVERIFY(!permissions.inputMonitoring()); QCOMPARE(opens, 0);
+        status = {true, true, true};
+        QVERIFY(permissions.requestAccessibility()); QVERIFY(permissions.requestInputMonitoring());
+        QCOMPARE(requests.size(), 2); QVERIFY(permissions.ready());
+        status.supported = false;
+        QVERIFY(!permissions.requestAccessibility()); QVERIFY(!permissions.requestInputMonitoring());
+        QCOMPARE(requests.size(), 2);
+    }
+    void permissionResultIsReadFromTheOsProbe() {
+        MacInputAccess::Status status{true, false, false};
+        MacInputPermissions permissions([&] { return status; }, [](const QUrl&) { return false; },
+            [&](MacInputPermissions::Permission permission) {
+                if (permission == MacInputPermissions::Permission::Accessibility) status.accessibility = true;
+                else status.inputMonitoring = true;
+            });
+        QVERIFY(permissions.requestAccessibility()); QVERIFY(permissions.accessibility());
+        QVERIFY(!permissions.ready());
+        QVERIFY(permissions.requestInputMonitoring()); QVERIFY(permissions.ready());
+    }
+    void bundleEntryDoesNotNeedASeparateExecutable() {
+        const QStringList ordinary{"client"};
+        QCOMPARE(TeraguchiStartup::arguments(ordinary, false), ordinary);
+        QCOMPARE(TeraguchiStartup::arguments(ordinary, true), QStringList({"client", "--workstations"}));
+        for (const auto& args : {QStringList{"client", "--version"}, QStringList{"client", "--help"},
+                                QStringList{"client", "--workstations"}, QStringList{"client", "stream", "example"}})
+            QCOMPARE(TeraguchiStartup::arguments(args, true), args);
+    }
     void readsNeverOpenSettings() {
         int reads = 0, opens = 0;
         MacInputAccess::Status status{true, false, false};

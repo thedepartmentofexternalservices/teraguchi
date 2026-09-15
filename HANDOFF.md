@@ -11,6 +11,12 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
+Local pilot permission repair adds explicit, individually scoped OS requests.
+Startup and session checks remain non-prompting. Pilot packaging must declare
+the actual client as its main executable; the strict Mac client supports a
+bundle boolean to open the picker without a launcher wrapper. Permission grants
+and persistence still require the exact installed candidate and operator check.
+
 The first authorized local pilot exposed a native assignment-list integration
 bug: QVariantList signals arrive in QML as a sequence rather than a JavaScript
 Array. The adapter now normalizes that list before the flow validates it. A
@@ -18,7 +24,7 @@ real native-provider-to-QML regression reproduces the failure before the fix;
 all 29 native provider/worker results pass afterward. This is discovery repair,
 not live login, video, input, or external-guest qualification.
 
-Current client gitlink: `89e3425babfb3c15c259ef4ec0510bd314e547fc` on `codex/assignment-refresh`.
+Current client gitlink: `26debc7a8f5fa0840559ceb70c8a0b72125e3b2a` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).
