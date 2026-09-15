@@ -41,11 +41,9 @@ struct Fixture {
     }
     void drain() { cocoa(); dispatch(); }
 };
-int main()
+static void runChecks()
 {
     @autoreleasepool {
-        [NSApplication sharedApplication];
-        [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
         CHECK(SDL_Init(SDL_INIT_EVENTS));
         {
             Fixture f;
@@ -121,5 +119,24 @@ int main()
         }
         SDL_Quit();
         std::printf("macos_system_keys assertions=%d result=PASS live_tap=false system_input_posted=false\n",checks);
+    }
+}
+
+int main()
+{
+    @autoreleasepool {
+        [NSApplication sharedApplication];
+        [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
+        // Local event monitors need a running AppKit application. Posting and
+        // draining markers before run() can leave the local monitors inactive.
+        // Stay non-activating and use only this process's synthetic events.
+        dispatch_async(dispatch_get_main_queue(), ^{
+            runChecks();
+            [NSApp stop:nil];
+            [NSApp postEvent:[NSEvent otherEventWithType:NSEventTypeApplicationDefined
+                location:NSZeroPoint modifierFlags:0 timestamp:0 windowNumber:0
+                context:nil subtype:0 data1:0 data2:0] atStart:NO];
+        });
+        [NSApp run];
     }
 }

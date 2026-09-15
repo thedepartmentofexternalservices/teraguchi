@@ -39,6 +39,8 @@ TestCase {
             property int sessions: 0
             property QtObject session: QtObject {}
             signal assignedAuthenticationCompleted(string requestId, string computerId, var error)
+            property bool inputAllowed: true
+            function assignedInputPermissionsReady() { return inputAllowed; }
             property int cancellations: 0
             function cancelAssignedAuthentication(id) { cancellations++; }
             property string displayError: ""
@@ -96,6 +98,26 @@ TestCase {
         compare(computers.requests, 0);
         compare(flow.displayCount, 2);
         compare(flow.problemTitle, "Selected displays unavailable");
+    }
+    function test_missingPermissionsBlocksBeforeHostPreparation() {
+        computers.inputAllowed = false;
+        flow.begin(false);
+        compare(credentialsSpy.count, 0); compare(computers.requests, 0);
+        compare(login.preparingNodeId, ""); compare(flow.problemTitle, "Mac permissions needed");
+    }
+    function test_permissionLossBeforeSubmitDoesNotSendCredentials() {
+        flow.begin(false); computers.inputAllowed = false;
+        verify(!login.submit(flow.generation, "example-artist", "synthetic-value"));
+        compare(computers.requests, 0); compare(login.token, -1);
+        compare(flow.problemTitle, "Mac permissions needed");
+    }
+    function test_permissionLossDuringPamDiscardsResult() {
+        flow.begin(false); verify(login.submit(flow.generation, "example-artist", "synthetic-value"));
+        var requestId = login.requestId;
+        computers.inputAllowed = false;
+        computers.assignedAuthenticationCompleted(requestId, "bookmark-a", undefined);
+        compare(computers.sessions, 0); compare(computers.cancellations, 1);
+        compare(flow.problemTitle, "Mac permissions needed");
     }
     function test_dispatchesCurrentTargetWithoutAttestations() {
         flow.begin(false);

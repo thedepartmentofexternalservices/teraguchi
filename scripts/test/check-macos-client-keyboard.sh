@@ -5,6 +5,7 @@ output=${1:?usage: check-macos-client-keyboard.sh PRIVATE_OUTPUT_DIRECTORY}
 : "${PLANK_MAC_CLIENT_DEPS:?Set the pinned SDL dependency directory}"
 mkdir -p "$output"
 flags=(-std=c++17 -Wall -Wextra -Werror
+    "-I$source_root/apps/client/app"
     "-I$PLANK_MAC_CLIENT_DEPS/install/include"
     "-I$source_root/apps/client/moonlight-common-c/moonlight-common-c/src")
 "${CXX:-c++}" "${flags[@]}" \

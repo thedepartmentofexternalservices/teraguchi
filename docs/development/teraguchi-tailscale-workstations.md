@@ -41,6 +41,9 @@ Sources: [sharing](https://tailscale.com/docs/features/sharing),
   development launcher, credentials, native session execution and deferred cleanup.
 - `AssignmentWatch`: a separate event-loop worker that continues checking local
   Tailscale state while SDL owns the Mac UI thread.
+- `MacInputPermissions` and the permission panel/gate: non-prompting OS checks,
+  explicit Settings actions and cancellation on loss. Native login and Session
+  execution repeat the checks; see [permission onboarding](teraguchi-mac-permissions.md).
 
 The picker initially lists permitted studio node candidates. Selecting Connect
 can prepare a normal bookmark at that node's Tailscale address. Existing bookmark
@@ -152,8 +155,9 @@ actual session cleanup, and clean-Mac onboarding require the scoped live tests.
 
 ## Next integration gate
 
-Implement native Mac two-output presentation and explicit permission onboarding;
-provide trusted studio setup and stable product identity for distribution. Then
+Implement native Mac two-output presentation; provide trusted studio setup and
+stable product identity for distribution. Permission onboarding is integrated
+but still needs clean-Mac and live revocation qualification. Then
 use a real external shared-user Mac to prove one-machine visibility, credentials,
 certificate handling, removal, active-session cleanup, reconnect and seat denial.
 Do not broaden tailnet membership or add a separate assignment service to make
@@ -163,9 +167,10 @@ these tests easier. Preserve strict capture and the working installation.
 
 The development client builds for arm64/macOS 26 with Qt 6.10.2 and the retained
 pinned dependencies. Native tests pass 27 results, including background refresh
-and removal while the UI event loop is not pumped. The QML suite passes 124
-results, including credential clearing, cancellation, cleanup ordering and
-selected-display rejection. Strict video admission/frame metadata and all eight
+and removal while the UI event loop is not pumped. The QML suite passes 135
+results, including credential clearing, cancellation, cleanup ordering,
+permission loss and selected-display rejection. Five native permission results
+also pass with injected checks. Strict video admission/frame metadata and all eight
 native Quit scenarios pass, including their negative controls.
 
 The actual uninstalled client smoke test uses blank portable settings, an absent

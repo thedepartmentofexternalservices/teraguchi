@@ -49,14 +49,17 @@ code behavior; they do not establish live access or physical video qualification
 - [x] Add prerequisite states for Tailscale availability, sign-in/share
   acceptance and assigned workstation visibility. Trusted setup currently comes
   from an explicit development launcher argument.
-- [ ] Add Mac permission onboarding and trusted distributable studio setup.
-- [ ] Reuse the candidate's non-prompting permission checks. Open the normal
-  system settings flow only after user action; support cancel, return, retry,
-  missing tablet/display, and permission loss with clear next actions.
+- [x] Add [Mac permission onboarding](teraguchi-mac-permissions.md) with separate
+  Accessibility/Input Monitoring statuses and the actual running bundle name.
+- [x] Reuse the candidate's non-prompting permission checks. Open System Settings
+  only after user action; support cancel, return, retry and permission loss.
+  Native login, startup, reconnect and the SDL loop repeat the OS checks.
+- [ ] Add trusted distributable studio setup and missing tablet/display repair.
 - [ ] Decide stable product bundle IDs before permission qualification.
   Keep the diagnostic app's grants separate from product grants.
-- [ ] Exercise the state flow offline, then qualify clean-Mac setup and repair
-  with the operator. No UI state substitutes for a real OS permission check.
+- [x] Exercise permission cancellation, retry and loss offline, including loss
+  before/during PAM. No UI state substitutes for a real OS permission check.
+- [ ] Qualify clean-Mac setup, permission persistence and repair with the operator.
 
 ### 3. Close access and ownership controls
 
@@ -113,7 +116,7 @@ Offline P3 work cannot satisfy these gates. Builder provisioning remains paused.
 ## Next coding slice
 
 The [integrated development picker](teraguchi-tailscale-workstations.md) now reaches
-native login and Session execution. Next: native Mac two-output presentation,
-permission onboarding, and trusted configuration/product identity. Then prepare
+native login and Session execution with permission onboarding. Next: native Mac
+two-output presentation and trusted configuration/product identity. Then prepare
 external guest and exact-candidate live acceptance. Keep P2 hardware limits and
 the deferred operator work explicit; this slice does not complete P3 or enter P4.

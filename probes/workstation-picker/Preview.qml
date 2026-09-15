@@ -26,6 +26,19 @@ ApplicationWindow {
         enabled: preview.scenario.indexOf("power-") === 0
         scenario: preview.scenario
     }
+    QtObject {
+        id: previewPermissions
+        property bool checked: true
+        property bool supported: true
+        property bool accessibility: preview.scenario === "permission-setup-allowed"
+        property bool inputMonitoring: preview.scenario === "permission-setup-allowed"
+        readonly property bool ready: accessibility && inputMonitoring
+        property string applicationName: "Example Client"
+        function refresh() { return ready; }
+        function openAccessibilitySettings() { return false; }
+        function openInputMonitoringSettings() { return false; }
+    }
+    MacPermissionsDialog { id: permissionsDialog; permissions: previewPermissions }
     property int pendingCheck: 0
     property int pendingConnection: 0
     property int requestedDisplays: 1
@@ -158,6 +171,7 @@ ApplicationWindow {
     }
     Component.onCompleted: {
         reset();
+        if (scenario.indexOf("permission-setup-") === 0) permissionsDialog.open();
         if (scenario === "assignment-stale")
             previewFlow.invalidateCatalog();
         else if (scenario === "assignment-refreshing" || scenario === "assignment-failure")
@@ -180,6 +194,12 @@ ApplicationWindow {
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
+        MacPermissionsPanel {
+            Layout.fillWidth: true
+            permissions: previewPermissions
+            visible: preview.scenario.indexOf("permission-") === 0
+            onReviewRequested: permissionsDialog.open()
+        }
         WorkstationPicker {
             Layout.fillWidth: true
             Layout.fillHeight: true

@@ -46,7 +46,7 @@ log = (out / 'qml-tests.txt').read_text()
 # Qt's first font-alias lookup is a platform notice, not a QML binding error.
 if any('QWARN' in line and 'qt.qpa.fonts:' not in line for line in log.splitlines()):
     raise SystemExit('Unexpected Qt/QML warning; inspect private test log.')
-scenarios = ('assignment-stale', 'assignment-refreshing', 'assignment-failure', 'ready', 'offline', 'occupied', 'incompatible', 'empty', 'connected',
+scenarios = ('permission-panel-needed', 'permission-setup-needed', 'permission-setup-allowed', 'assignment-stale', 'assignment-refreshing', 'assignment-failure', 'ready', 'offline', 'occupied', 'incompatible', 'empty', 'connected',
              'interrupted', 'display-mismatch', 'source-depth', 'permissions',
              'seat-race', 'connection-failure', 'power-off', 'power-standby',
              'power-unknown', 'power-starting', 'power-unavailable', 'power-no-access', 'power-stale')
@@ -57,7 +57,7 @@ if native_capture:
     capture_env['QT_QPA_PLATFORM'] = 'cocoa'
     capture_env.pop('QT_QUICK_BACKEND', None)
 
-for appearance, compact, states in (('light', False, scenarios), ('light', True, ('ready', 'display-mismatch', 'interrupted', 'power-off', 'power-unknown', 'power-starting')), ('dark', False, ('ready', 'power-off', 'interrupted')), ('dark', True, ('power-unknown',))):
+for appearance, compact, states in (('light', False, scenarios), ('light', True, ('permission-panel-needed', 'permission-setup-needed', 'ready', 'display-mismatch', 'interrupted', 'power-off', 'power-unknown', 'power-starting')), ('dark', False, ('permission-setup-allowed', 'ready', 'power-off', 'interrupted')), ('dark', True, ('power-unknown',))):
     for state in states:
         name = state + ('-compact' if compact else '') + ('-dark' if appearance == 'dark' else '')
         image = out / (name + '.png')
