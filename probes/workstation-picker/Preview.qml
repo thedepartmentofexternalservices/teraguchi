@@ -9,8 +9,8 @@ ApplicationWindow {
     visible: true
     width: previewWidth
     height: previewHeight
-    minimumWidth: 860
-    minimumHeight: 680
+    minimumWidth: 780
+    minimumHeight: 570
     title: "Teraguchi · Interface preview"
     color: theme.canvas
     TeraguchiTheme {
@@ -171,37 +171,6 @@ ApplicationWindow {
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
-        Rectangle {
-            Layout.fillWidth: true
-            implicitHeight: 42
-            color: "#F5F4F1"
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: 30
-                anchors.rightMargin: 30
-                Label {
-                    text: "INTERFACE PREVIEW"
-                    color: "#0A0A0A"
-                    font.family: theme.sans
-                    font.pixelSize: 10
-                    font.weight: Font.Bold
-                    font.letterSpacing: 1
-                }
-                Rectangle {
-                    width: 1
-                    height: 14
-                    color: "#8C8A85"
-                }
-                Label {
-                    Layout.fillWidth: true
-                    text: "Sample workstations. No network connection, video, or input forwarding."
-                    color: "#0A0A0A"
-                    font.family: theme.sans
-                    font.pixelSize: 11
-                    elide: Text.ElideRight
-                }
-            }
-        }
         WorkstationPicker {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -210,61 +179,77 @@ ApplicationWindow {
         }
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 64
-            color: "#141414"
+            implicitHeight: 38
+            color: theme.toolbar
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: theme.stroke
+            }
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: 30
-                anchors.rightMargin: 30
+                anchors.leftMargin: 16
+                anchors.rightMargin: 16
                 spacing: 12
                 Label {
-                    text: "SIMULATE"
-                    color: "#C9C7C1"
-                    font.family: theme.sans
-                    font.pixelSize: 10
-                    font.letterSpacing: 1
-                }
-                ComboBox {
-                    id: scenarios
-                    Layout.preferredWidth: 230
-                    model: ["Normal connection", "Workstation becomes occupied", "Missing Mac permissions", "Missing selected display", "8-bit capture source", "Connection fails", "Power: outlet off", "Power: verified standby", "Power: unknown", "Power: starting", "Power: unavailable", "Power: no permission", "Power: stale status"]
-                    property var presetKeys: ["ready", "seat-race", "permissions", "display-mismatch", "source-depth", "connection-failure", "power-off", "power-standby", "power-unknown", "power-starting", "power-unavailable", "power-no-access", "power-stale"]
-                    currentIndex: Math.max(0, presetKeys.indexOf(preview.scenario))
-                    onActivated: {
-                        scenario = presetKeys[currentIndex];
-                        reset();
-                    }
-                    Accessible.name: "Preview scenario"
-                    background: Rectangle {
-                        radius: 0
-                        color: "#0A0A0A"
-                        border.color: scenarios.activeFocus ? "#0099AF" : "#4A4845"
-                    }
-                    contentItem: Text {
-                        leftPadding: 12
-                        rightPadding: 26
-                        text: scenarios.displayText
-                        color: "#FFFFFF"
-                        font.family: theme.sans
-                        font.pixelSize: 12
-                        verticalAlignment: Text.AlignVCenter
-                        elide: Text.ElideRight
-                    }
-                }
-                Item {
                     Layout.fillWidth: true
+                    text: "Preview only. Sample workstations; no network or power commands."
+                    font.pixelSize: 11
+                    color: theme.muted
+                    elide: Text.ElideRight
                 }
                 TeraguchiButton {
-                    text: "Simulate drop"
+                    text: "Scenarios…"
+                    onClicked: scenarioDialog.open()
+                }
+            }
+        }
+    }
+    Dialog {
+        id: scenarioDialog
+        title: "Preview scenarios"
+        parent: Overlay.overlay
+        anchors.centerIn: parent
+        width: 440
+        modal: true
+        standardButtons: Dialog.Close
+        ColumnLayout {
+            spacing: 12
+            Label {
+                Layout.fillWidth: true
+                text: "These scenarios use simulated workstations. No connections or power commands are sent."
+                font.pixelSize: 13
+                wrapMode: Text.WordWrap
+            }
+            ComboBox {
+                id: scenarios
+                Layout.fillWidth: true
+                font.pixelSize: 13
+                model: ["Normal connection", "Workstation becomes occupied", "Missing Mac permissions", "Missing selected display", "8-bit capture source", "Connection fails", "Power: outlet off", "Power: verified standby", "Power: unknown", "Power: starting", "Power: unavailable", "Power: no permission", "Power: stale status"]
+                property var presetKeys: ["ready", "seat-race", "permissions", "display-mismatch", "source-depth", "connection-failure", "power-off", "power-standby", "power-unknown", "power-starting", "power-unavailable", "power-no-access", "power-stale"]
+                currentIndex: Math.max(0, presetKeys.indexOf(preview.scenario))
+                onActivated: {
+                    scenario = presetKeys[currentIndex];
+                    reset();
+                    scenarioDialog.close();
+                }
+                Accessible.name: "Preview scenario"
+            }
+            RowLayout {
+                TeraguchiButton {
+                    text: "Simulate interruption"
                     enabled: previewFlow.phase === "connected"
-                    onClicked: previewFlow.interrupted(previewFlow.generation)
+                    onClicked: {
+                        previewFlow.interrupted(previewFlow.generation);
+                        scenarioDialog.close();
+                    }
                 }
                 TeraguchiButton {
                     text: "Reset preview"
                     onClicked: {
                         scenario = "ready";
-                        scenarios.currentIndex = 0;
                         reset();
+                        scenarioDialog.close();
                     }
                 }
             }

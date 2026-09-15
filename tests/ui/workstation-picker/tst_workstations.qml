@@ -8,8 +8,8 @@ TestCase {
     name: "TeraguchiWorkstations"
     when: windowShown
     visible: true
-    width: 1120
-    height: 690
+    width: 940
+    height: 612
     property var controller
     property var activeView: null
     Component {
@@ -87,8 +87,8 @@ TestCase {
         wait(0);
     }
     function init() {
-        tests.Window.window.width = 1120;
-        tests.Window.window.height = 690;
+        tests.Window.window.width = 940;
+        tests.Window.window.height = 650;
         controller = createTemporaryObject(flowComponent, tests);
         verify(controller !== null);
         controller.setWorkstations(hosts());
@@ -453,8 +453,8 @@ TestCase {
     function test_uiButtonsDriveTheFlow() {
         var view = pickerComponent.createObject(tests, {
             flow: controller,
-            width: 1120,
-            height: 690
+            width: 940,
+            height: 612
         });
         activeView = view;
         verify(view !== null);
@@ -473,12 +473,12 @@ TestCase {
         compare(controller.phase, "idle");
     }
     function test_uiCompactKeepsPrimaryActionVisible() {
-        tests.Window.window.width = 860;
-        tests.Window.window.height = 680;
+        tests.Window.window.width = 780;
+        tests.Window.window.height = 570;
         var view = pickerComponent.createObject(tests, {
             flow: controller,
-            width: 860,
-            height: 574
+            width: 780,
+            height: 532
         });
         activeView = view;
         controller.chooseDisplays(2);
@@ -496,34 +496,68 @@ TestCase {
     function test_uiCompactCanScrollToDetails() {
         var view = pickerComponent.createObject(tests, {
             flow: controller,
-            width: 860,
-            height: 574
+            width: 780,
+            height: 532
         });
         activeView = view;
+        waitForRendering(view);
+        var details = findChild(view, "detailsButton");
+        var corner = details.mapToItem(view, 0, 0);
+        verify(corner.y >= 0 && corner.y + details.height <= view.height);
+        mouseClick(details);
+        verify(view.detailsOpen);
         waitForRendering(view);
         var scroll = findChild(view, "connectionScroll");
         var bar = findChild(view, "connectionScrollBar");
         verify(scroll.contentHeight > scroll.availableHeight);
         verify(bar.height > 100);
-        var corner = bar.mapToItem(scroll, 0, 0);
+        corner = bar.mapToItem(scroll, 0, 0);
         compare(corner.x + bar.width, scroll.width);
         compare(corner.y, scroll.topPadding);
-        // Exercise the scrollbar itself, not a direct contentY assignment.
+        var initialY = scroll.contentItem.contentY;
         bar.forceActiveFocus();
         for (var step = 0; step < 12; ++step)
             keyClick(Qt.Key_Down);
         waitForRendering(view);
-        var details = findChild(view, "detailsButton");
-        corner = details.mapToItem(scroll, 0, 0);
-        verify(corner.y >= 0 && corner.y + details.height <= scroll.height);
-        mouseClick(details);
-        verify(view.detailsOpen);
+        verify(scroll.contentItem.contentY > initialY);
+        // The primary action remains available while details scroll.
+        mouseClick(findChild(view, "connectButton"));
+        compare(controller.phase, "checking");
     }
+    function test_uiSearchAndArrowNavigation() {
+        var view = pickerComponent.createObject(tests, {
+            flow: controller,
+            width: 940,
+            height: 612
+        });
+        activeView = view;
+        waitForRendering(view);
+        var row = findChild(view, "host-a");
+        row.forceActiveFocus();
+        keyClick(Qt.Key_Down);
+        compare(controller.selectedId, "b");
+        keyClick(Qt.Key_Up);
+        compare(controller.selectedId, "a");
+        var search = findChild(view, "workstationSearch");
+        search.forceActiveFocus();
+        keyClick(Qt.Key_B);
+        tryCompare(findChild(view, "workstationList"), "count", 1);
+        compare(view.visibleWorkstations[0].id, "b");
+        mouseClick(findChild(view, "host-b"));
+        compare(controller.selectedId, "b");
+        verify(!findChild(view, "connectButton").enabled);
+        search.forceActiveFocus();
+        keyClick(Qt.Key_X);
+        tryCompare(findChild(view, "workstationList"), "count", 0);
+        compare(controller.selectedId, "b");
+        compare(controller.workstations.length, 4);
+    }
+
     function test_uiDisplayChoiceKeyboardAndSessionLock() {
         var view = pickerComponent.createObject(tests, {
             flow: controller,
-            width: 1120,
-            height: 690
+            width: 940,
+            height: 612
         });
         activeView = view;
         waitForRendering(view);
@@ -541,8 +575,8 @@ TestCase {
     function test_uiUnavailableAndKeyboardActivation() {
         var view = pickerComponent.createObject(tests, {
             flow: controller,
-            width: 1120,
-            height: 690
+            width: 940,
+            height: 612
         });
         activeView = view;
         verify(view !== null);

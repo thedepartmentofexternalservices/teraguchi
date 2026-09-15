@@ -9,6 +9,7 @@
     <file alias="TeraguchiButton.qml">../../apps/client/app/gui/teraguchi/TeraguchiButton.qml</file>
     <file alias="TeraguchiDisplayChoice.qml">../../apps/client/app/gui/teraguchi/TeraguchiDisplayChoice.qml</file>
     <file alias="TeraguchiScrollBar.qml">../../apps/client/app/gui/teraguchi/TeraguchiScrollBar.qml</file>
+    <file alias="TeraguchiComputerIcon.qml">../../apps/client/app/gui/teraguchi/TeraguchiComputerIcon.qml</file>
     <file alias="TeraguchiTheme.qml">../../apps/client/app/gui/teraguchi/TeraguchiTheme.qml</file>
   </qresource>
 </RCC>

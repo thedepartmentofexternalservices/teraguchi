@@ -12,6 +12,7 @@
 #include <QQmlNetworkAccessManagerFactory>
 #include <QQuickStyle>
 #include <QQuickWindow>
+#include <QStyleHints>
 #include <QTimer>
 
 class BlockedReply final : public QNetworkReply {
@@ -42,14 +43,18 @@ int main(int argc, char** argv) {
     QGuiApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("Teraguchi UI Preview"));
     app.setOrganizationName(QStringLiteral("TeraguchiPreview"));
-    QQuickStyle::setStyle(QStringLiteral("Basic"));
+    QQuickStyle::setStyle(QStringLiteral("macOS"));
     QCommandLineParser parser;
     parser.addHelpOption();
-    parser.addOption({"capture", "Save an offscreen preview and exit.", "file"});
+    parser.addOption({"capture", "Save the preview window and exit.", "file"});
     parser.addOption({"scenario", "Sample state to preview.", "name", "ready"});
+    parser.addOption({"appearance", "Preview appearance: system, light or dark.", "name", "system"});
     parser.addOption({"compact", "Use the minimum supported preview size."});
     parser.addOption({"verify-network-block", "Verify the preview denies network requests without opening a window."});
     parser.process(app);
+    const auto appearance = parser.value("appearance");
+    if (appearance != "system" && appearance != "light" && appearance != "dark") return 2;
+    if (appearance != "system") app.styleHints()->setColorScheme(appearance == "dark" ? Qt::ColorScheme::Dark : Qt::ColorScheme::Light);
     if (parser.isSet("verify-network-block")) {
         OfflineNetwork blocked;
         auto* reply = blocked.get(QNetworkRequest(QUrl(QStringLiteral("https://example.invalid/preview-test"))));
@@ -69,8 +74,8 @@ int main(int argc, char** argv) {
     bool qmlWarnings = false;
     QObject::connect(&engine, &QQmlEngine::warnings, &app, [&](const QList<QQmlError>&) { qmlWarnings = true; });
     engine.rootContext()->setContextProperty("initialScenario", parser.value("scenario"));
-    engine.rootContext()->setContextProperty("previewWidth", parser.isSet("compact") ? 860 : 1120);
-    engine.rootContext()->setContextProperty("previewHeight", parser.isSet("compact") ? 680 : 790);
+    engine.rootContext()->setContextProperty("previewWidth", parser.isSet("compact") ? 780 : 940);
+    engine.rootContext()->setContextProperty("previewHeight", parser.isSet("compact") ? 570 : 650);
     engine.load(QUrl(QStringLiteral("qrc:/preview/Preview.qml")));
     if (engine.rootObjects().isEmpty()) return 3;
     if (parser.isSet("capture")) {

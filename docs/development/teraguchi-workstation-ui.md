@@ -32,43 +32,43 @@ optional studio provider supplies the proposed power-on interface described in
 
 ## Design and interaction
 
-The current design adapts the **1986 Studios Coolant** system to native Qt/QML:
-ink/paper contrast, square controls, a compact Archivo Black wordmark, indexed
-workstations, and outlined one/two-display cards. Cyan marks selection and
-keyboard focus. Lime and azure support status labels; words carry the meaning
-independently of color. Primary buttons invert black/white on hover. No imagery,
-gradients, rounded cards, shadows or remote asset loading are introduced.
-Alan's PLANK attribution remains visible in the footer. The wordmark is a
-proposal; package identifiers, production icons, signing identity and saved
-settings remain unchanged.
+The current direction follows familiar macOS utility conventions: a compact
+15 px app label, toolbar, searchable sidebar, selected-workstation details and
+nearby Connect/Power on actions. The user's macOS direction supersedes the
+previous Coolant visual proposal. System typography and restrained surfaces
+replace the custom fonts, numbered rows and outlined display cards. Alan's
+PLANK attribution remains visible at the bottom of the sidebar.
 
-The source is `1986 Studios Design System coolant/README.md` and
-`colors_and_type.css` in the supplied design-system repository. Its README and
-CSS define the Coolant cyan palette; the older orange in that folder's
-`SKILL.md` is not used. The Qt theme maps the core tokens directly and converts
-OKLCH accents to channel-clipped sRGB: cyan `#0099AF`, azure `#3C79D1`, lime
-`#6FC267`. It follows the 8-point spacing scale and hard-edged line icon rules.
-Automotive imagery and customer pitch content are not part of this client.
+The preview selects Qt Quick Controls' **macOS style**. Buttons, radio buttons,
+search, scrollbars and the preview dialog use its standard controls. Their
+backgrounds and content items are not replaced. The sidebar uses a deliberately
+custom Basic delegate with system selection colors and an original QML computer
+glyph. The spinner uses Basic's QML implementation because the prepared Qt tree
+lacks the WebP plugin required by macOS style's animated spinner asset.
 
-Typography uses installed Archivo, Archivo Black and JetBrains Mono on the
-preview Mac, with explicit Helvetica Neue/Archivo and Menlo fallbacks. Font
-files are not copied or downloaded at runtime. A distributable client still
-needs licensed font assets and notices bundled with its resources so that a
-clean Mac receives the same typography. The preview does not close that gate.
+The system font comes from Qt's application font. There are no custom fonts to
+bundle for this design. Light and dark surfaces follow the application's color
+scheme; interactive previews follow the system by default. The capture-only
+appearance option changes this process, not the user's macOS preferences.
+This remains a Qt app; no SwiftUI conversion or Liquid Glass fidelity is claimed.
+References: [Apple typography](https://developer.apple.com/design/human-interface-guidelines/typography),
+[Apple layout](https://developer.apple.com/design/human-interface-guidelines/layout),
+and [Qt macOS style](https://doc.qt.io/qt-6/qtquickcontrols-macos.html).
 
-Buttons and workstation rows accept keyboard focus and activation. Each row
-announces its name and status. Host names use plain text, never rich-text
-interpretation. Main connection/recovery actions stay beneath the scrolling
-details, so long errors cannot hide them at the compact window size. The chosen
-display layout remains identifiable when its controls are locked during a
-connection. Scrollbars have square, visible thumbs, and the details scrollbar
-is positioned at the right edge with the full viewport height. Screen-reader
-and physical-keyboard acceptance remain open.
+Search filters the assigned list locally; it cannot grant assignment or change
+authorization. Up/Down changes selection within the visible list. Buttons and
+rows accept keyboard focus and activation; each row announces its name/status.
+Host names render as plain text. Display choice uses standard radio buttons and
+remains identifiable when locked during a connection. Primary actions remain
+outside the scrolling details area. Technical power telemetry is collapsed by
+default, while the verified-standby outlet-cycle explanation stays visible.
+Screen-reader and physical-keyboard acceptance remain open.
 
-The preview contains a permanent simulation banner and developer scenario
-controls. They are part of the harness, not the proposed artist workflow. Sample
-names contain no deployment inventory or artist identities. No artwork, live
-frame, measured latency or successful physical output is fabricated.
+The harness has a permanent preview-only footer. Developer scenarios move into
+a separate dialog instead of occupying the artist's main work area. Sample
+names contain no deployment inventory or artist identities. Captures show the
+window's content; the native window frame is not faked or drawn into the UI.
+No live frame, measured latency or successful physical output is fabricated.
 
 ## Source and runtime boundaries
 
@@ -81,8 +81,8 @@ The harness embeds QML resources and initializes only Qt and the sample model.
 It has no ComputerManager, discovery, credential entry, saved bookmark access,
 streaming or input-forwarding code. Its QML network manager rejects every
 request, and a separate check verifies that rejection. It uses its own preview
-application identity and writes no preferences. Captures use an offscreen Qt
-window, not macOS screen recording.
+application identity and writes no preferences. Captures read only the preview
+window through Qt, without macOS screen recording.
 
 ## Build and inspect
 
@@ -95,40 +95,47 @@ bash scripts/test/check-workstation-ui.sh "$PRIVATE_UI_OUTPUT"
 ```
 
 The script compiles an arm64 Mac preview, runs the QML state/control tests,
-checks network denial, and renders normal/compact sample screens. To explore
-it interactively on the development Mac after that build:
+checks network denial, and renders normal/compact sample screens. Default
+headless captures test layout only: native control painting is incomplete with
+Qt's offscreen platform. For accurate native control pixels, run in an available
+Mac GUI session with `PLANK_UI_NATIVE_CAPTURE=1` added to that command. It opens
+short-lived simulated windows, uses Cocoa and Qt's default Mac graphics backend,
+captures each preview's own window, and exits. It does not use screen recording.
+Cocoa with the software scene graph also renders native controls incompletely;
+leave `QT_QUICK_BACKEND` unset for visual review. The script does this for native
+capture and records the capture platform in its summary.
+
+To explore it interactively on the development Mac after that build:
 
 ```sh
 "$PRIVATE_UI_OUTPUT/build/teraguchi-ui-preview"
 ```
 
 This executable relies on the prepared Qt installation. It is not a signed,
-notarized or distributable Teraguchi application. No GUI preview was left running
-after the automated checks.
+notarized or distributable Teraguchi application. Each capture process exits automatically after saving its own window.
 
 ## Validation and limitations
 
 Test environment: Mac Studio M2 Ultra, 64 GB RAM, macOS 26.5.2 (25F84), Qt 6.10.2,
-Apple Clang, arm64 target, offscreen software scene graph. No Rocky or Flame
-runtime participated. This candidate does not establish physical display or
+Apple Clang, arm64 target, offscreen software scene graph for QML tests, Cocoa/default Mac graphics for
+visual captures. No Rocky or Flame runtime participated. This candidate does not establish physical display or
 hardware-rendering performance.
 
 The local suite covers unavailable/unassigned hosts, malformed catalogs,
 required attestations, simultaneous requests, stale callbacks, cancellation,
 assignment removal, selected display preservation, explicit reconnect,
 disconnect semantics, mouse clicks, keyboard activation and compact action
-visibility. Screens are rendered at 1120×790 and 860×680. Qt's first font lookup
+visibility. Screens are rendered at 940×650 and 780×570 in light appearance,
+with four additional dark-appearance cases. Qt's first offscreen font lookup
 emits a platform notice; no QML type or binding warning is accepted by the runner.
-The current revision passes 68 QtTest results including both suites' setup and
-cleanup. Added cases cover optional power eligibility, uncertainty, freshness,
-duplicate clicks, assignment changes and simulated boot completion. Compact
-scrolling, display keyboard activation and locked selection remain covered.
-Network denial and 25 rendered screens also pass. Normal and compact ready,
-error and recovery screens were visually inspected. The preceding candidate's
-stale-request/display-count negative controls and 12 CI policy/context tests
-remain applicable; flow logic and CI wiring did not change in this visual
-revision. Exact commits, design-source hashes and capture hashes are retained
-in the private receipt.
+The current revision passes 69 QtTest results including both suites' setup and
+cleanup. Search, arrow navigation, native display-control activation, compact
+scrolling/action access and collapsed power telemetry are covered. Existing
+power eligibility, freshness, duplicate request and simulated boot tests pass.
+Network denial and 29 rendered screens also pass. Normal/compact connection,
+power, error and recovery screens were visually inspected in native captures.
+The flow model and CI wiring did not change in this visual revision. Exact
+source commits, capture hashes and the visual-review record remain private.
 The Mac CI build path now calls the same checker; hosted CI has not been run.
 
 ## Next integration slice

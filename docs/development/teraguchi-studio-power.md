@@ -132,7 +132,10 @@ These service and hardware tests have not run; the service is not built yet.
 
 ## Preview validation
 
-The smaller wordmark is 22 px (20 px in the compact window). Optional power
+The macOS layout uses a compact 15 px application label. Power on and Check
+status sit below the selected workstation. Outlet and machine telemetry are
+behind Show power details; the verified-standby cycle explanation stays visible.
+Optional power
 scenarios use seven fictitious assigned workstations and cover outlet off,
 verified standby, unknown machine state, starting, service failure, no permission
 and stale status. The normal preview keeps the provider disabled.

@@ -9,8 +9,8 @@ TestCase {
     name: "TeraguchiStudioPower"
     when: windowShown
     visible: true
-    width: 1120
-    height: 690
+    width: 940
+    height: 612
     property var flow
     property var provider
     property var view: null
@@ -60,8 +60,8 @@ TestCase {
         signalName: "refreshRequested"
     }
     function init() {
-        tests.Window.window.width = 1120;
-        tests.Window.window.height = 790;
+        tests.Window.window.width = 940;
+        tests.Window.window.height = 650;
         flow = createTemporaryObject(flowComponent, tests);
         provider = createTemporaryObject(providerComponent, tests);
         flow.setWorkstations([
@@ -99,8 +99,8 @@ TestCase {
         view = pickerComponent.createObject(tests, {
             flow: flow,
             studioPower: adapter,
-            width: compact ? 860 : 1120,
-            height: compact ? 574 : 690
+            width: compact ? 780 : 940,
+            height: compact ? 532 : 612
         });
         verify(view !== null);
         waitForRendering(view);
@@ -298,6 +298,11 @@ TestCase {
         var machine = findChild(view, "machinePowerLabel");
         var outlet = findChild(view, "outletPowerLabel");
         compare(machine.text, "Unknown");
+        verify(!machine.visible);
+        mouseClick(findChild(view, "powerDetailsButton"));
+        verify(view.powerDetailsOpen);
+        verify(machine.visible && outlet.visible);
+        waitForRendering(view);
         verify(machine.mapToItem(view, 0, 0).x - outlet.mapToItem(view, 0, 0).x >= 100);
         verify(!view.canRequestPower);
         // Other studios can supply providers with no outlet telemetry.

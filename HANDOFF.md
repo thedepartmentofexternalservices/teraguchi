@@ -2,43 +2,43 @@
 
 Read AGENTS.md and the platform build runbook before work.
 
-## Teraguchi optional studio power preview
+## Teraguchi macOS workstation interface
 
-Local branch `codex/optional-workstation-power` starts at root
-`4ca62c81ef66d54af7e76eef46a0114ce7ef3db8` and client
-`ca7e87cf7181dba49715554b378d75a3f242aae3`. The client gitlink is
-`48568fa23314eb74daa40cee3695cbc81514bdb8`, containing the smaller wordmark and optional power
-presentation. Host, transport and other
-recursive pins are unchanged. The Linux input candidate is still unpromoted.
+Local branch `codex/macos-workstation-ui` starts at root
+`ff3948bb2e6b208f1fa62bee5f48c84a6771f0ec` and client
+`48568fa23314eb74daa40cee3695cbc81514bdb8`. The client gitlink is
+`ce00cde589f91ee8ae8128bb42c2b8d0bc8e8dca`. Host, transport and other recursive pins are unchanged.
+The Linux input candidate remains unpromoted.
 
-The header wordmark is reduced to 22 px (20 px compact). An administrator-enabled
-studio adapter can expose power status and Power on; the default is absent.
-The offline harness simulates seven assigned workstations and off, verified
-standby, unknown, starting, unavailable, denied and stale states. Outlet power
-is separate from machine/connection status. Unknown or stale evidence cannot
-permit a cycle. Read [the provider and private-service plan](docs/development/teraguchi-studio-power.md).
-
-The local bot source already supplies outlet status and on/cycle operations.
-Live integration still requires an always-on authenticated studio service,
-assignment checks, durable jobs, cross-caller locking, safe off-state evidence
-and a qualified controller trust/configuration path. The client must not send
-Slack commands or hold power-strip credentials. The inherited Relay wake path
-is unchanged. Public code contains only generic presentation and mock scenarios.
+The user's macOS direction replaces the Coolant visual proposal. The preview
+uses Qt macOS controls, system typography, a compact toolbar, searchable sidebar,
+native display radios and actions beside the selected workstation. Light/dark
+appearance is supported. Optional studio power remains disabled by default;
+telemetry is in a disclosure while the standby-cycle explanation stays visible.
+Read [the UI scope and capture procedure](docs/development/teraguchi-workstation-ui.md)
+and [the private power-service plan](docs/development/teraguchi-studio-power.md).
 
 The arm64 preview build passes with Qt 6.10.2 on Mac Studio M2 Ultra,
-macOS 26.5.2 (25F84). 68 QtTest results pass, with network denial and 25 offscreen
-renders. Normal and compact screens were visually inspected. This is not a
-live service, full release build, physical test or power-control qualification.
-No installed app, workstation or power strip was accessed or changed. No Slack
-message was sent, no service deployed, and nothing published. Private evidence
-and recovery bundles record exact source commits. P2 gates remain open.
+macOS 26.5.2 (25F84). 69 QtTest results pass with network denial. There are 29
+normal/compact light/dark captures. Accurate native control painting needs Cocoa
+and the default Mac graphics backend: headless/software captures omit parts of
+native controls and are layout evidence only. Native captures were visually
+reviewed. The separate preview opens briefly and exits; it captures its own
+window without screen recording. Exact commits and private evidence hashes are
+retained with verified Git recovery bundles.
 
-Next: build and test the private power-service core against a fake controller,
-then add read-only authenticated status before enabling starts. Pilot any live
-power change only on the previously authorized test workstation, with agreed
-operator attendance and verified recovery. Do not infer permission to power the
-whole fleet from inventory or UI fixtures. Preserve the strict session-adapter,
-native capture, physical input/display and recovery qualification requirements.
+No installed client, host or power strip changed. No live power service is built,
+no Slack command was sent, and nothing is published. The connection-flow model
+and its strict checks are unchanged. Physical display/input, accessibility,
+production lifecycle/resource integration and clean-Mac packaging remain open.
+
+Next: wire authoritative assignments and PLANK's existing authentication/session
+objects into the UI with the same strict admission and cancellation contract.
+The private power service can be built against a fake controller before adding
+read-only authenticated status. A later live pilot remains limited to the
+previously authorized test workstation, with agreed attendance and verified
+recovery. Inventory does not authorize fleet power changes. P2 gates remain open;
+new transport work and Windows remain gated. Earlier input checkpoints follow.
 
 ## Teraguchi Linux input preparation
 
