@@ -263,6 +263,33 @@ TestCase {
         computers.assignedAuthenticationCompleted("request-1", "bookmark-a", "denied");
         compare(sessionSpy.count, 0);
         compare(flow.phase, "blocked");
+        compare(flow.problemTitle, "Sign-in check failed");
+        compare(flow.problem, "denied");
+    }
+    function test_headlessDisplayErrorSurvivesLoginCleanup() {
+        var dialog = createTemporaryObject(dialogType, tests, {flow: flow, login: login});
+        flow.begin(false);
+        login.submit(flow.generation, "example-artist", "fixture-only");
+        computers.assignedAuthenticationCompleted("request-1", "bookmark-a", "Host reported no connected outputs (Error 400)");
+        compare(sessionSpy.count, 0);
+        compare(computers.sessions, 0);
+        compare(login.requestId, "");
+        compare(computers.displayToken, "");
+        compare(flow.phase, "blocked");
+        compare(flow.supportCode, "displays");
+        compare(flow.problemTitle, "Workstation display unavailable");
+        verify(flow.problem.indexOf("no active displays") >= 0);
+        compare(dialog.visible, false);
+        flow.refresh();
+        provider.catalogReady(provider.requestToken, provider.entries, 30000);
+        compare(flow.problemTitle, "Workstation display unavailable");
+    }
+    function test_signInErrorIsBoundedAndCannotStartSession() {
+        flow.begin(false);
+        login.submit(flow.generation, "example-artist", "fixture-only");
+        computers.assignedAuthenticationCompleted("request-1", "bookmark-a", "x".repeat(2000));
+        compare(flow.problem.length, 1024);
+        compare(computers.sessions, 0);
     }
 
     function test_discoveryWaitsForVerifiedHost() {

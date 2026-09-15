@@ -11,6 +11,14 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
+The pilot connection check exposed a headless-display diagnostic gap. The
+client still rejects a host with no active outputs, but now names that condition
+and retains the sign-in error in the picker instead of replacing it with a
+generic connection failure. 17 native topology results and 159 QML results pass;
+negative controls reproduce the old message loss. This source repair does not
+provision a host display or qualify a live connection. It has not replaced the
+installed pilot; preserve that bundle's newly working permission identity.
+
 Local pilot permission repair adds explicit, individually scoped OS requests.
 Startup and session checks remain non-prompting. Pilot packaging must declare
 the actual client as its main executable; the strict Mac client supports a
@@ -24,7 +32,7 @@ real native-provider-to-QML regression reproduces the failure before the fix;
 all 29 native provider/worker results pass afterward. This is discovery repair,
 not live login, video, input, or external-guest qualification.
 
-Current client gitlink: `26debc7a8f5fa0840559ceb70c8a0b72125e3b2a` on `codex/assignment-refresh`.
+Current client gitlink: `bec0c076057d4e3842b679e8e62cfecd88562019` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).

@@ -16,7 +16,7 @@
     },
     {
       "path": "apps/client",
-      "commit": "26debc7a8f5fa0840559ceb70c8a0b72125e3b2a",
+      "commit": "bec0c076057d4e3842b679e8e62cfecd88562019",
       "sha256": {
         "app/backend/nvhttp.cpp": "ad793c34677f85946b4be04b43d7d7a10d7c833420a7c80e610ad2a82505c4bf",
         "app/backend/computermanager.cpp": "3a8f8de6d650b1357f7973e68f3d6a2a4b64e1565acf7eadf3bf2f8dca7eb17d",
