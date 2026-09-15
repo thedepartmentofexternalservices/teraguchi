@@ -11,13 +11,21 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
+The operator confirmed a pen-only alignment bug with Flame's four Tablet Margins
+at 5%; setting them to zero restored alignment. The Mac client showed the local
+pointer while the host applied Wacom Area cropping. A client repair now connects
+Mac pen ownership to the existing host-position cursor channel and an
+input-transparent native overlay. See [the input checkpoint](docs/development/teraguchi-macos-input.md#mac-pen-cursor-and-flame-margins).
+The zero-margin workaround is confirmed; the nonzero-margin repair still needs
+an installed-candidate physical check. No host settings were changed by the agent.
+
 The onboarding pilot is now installed from root `fd5e9c3` and client
 `5955945b`. Its bundled setup loaded automatically, and the live list contains
 only the configured workstation. Settings and the separate Mac input dialog
 were visually checked in the installed app. Fresh portable startup, saved setup,
 restart, idle Quit, signature and all 107 Mach-O minimum-OS checks pass. The
-previous working pilot is retained privately. Both input grants need operator
-renewal after this ad-hoc rebuild; no new live session was attempted. The pilot
+previous working pilot is retained privately. The operator renewed the input
+grants after the scoped reset and confirmed a working live session. The pilot
 remains local-only; trusted artist distribution and clean-guest onboarding are
 still open. Private notes hold exact hashes, setup revision/expiry and recovery.
 
@@ -76,7 +84,7 @@ real native-provider-to-QML regression reproduces the failure before the fix;
 all 29 native provider/worker results pass afterward. This is discovery repair,
 not live login, video, input, or external-guest qualification.
 
-Current client gitlink: `5955945b9840e5c144d618af5d5fb3053024e1b5` on `codex/assignment-refresh`.
+Current client gitlink: `6267acf7a04023281b19fb72a58cb8984a6d3b39` on `codex/assignment-refresh`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).

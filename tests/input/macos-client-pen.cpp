@@ -205,5 +205,44 @@ int main()
         CHECK(f.packets.back().rotation == sample.second);
         CHECK(f.packets.back().tilt == std::abs(sample.first));
     }
+    {
+        bool remoteCursor = false, accept = true, local = false, mapped = true;
+        int activations = 0;
+        MacPenInput pen{
+            [&](const MacPenInput::Packet&) { return accept; },
+            [&](SDL_WindowID,float,float,float& x,float& y) { x = y = 0.5f; return mapped; },
+            [] {},
+            [&](SDL_PenID,SDL_WindowID,float,float,SDL_PenInputFlags,Uint64) { return local; },
+            [] {},
+            [&](bool remote) { remoteCursor = remote; activations += remote; }};
+        pen.handle(point(SDL_EVENT_PEN_MOTION, 1, hover));
+        CHECK(!remoteCursor); // Incomplete native samples do not own the cursor.
+        pen.flush(); CHECK(remoteCursor && activations == 1);
+        remoteCursor = false; // A real mouse restores native pointer ownership.
+        pen.handle(point(SDL_EVENT_PEN_MOTION, 2, hover)); pen.flush();
+        CHECK(remoteCursor && activations == 2);
+        local = true;
+        pen.handle(point(SDL_EVENT_PEN_MOTION, 3, hover)); pen.flush();
+        CHECK(!remoteCursor); // Local controls keep the native cursor.
+        local = false;
+        pen.handle(point(SDL_EVENT_PEN_MOTION, 4, hover)); pen.flush();
+        CHECK(remoteCursor);
+        mapped = false;
+        pen.handle(point(SDL_EVENT_PEN_MOTION, 5, hover)); pen.flush();
+        CHECK(!remoteCursor); // Letterbox / outside an owned output.
+        mapped = true;
+        pen.handle(point(SDL_EVENT_PEN_DOWN, 6, contact)); pen.flush();
+        CHECK(remoteCursor);
+        pen.suspend(); CHECK(!remoteCursor);
+        pen.handle(point(SDL_EVENT_PEN_MOTION, 7, contact)); pen.flush();
+        CHECK(!remoteCursor); // Focus returns with a held tip: wait for lift.
+        pen.handle(point(SDL_EVENT_PEN_UP, 8, hover)); pen.flush();
+        CHECK(remoteCursor);
+        SDL_Event out{}; out.pproximity = {SDL_EVENT_PEN_PROXIMITY_OUT,0,9,0,1};
+        pen.handle(out); CHECK(!remoteCursor);
+        accept = false;
+        pen.handle(point(SDL_EVENT_PEN_MOTION, 10, hover)); pen.flush();
+        CHECK(!remoteCursor); // Rejected sends must not hide the local pointer.
+    }
     std::printf("macos_client_pen assertions=%d result=PASS physical_input=false\n", checks);
 }

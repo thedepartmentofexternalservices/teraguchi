@@ -40,6 +40,52 @@ This is client implementation and offline validation, not a claim of working
 Flame brush pressure, raw-HID parity, multi-display mapping or complete keyboard
 capture.
 
+## Mac pen cursor and Flame margins
+
+A live single-output pilot exposed a pen-only click offset with the mouse
+correct. The host stylus advertised axes `0..19200` / `0..10800`, but its active
+Wacom Area was `960 540 18240 10260`. The operator's Flame preferences showed
+5% margins on all four sides. Setting those margins to zero restored alignment.
+The initial claim that the preceding day worked is retained; the exact change
+that activated the mismatch has not been established.
+
+The normalized client sends full-stream coordinates. Flame's Wacom driver maps
+those coordinates through its configured tablet area before clicking. The Mac
+client showed the locally positioned cursor, while Linux already used the host's
+post-driver cursor position for tablet input. Zero margins are a temporary
+workaround, not the intended product constraint.
+
+The repair connects accepted Mac pen samples to that existing cursor-position
+channel. An input-transparent Cocoa layer shows the host shape and hotspot on
+the matching presentation output. It never warps the OS pointer, changes pen
+packets, guesses a margin percentage, or edits Flame preferences. A newer host
+position is required when switching to pen ownership. Mouse input, proximity
+leave, local controls, mapping rejection, focus loss and capture cancellation
+restore native pointer ownership. Renderer replacement recreates the overlays;
+reconnect retains the existing sequence-epoch reset. Linux keeps its existing
+Wayland implementation behind the shared cursor type.
+
+Offline checks cover complete-sample ownership, held-contact suppression,
+rejected sends and local routing. The native regression uses hidden windows to
+check hotspot placement, alpha/color bytes, top-down coordinates, two-output
+mapping, resize, input transparency and parent replacement. These tests do not
+qualify physical pen alignment with nonzero margins or cursor latency over WAN.
+Run the native check on an authorized GUI Mac:
+
+```bash
+bash scripts/test/check-macos-tablet-cursor.sh "$PLANK_WORK_ROOT/tablet-cursor"
+```
+
+Local results: 16,439 pen assertions, 35 hidden native cursor checks (including
+a Metal view), 18 presentation results and eight Quit scenarios pass.
+
+Hosted CI builds this harness with `--build-only`; it does not claim a native
+window-server or physical Wacom pass. The installed pilot must be recorded
+separately from the source repair. Live acceptance: restore the preferred
+margins, hover/click near the center and all edges, test a pressure stroke,
+switch to a real mouse and back, visit local controls, refocus, then repeat
+with paired outputs.
+
 ## Host pressure gate found during review
 
 The reviewed Linux Host is
