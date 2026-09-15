@@ -392,10 +392,186 @@ TestCase {
         compare(disconnectSpy.count, 1);
         verify(!controller.acceptCheck(token, pass()));
     }
-    function test_malformedCatalogClearsAvailability() {
+    function test_malformedCatalogDisablesAvailabilityWithoutRevokingAssignment() {
         controller.setWorkstations(null);
-        compare(controller.workstations.length, 0);
+        compare(controller.workstations.length, 4);
         verify(!controller.canConnect);
+    }
+    function test_refreshLatchesBeforeSynchronousReply() {
+        controller.refreshRequested.connect(function (token) {
+            verify(controller.catalogRefreshing);
+            verify(!controller.canConnect);
+            verify(controller.acceptCatalog(token, hosts(), 60000));
+        });
+        verify(controller.refresh());
+        verify(controller.catalogFresh);
+        verify(!controller.catalogRefreshing);
+        verify(controller.canConnect);
+    }
+    function test_failedRefreshRetainsListAndSelection() {
+        controller.chooseDisplays(2);
+        controller.refresh();
+        var token = controller.catalogGeneration;
+        verify(!controller.refresh());
+        verify(!controller.begin(false));
+        controller.rejectCatalog(token);
+        compare(controller.workstations.length, 4);
+        compare(controller.selectedId, "a");
+        compare(controller.displayCount, 2);
+        verify(!controller.canConnect);
+        verify(controller.catalogProblem.length > 0);
+        verify(!controller.acceptCatalog(token, hosts(), 60000));
+    }
+    function test_oldRefreshCannotRestoreRevokedAssignment() {
+        controller.refresh();
+        var old = controller.catalogGeneration;
+        controller.rejectCatalog(old);
+        controller.refresh();
+        var current = controller.catalogGeneration;
+        verify(!controller.acceptCatalog(old, hosts(), 60000));
+        verify(controller.acceptCatalog(current, [], 60000));
+        verify(!controller.acceptCatalog(old, hosts(), 60000));
+        compare(controller.workstations.length, 0);
+        compare(controller.selectedId, "");
+    }
+    function test_pushSnapshotRetiresPendingRefresh() {
+        controller.refresh();
+        var token = controller.catalogGeneration;
+        controller.setWorkstations([]);
+        verify(!controller.acceptCatalog(token, hosts(), 60000));
+        compare(controller.workstations.length, 0);
+        verify(controller.catalogFresh);
+    }
+    function test_refreshFailureKeepsEstablishedSession() {
+        var token = connect();
+        verify(controller.refresh());
+        controller.rejectCatalog(controller.catalogGeneration);
+        compare(controller.phase, "connected");
+        verify(controller.sessionOpen);
+        compare(disconnectSpy.count, 0);
+        controller.interrupted(token);
+        verify(!controller.begin(true));
+        controller.refresh();
+        controller.acceptCatalog(controller.catalogGeneration, hosts(), 60000);
+        verify(controller.begin(true));
+    }
+    function test_refreshRevocationDisconnectsEstablishedSession() {
+        connect();
+        controller.refresh();
+        controller.acceptCatalog(controller.catalogGeneration, [], 60000);
+        compare(disconnectSpy.count, 1);
+        verify(!controller.sessionOpen);
+    }
+    function test_malformedRefreshDoesNotRevokeSession() {
+        connect();
+        controller.refresh();
+        verify(!controller.acceptCatalog(controller.catalogGeneration, null, 60000));
+        verify(controller.sessionOpen);
+        verify(!controller.catalogFresh);
+        compare(disconnectSpy.count, 0);
+    }
+    function test_expiryCancelsPendingConnection_data() {
+        return [{tag: "checking", opening: false}, {tag: "opening", opening: true}];
+    }
+    function test_expiryCancelsPendingConnection(data) {
+        controller.begin(false);
+        var token = controller.generation;
+        if (data.opening)
+            controller.acceptCheck(token, pass());
+        controller.cancelRequested.connect(function (retired) {
+            verify(!controller.acceptCheck(retired, pass()));
+            verify(!controller.acceptConnection(retired, true));
+        });
+        controller.invalidateCatalog();
+        compare(cancelSpy.count, 1);
+        verify(!controller.sessionOpen);
+        verify(!controller.begin(false));
+    }
+    function test_expiryDuringReconnectKeepsDisconnect() {
+        controller.interrupted(connect());
+        controller.begin(true);
+        controller.invalidateCatalog();
+        compare(controller.phase, "interrupted");
+        compare(cancelSpy.count, 1);
+        verify(controller.sessionOpen);
+        verify(controller.disconnect());
+    }
+    function test_expiryTimerDisablesIdleConnect() {
+        controller.setWorkstations(hosts(), 20);
+        tryCompare(controller, "catalogFresh", false);
+        verify(!controller.begin(false));
+    }
+    function test_delayedExpiryCannotStartOrComplete_data() {
+        return [{tag: "idle", phase: "idle"}, {tag: "checking", phase: "checking"}, {tag: "opening", phase: "connecting"}];
+    }
+    function test_delayedExpiryCannotStartOrComplete(data) {
+        if (data.phase !== "idle")
+            controller.begin(false);
+        var token = controller.generation;
+        if (data.phase === "connecting")
+            controller.acceptCheck(token, pass());
+        // Simulate resume before the Qt timer has been delivered.
+        controller.catalogExpiry.stop();
+        controller.catalogExpiresAt = Date.now() - 1;
+        verify(!controller.begin(false));
+        verify(!controller.acceptCheck(token, pass()));
+        verify(!controller.acceptConnection(token, true));
+        verify(!controller.catalogFresh);
+    }
+    function test_clockRollbackRequiresRefresh() {
+        controller.catalogAcceptedAt = Date.now() + 10000;
+        verify(!controller.begin(false));
+        verify(!controller.catalogFresh);
+    }
+    function test_badRefreshLifetime_data() {
+        return [{tag: "missing", value: undefined}, {tag: "negative", value: -1}, {tag: "zero", value: 0}, {tag: "too long", value: 60001}, {tag: "string", value: "100"}, {tag: "fraction", value: 1.5}, {tag: "nan", value: NaN}];
+    }
+    function test_badRefreshLifetime(data) {
+        controller.refresh();
+        verify(!controller.acceptCatalog(controller.catalogGeneration, hosts(), data.value));
+        verify(!controller.catalogFresh);
+        verify(!controller.catalogRefreshing);
+    }
+    function test_refreshTimeoutRetiresReply() {
+        controller.catalogTimeout.interval = 20;
+        controller.refresh();
+        var token = controller.catalogGeneration;
+        tryCompare(controller, "catalogRefreshing", false);
+        verify(!controller.acceptCatalog(token, hosts(), 60000));
+        verify(!controller.canConnect);
+    }
+    function test_lateReplyBeforeTimeoutEventIsRejected() {
+        controller.refresh();
+        var token = controller.catalogGeneration;
+        controller.catalogTimeout.stop();
+        controller.catalogRequestedAt = Date.now() - 16000;
+        verify(!controller.acceptCatalog(token, hosts(), 60000));
+        verify(!controller.catalogFresh);
+        verify(!controller.catalogRefreshing);
+    }
+    function test_cancelledRefreshCannotCompleteReentrantly() {
+        controller.refresh();
+        controller.catalogCancelRequested.connect(function (token) {
+            verify(!controller.acceptCatalog(token, hosts(), 60000));
+        });
+        controller.setWorkstations([]);
+        compare(controller.workstations.length, 0);
+        verify(controller.catalogFresh);
+    }
+    function test_uiRefreshRecoversStaleSelection() {
+        var view = pickerComponent.createObject(tests, {flow: controller, width: 940, height: 612});
+        activeView = view;
+        controller.invalidateCatalog();
+        waitForRendering(view);
+        verify(!findChild(view, "connectButton").enabled);
+        compare(findChild(view, "flowHeading").text, "Refresh your assignments");
+        var refresh = findChild(view, "refreshButton");
+        mouseClick(refresh);
+        verify(controller.catalogRefreshing);
+        verify(!refresh.enabled);
+        controller.acceptCatalog(controller.catalogGeneration, hosts(), 60000);
+        verify(findChild(view, "connectButton").enabled);
+        compare(controller.selectedId, "a");
     }
     function test_reentrantCatalogCancellation_data() {
         return [

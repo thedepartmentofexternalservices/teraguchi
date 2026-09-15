@@ -46,7 +46,7 @@ log = (out / 'qml-tests.txt').read_text()
 # Qt's first font-alias lookup is a platform notice, not a QML binding error.
 if any('QWARN' in line and 'qt.qpa.fonts:' not in line for line in log.splitlines()):
     raise SystemExit('Unexpected Qt/QML warning; inspect private test log.')
-scenarios = ('ready', 'offline', 'occupied', 'incompatible', 'empty', 'connected',
+scenarios = ('assignment-stale', 'assignment-refreshing', 'assignment-failure', 'ready', 'offline', 'occupied', 'incompatible', 'empty', 'connected',
              'interrupted', 'display-mismatch', 'source-depth', 'permissions',
              'seat-race', 'connection-failure', 'power-off', 'power-standby',
              'power-unknown', 'power-starting', 'power-unavailable', 'power-no-access', 'power-stale')

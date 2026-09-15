@@ -25,9 +25,8 @@ use Git and verified bundles to reconstruct them rather than guessing paths.
 ## Repository and source state
 
 - Product: [Teraguchi](https://github.com/thedepartmentofexternalservices/teraguchi),
-  branch `codex/macos-workstation-ui`. The source checkpoint before this
-  documentation update is `8f06e5afe0f2574df2fd7434a06ab1c9fb0f8203`.
-- Client gitlink: `ce00cde589f91ee8ae8128bb42c2b8d0bc8e8dca` in
+  branch `codex/assignment-refresh`, based on the archived `de64db3` checkpoint.
+- Client gitlink: `a354a8c3db1ad7a9f59cbd2298f7e0524f3f054e` in
   [Teraguchi Client](https://github.com/thedepartmentofexternalservices/teraguchi-client).
   Use the root's exact gitlink and initialize required submodules before builds.
 - Separate Linux input candidate:
@@ -134,6 +133,15 @@ Do not resume it, configure sudo/cgroups/UID mappings, or provision a VM merely
 because the prepared files exist. No controller packages or host services were
 changed. Private staged files and rootless storage remain; inspect exact paths
 in the private receipt before eventual cleanup. Do not prune unrelated containers.
+
+## Current priority: P3 and P4
+
+The operator deferred provenance/physical input follow-up and requested
+independent work toward P3 and P4. Follow the [implementation order](teraguchi-p3-p4.md).
+The assignment-refresh candidate on `codex/assignment-refresh` adds offline
+freshness, timeout, and late-reply handling. The native Tailscale provider and scoped PAM/Session handoff are now development
+components. Production dialog, display, and session-lifecycle wiring remain next. No deployment, builder restart, or background soak is authorized
+by that work. The pickup order below remains the deferred physical-test sequence.
 
 ## Pickup order
 

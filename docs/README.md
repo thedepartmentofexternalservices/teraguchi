@@ -26,3 +26,8 @@
 
 Shared wire contracts live in [protocol](../protocol/). Current work belongs in
 [HANDOFF.md](../HANDOFF.md), not a growing chronology in the top-level README.
+
+- [Tailscale shared workstations](development/teraguchi-tailscale-workstations.md):
+  local share discovery, native PAM handoff, test evidence, and remaining UI gates.
+- [P3/P4 implementation order](development/teraguchi-p3-p4.md): current coding
+  priorities and the live gates before the WAN pilot.

@@ -114,8 +114,13 @@ ApplicationWindow {
             checkTimer.stop();
             connectTimer.stop();
         }
-        function onRefreshRequested(workstationId) {
-            previewFlow.setWorkstations(sampleHosts());
+        function onRefreshRequested(token) {
+            if (scenario === "assignment-refreshing")
+                return;
+            if (scenario === "assignment-failure")
+                previewFlow.rejectCatalog(token);
+            else
+                previewFlow.acceptCatalog(token, sampleHosts(), 60000);
         }
     }
     Timer {
@@ -153,7 +158,11 @@ ApplicationWindow {
     }
     Component.onCompleted: {
         reset();
-        if (scenario === "offline")
+        if (scenario === "assignment-stale")
+            previewFlow.invalidateCatalog();
+        else if (scenario === "assignment-refreshing" || scenario === "assignment-failure")
+            previewFlow.refresh();
+        else if (scenario === "offline")
             previewFlow.selectWorkstation("studio-b");
         else if (scenario === "occupied")
             previewFlow.selectWorkstation("studio-c");

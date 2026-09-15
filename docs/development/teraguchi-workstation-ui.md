@@ -152,3 +152,15 @@ signing, Tailscale isolation, and clean-Mac setup remain separate P3 work.
 The P2 native capture, Wacom, shortcuts, physical displays and recovery gates
 remain open. Neither this preview nor its tests promotes the Linux input
 candidate or authorizes additional transport work.
+
+## Assignment refresh follow-up
+
+The `codex/assignment-refresh` slice adds generation-scoped asynchronous refresh,
+a 15-second timeout, and a local cache lifetime of at most 60 seconds. Expired
+assignments retain the visible list and display choice but cannot start a new
+connection, reconnect, or power request. Refresh failure preserves established
+sessions; explicit removal in an accepted snapshot still disconnects. Pending
+checks are cancelled on expiry, and delayed callbacks cannot start a session.
+The adapter contract and source-side freshness obligations are documented in
+the client component README. This remains an offline preview, not a source of
+authenticated assignments. Continue with the [P3/P4 checklist](teraguchi-p3-p4.md).
