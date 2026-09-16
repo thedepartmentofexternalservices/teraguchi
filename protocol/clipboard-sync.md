@@ -64,13 +64,18 @@ queued without event-owned heap payloads and carry a session epoch so events
 from an earlier connection cannot apply after reconnect.
 
 The client deduplicates repeated Host text by content. It never compares Host
-generations against its independent outbound generation.
+generations against its independent outbound generation. Failed transport
+sends remain pending for the next poll; failure to queue a Host offer on the
+SDL event loop terminates the affected session.
 
 ## Host behavior
 
 The Linux X11 Host watches `CLIPBOARD`, publishes client text as owner of
 `CLIPBOARD` and `PRIMARY`, and answers `SelectionRequest` for UTF-8/plain-text
 targets. It records each locally forwarded value to prevent repeated offers.
+Validated Client offers cross a bounded latest-value inbox; the dedicated
+clipboard thread performs all Xlib selection reads and writes. If several
+offers arrive before the next 250 ms poll, the newest clipboard value wins.
 
 Session teardown releases any synthetic selection ownership, destroys the X11
 window, and closes the display after clipboard workers stop.

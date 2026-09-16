@@ -12,21 +12,24 @@ notes' README before machine-specific work; deployment information stays outside
   reconnect lifecycle were incomplete. Do not transfer its live result to the
   replacement candidate.
 
-- Hardened clipboard candidate root `25b25bc`, Client `450c75c6`, Host
-  `434b8def` validates exact frame lengths and Unicode scalars, keeps direction
+- Hardened clipboard candidate root `7f7955c`, Client `46a029fa`, Host
+  `d08a0a95` validates exact frame lengths and Unicode scalars, keeps direction
   generations independent, resets state per session, drops stale reconnect
-  events, requires stream focus for Mac → Host sync, deduplicates Host offers,
-  and releases X11 resources on teardown. The Client's four existing suites
-  plus nine clipboard lifecycle cases pass locally. The exact public submodule
-  commits are fetchable from clean checkouts. Hosted validation and a repeat
-  live clipboard/reconnect test remain pending.
+  events, retries failed sends, terminates on local event-queue failure, requires
+  stream focus for Mac → Host sync, deduplicates Host offers, applies all X11
+  ownership changes on one Host thread, and releases X11 resources on teardown.
+  The three existing Client suites and nine clipboard test functions (11 Qt
+  results including setup/cleanup) pass locally. A fresh GitHub clone fetched
+  the exact Root, Client, Host and common-c gitlinks through their committed
+  URLs. Hosted validation and a repeat live clipboard/reconnect test remain
+  pending.
 
 - Local ad-hoc Pilot `PLANK 1.0.116-clipboard-safety` was built from the clean
   candidate and passes minimum-macOS, private-build-path and deep strict
   signature gates. Its Client executable SHA256 is
-  `656ab03211ec952b7bed49e56c66fcf947d9a3559b3a7ff03132a200dccca4e4`;
+  `f65b5f4c196207744d7bbc9bb04dc5b0baf19f13239f55ea8113f270d0bf487e`;
   the retained ZIP SHA256 is
-  `0660be47eaab6466fce3af9c897becb29b30e9d744c52feb22acf7807089f3a4`.
+  `dcdfbb3b8eba37c3af89171a46060933840ede8ec09e66fb71ee770a084d7164`.
   It is local-pilot only, not Developer ID signed or notarized. Private receipt
   `installed-clipboard-safety-pilot.json` records exact provenance.
 
