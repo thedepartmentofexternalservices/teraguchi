@@ -42,6 +42,15 @@ capture.
 
 ## Mac pen cursor and Flame margins
 
+**Current disposition: rejected for cursor lag.** Once the overlay was visible,
+the operator reported that it dragged behind the pen. Showing a returned host
+position adds input/return scheduling and network delay to cursor motion. The
+Mac forwarding callback no longer switches cursor ownership; native positioning
+is retained. The installed pilot was rolled back to the pre-cursor build.
+Nonzero-margin alignment remains unresolved. Zero margins are the previously
+confirmed temporary workaround. Offline geometry/rendering checks below are
+engineering evidence, not latency acceptance.
+
 A live single-output pilot exposed a pen-only click offset with the mouse
 correct. The host stylus advertised axes `0..19200` / `0..10800`, but its active
 Wacom Area was `960 540 18240 10260`. The operator's Flame preferences showed

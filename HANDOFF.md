@@ -11,6 +11,18 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
+**Cursor candidate rejected for latency.** After the visibility repair, the
+operator reported that the cursor drags behind the pen. Mac pen input now keeps
+native cursor ownership in source; the host-position callback is disabled. The
+installed app has been restored from the verified pre-cursor package at root
+`fd5e9c3` / client `5955945b`. Its earlier zero-margin alignment pass is retained;
+operator-owned input-grant renewal and a rollback recheck are pending. Use 0%
+on all four Flame tablet margins as the temporary workaround. The 5% alignment
+problem remains open. Do not reinstall the rejected cursor candidates.
+
+The sections below retain the cursor investigation and test evidence; local
+rendering checks did not establish acceptable physical cursor latency.
+
 The installed Mac cursor candidate at root `879e90c` / client `6267acf7`
 **failed** its physical test with Flame Tablet Margins at 5%. The operator sees
 one stationary cursor on the target while the click lands elsewhere. Setting
