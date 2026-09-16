@@ -9,9 +9,10 @@ cleanup_only=false
 requested_layout=
 requested_mode_1=
 requested_mode_2=
+requested_flame_ui_origin=left
 
 usage() {
-  echo "usage: $0 [--cleanup] [--config FILE] [--output FILE] [--edid-dir DIRECTORY] [--layout LAYOUT --mode-1 MODE [--mode-2 MODE]]" >&2
+  echo "usage: $0 [--cleanup] [--config FILE] [--output FILE] [--edid-dir DIRECTORY] [--layout LAYOUT --mode-1 MODE [--mode-2 MODE]] [--flame-ui-origin left|right]" >&2
 }
 
 while (($#)); do
@@ -48,6 +49,11 @@ while (($#)); do
     --mode-2)
       (($# >= 2)) || { usage; exit 2; }
       requested_mode_2=$2
+      shift 2
+      ;;
+    --flame-ui-origin)
+      (($# >= 2)) || { usage; exit 2; }
+      requested_flame_ui_origin=$2
       shift 2
       ;;
     *)
@@ -148,6 +154,17 @@ case $active_layout in
     exit 1
     ;;
 esac
+case $requested_flame_ui_origin in
+  left|right) ;;
+  *)
+    echo "invalid flame UI origin: ${requested_flame_ui_origin}" >&2
+    exit 2
+    ;;
+esac
+if [[ $requested_flame_ui_origin == right && $active_layout != dual-horizontal ]]; then
+  echo "--flame-ui-origin right is valid only for dual-horizontal layout" >&2
+  exit 2
+fi
 mode_dimensions() {
   case $1 in
     1024x2160) echo '1024 2160' ;;
@@ -254,10 +271,17 @@ if [[ $active_layout == single ]]; then
   connected_monitors="DFP-0, DFP-2"
   custom_edid="DFP-0:${edid_dir}/virtual-1.edid; DFP-2:${edid_dir}/virtual-2.edid"
   metamodes="DFP-0: ${output_mode_1} +0+0, DFP-2: NULL"
+  xinerama_order="DFP-0, DFP-2"
 else
   connected_monitors="DFP-0, DFP-2"
   custom_edid="DFP-0:${edid_dir}/virtual-1.edid; DFP-2:${edid_dir}/virtual-2.edid"
-  metamodes="DFP-0: ${output_mode_1} +0+0, DFP-2: ${output_mode_2} +${output_1_width}+0"
+  if [[ $requested_flame_ui_origin == right ]]; then
+    metamodes="DFP-2: ${output_mode_2} +0+0, DFP-0: ${output_mode_1} +${output_2_width}+0"
+    xinerama_order="DFP-2, DFP-0"
+  else
+    metamodes="DFP-0: ${output_mode_1} +0+0, DFP-2: ${output_mode_2} +${output_1_width}+0"
+    xinerama_order="DFP-0, DFP-2"
+  fi
 fi
 
 output_directory=${output_file%/*}
@@ -290,7 +314,7 @@ Section "Device"
     Option "UseDisplayDevice" "${connected_monitors}"
     Option "CustomEDID" "${custom_edid}"
     Option "MetaModes" "${metamodes}"
-    Option "nvidiaXineramaInfoOrder" "DFP-0, DFP-2"
+    Option "nvidiaXineramaInfoOrder" "${xinerama_order}"
     Option "HardDPMS" "False"
     Option "Interactive" "False"
 EndSection
@@ -305,7 +329,7 @@ Section "Screen"
     EndSubSection
 EndSection
 EOF
-chmod 0644 -- "$temporary_file"
+chmod 0644 "$temporary_file"
 
 if [[ -e $output_file ]] && cmp -s -- "$temporary_file" "$output_file"; then
   echo "PLANK virtual display topology is already current: ${active_layout} ${output_mode_1} ${output_mode_2}"

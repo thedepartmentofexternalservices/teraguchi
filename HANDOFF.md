@@ -5,6 +5,20 @@ notes' README before machine-specific work; deployment information stays outside
 
 ## Current state
 
+- Teraguchi Pilot on dxs-flame-06 (2026-09-16): bidirectional UTF-8 clipboard
+  sync is operator-qualified. Mac → Flame uses copy on Mac then Ctrl+V in the
+  remote session; Flame → Mac uses copy on host then Cmd+V on Mac. Client fixes
+  are on Teraguchi root `231ee8d` / Client `3ba987a2` (main-thread pasteboard
+  polling, host-offer dedupe, NSPasteboard-backed Ctrl+V). Installed ad-hoc Pilot
+  binary SHA256 `c4c26114f99db1185ab7af8c5951a0e3985f2407681f6c07e1ff43c493dc49cf`.
+  Upstream handoff to Alan is open on instinctual/plank#2 and sibling PRs; rebase
+  waits for Alan's macOS freeze. Do not rebase until he asks.
+
+- Flame UI monitor selection: `plank-display-prepare --flame-ui-origin`
+  `{left,right}` is implemented for boot MetaMode/Xinerama order. Host supervisor,
+  launch negotiation, and Teraguchi picker work remain open. See
+  `docs/development/teraguchi-flame-ui-origin.md`.
+
 - The operator authorized merging the reconnect follow-up into main after
   manually installing Host 1.0.116. Reconnect implementation root `4173138`
   and Client `e8fc0cc0` extend the previously accepted root `d34a110` / Client
