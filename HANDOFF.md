@@ -5,14 +5,33 @@ notes' README before machine-specific work; deployment information stays outside
 
 ## Current state
 
-- Teraguchi Pilot on dxs-flame-06 (2026-09-16): bidirectional UTF-8 clipboard
-  sync is operator-qualified. Mac → Flame uses copy on Mac then Ctrl+V in the
-  remote session; Flame → Mac uses copy on host then Cmd+V on Mac. Client fixes
-  are on Teraguchi root `231ee8d` / Client `3ba987a2` (main-thread pasteboard
-  polling, host-offer dedupe, NSPasteboard-backed Ctrl+V). Installed ad-hoc Pilot
-  binary SHA256 `c4c26114f99db1185ab7af8c5951a0e3985f2407681f6c07e1ff43c493dc49cf`.
-  Upstream handoff to Alan is open on instinctual/plank#2 and sibling PRs; rebase
-  waits for Alan's macOS freeze. Do not rebase until he asks.
+- On 2026-09-16 the operator confirmed bidirectional UTF-8 clipboard behavior
+  with an earlier local prototype: Mac copy then Linux `Ctrl+V`, and Linux copy
+  then macOS `Cmd+V`. A subsequent review rejected that prototype as a package
+  candidate because its bundle signature, source pins, frame validation and
+  reconnect lifecycle were incomplete. Do not transfer its live result to the
+  replacement candidate.
+
+- Hardened clipboard candidate root `25b25bc`, Client `450c75c6`, Host
+  `434b8def` validates exact frame lengths and Unicode scalars, keeps direction
+  generations independent, resets state per session, drops stale reconnect
+  events, requires stream focus for Mac → Host sync, deduplicates Host offers,
+  and releases X11 resources on teardown. The Client's four existing suites
+  plus nine clipboard lifecycle cases pass locally. The exact public submodule
+  commits are fetchable from clean checkouts. Hosted validation and a repeat
+  live clipboard/reconnect test remain pending.
+
+- Local ad-hoc Pilot `PLANK 1.0.116-clipboard-safety` was built from the clean
+  candidate and passes minimum-macOS, private-build-path and deep strict
+  signature gates. Its Client executable SHA256 is
+  `656ab03211ec952b7bed49e56c66fcf947d9a3559b3a7ff03132a200dccca4e4`;
+  the retained ZIP SHA256 is
+  `0660be47eaab6466fce3af9c897becb29b30e9d744c52feb22acf7807089f3a4`.
+  It is local-pilot only, not Developer ID signed or notarized. Private receipt
+  `installed-clipboard-safety-pilot.json` records exact provenance.
+
+- Upstream handoff to Alan is open on instinctual/plank#2 and sibling PRs.
+  Rebase waits for Alan's macOS freeze. Do not rebase until he asks.
 
 - Flame UI monitor selection: `plank-display-prepare --flame-ui-origin`
   `{left,right}` is implemented for boot MetaMode/Xinerama order. Host supervisor,
