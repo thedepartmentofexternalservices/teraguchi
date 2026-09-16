@@ -2,6 +2,25 @@
 
 Read AGENTS.md and the platform build runbook before work.
 
+## Current repair (2026-09-16)
+
+Clipboard v1 is implemented and operator-qualified on dxs-flame-06. Source pins
+on this branch are Client `c562d131` and Host `434b8def`, plus the local
+AppKit-off-mutex / Flame-UI bootstrap follow-up. Generations are per direction
+and reset on reconnect. Mac outbound sync is focus-gated. Host X11 selections
+are destroyed on session teardown.
+
+Flame UI origin boot config (`plank-display-prepare --flame-ui-origin`) is in
+root packaging only. Live host switching and the Teraguchi picker are still
+open. See `docs/development/teraguchi-flame-ui-origin.md`.
+
+Do not treat an ad-hoc Pilot copy as a signed candidate until
+`codesign --verify --deep --strict` and the package build-path gate pass.
+Record the installed binary hash after copy, not before. Alan rebase remains
+deferred until he freezes macOS work.
+
+
+
 The operator accepted the macOS UI and requested publication and a new-task
 handoff on 2026-09-15. Start with the [current handoff](docs/development/teraguchi-handoff.md).
 Physical input diagnostics and short operator session checks have now run.

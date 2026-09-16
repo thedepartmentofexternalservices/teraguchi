@@ -75,8 +75,7 @@ Text is the first gate; images and files are out of scope for v1.
 
 Normal shortcuts must work when the stream window is focused:
 
-- Mac → host: `Cmd+C` locally, then paste in remote session via `Cmd+V` (mapped
-  through the existing keyboard path) **or** automatic clipboard push on change.
+- Mac → host: `Cmd+C` locally, then `Ctrl+V` in Flame / remote apps.
 - Host → Mac: `Ctrl+C` (or Flame copy) on host, then `Cmd+V` on Mac.
 
 The hidden `Ctrl+Option+Shift+V` inject path is not sufficient and must not
@@ -86,7 +85,7 @@ remain the only option.
 
 | Layer | Behavior |
 |---|---|
-| Protocol | New PlankTransport control channel messages: `clipboard_offer` (UTF-8 text, MIME `text/plain;charset=utf-8`), `clipboard_request`, bounded size (suggest 1 MiB), generation/id to drop stale payloads. Feature flag `0x???` negotiated at launch. |
+| Protocol | `PLANK_TRANSPORT_EVENT_CLIPBOARD_OFFER` / `PLANK_TRANSPORT_INPUT_CLIPBOARD_OFFER`, 1 MiB UTF-8, independent generations, feature `0x400000`. |
 | Client | Watch NSPasteboard while streaming; on change, send offer if feature enabled. On host offer, write macOS pasteboard. `Cmd+V` in stream uses local pasteboard → existing text inject **or** synced payload. |
 | Host | Watch X11/Wayland clipboard selection while session active; on change, send offer. On client offer, set host clipboard and notify Flame toolkits. |
 | Security | Session-bound only; no clipboard persistence across hosts; reject non-text v1; rate-limit offers; log byte counts, not contents. |
@@ -100,8 +99,8 @@ remain the only option.
 
 ### Acceptance
 
-- [ ] Copy sentence on Mac → paste in remote gnome-terminal and Flame text field.
-- [ ] Copy sentence in remote app → paste in Mac TextEdit while stream focused.
+- [x] Copy sentence on Mac → paste in remote gnome-terminal and Flame text field.
+- [x] Copy sentence in remote app → paste in Mac TextEdit while stream focused.
 - [ ] Copy while stream unfocused does not leak to host (Mac pasteboard local only).
 - [ ] Session end clears injected clipboard state; no stale host text on Mac after disconnect.
 - [ ] Payload over limit fails with visible client notice, not silent truncate.

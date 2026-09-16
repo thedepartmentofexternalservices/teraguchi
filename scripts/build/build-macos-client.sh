@@ -56,3 +56,13 @@ if /usr/libexec/PlistBuddy -c 'Print :PLANKVersion' "$plist" >/dev/null 2>&1; th
 else
     /usr/libexec/PlistBuddy -c "Add :PLANKVersion string $version" "$plist"
 fi
+# Clipboard session/lifecycle suite is Mac-only and required for this candidate.
+mkdir -p "$build/tests/macclipboardsync"
+(
+    cd "$build/tests/macclipboardsync"
+    qmake "$client/tests/macclipboardsync/macclipboardsync.pro" CONFIG+=release CONFIG-=app_bundle \
+        QMAKE_MACOSX_DEPLOYMENT_TARGET="$PLANK_MACOS_CLIENT_TARGET" QMAKE_APPLE_DEVICE_ARCHS=arm64 \
+        "QMAKE_CXXFLAGS+=$PLANK_C_FILE_FLAGS -include arm_acle.h"
+    make -j"${PLANK_BUILD_JOBS:-8}"
+    PLANK_REPO_ROOT="$source_root" QT_QPA_PLATFORM=offscreen "./macclipboardsync"
+)

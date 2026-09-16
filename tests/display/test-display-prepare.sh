@@ -3,7 +3,7 @@
 set -euo pipefail
 
 repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
-work_dir=$(mktemp -d --tmpdir plank-display-test.XXXXXX)
+work_dir=$(mktemp -d -t plank-display-test.XXXXXX)
 cleanup() {
   rm -rf -- "$work_dir"
 }
@@ -87,7 +87,34 @@ fi
 run_requested_prepare \
   --layout dual-horizontal --mode-1 4096x2160 --mode-2 1024x2160 >/dev/null
 grep -Fq 'DFP-0: 4096x2160 +0+0, DFP-2: 1024x2160 +4096+0' "$output_file"
+grep -Fq 'Option "nvidiaXineramaInfoOrder" "DFP-0, DFP-2"' "$output_file"
 grep -Fq 'virtual-2.edid' "$output_file"
+
+run_requested_prepare \
+  --layout dual-horizontal --mode-1 4096x2160 --mode-2 1024x2160 \
+  --flame-ui-origin right >/dev/null
+grep -Fq 'DFP-2: 1024x2160 +0+0, DFP-0: 4096x2160 +1024+0' "$output_file"
+grep -Fq 'Option "nvidiaXineramaInfoOrder" "DFP-2, DFP-0"' "$output_file"
+
+if run_requested_prepare \
+  --layout single --mode-1 3840x2160 --flame-ui-origin right >/dev/null 2>&1; then
+  echo "flame UI origin right was accepted for a single layout" >&2
+  exit 1
+fi
+if run_requested_prepare \
+  --layout dual-horizontal --mode-1 5120x2160 --mode-2 4096x2160 >/dev/null 2>&1; then
+  echo "an oversized dual canvas was accepted" >&2
+  exit 1
+fi
+rm -f "$config_file"
+if ! "$repo_dir/packaging/host/linux/bin/plank-display-prepare" --cleanup \
+      --output "$output_file" >/dev/null; then
+  echo "cleanup required host.conf" >&2
+  exit 1
+fi
+printf '[display]\nstartup_layout = virtual\n' >"$config_file"
+run_requested_prepare \
+  --layout dual-horizontal --mode-1 4096x2160 --mode-2 1024x2160 >/dev/null
 
 previous_hash=$(sha256sum "$output_file")
 printf '[display]\nstartup_layout = three\n' >"$config_file"

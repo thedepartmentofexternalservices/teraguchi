@@ -1,6 +1,8 @@
-# Clipboard sync (draft)
+# Clipboard sync v1
 
-Status: **draft** — required for Teraguchi daily work; not implemented.
+Status: **implemented** for UTF-8 text on Mac Client ↔ Linux Host. Live
+qualification passed on dxs-flame-06 (2026-09-16). Host supervisor live
+display origin and picker persistence are separate work.
 
 ## Goal
 
@@ -27,31 +29,33 @@ session for Mac→host paste — Command maps to Linux Super, not Control.
 
 ## Negotiation
 
-Add a protocol feature bit on `/launch` (exact value TBD in
-`protocol/host-version.md`):
+Feature bit `ClipboardSyncFeature` (`0x400000`) on `/launch`:
 
-- Client sends `plankFeatureFlags` with `PLANK_FEATURE_CLIPBOARD_SYNC`.
-- Host echoes acceptance in the launch response. If absent, behavior matches
-  today's product: no sync; optional legacy text inject only.
+- Client sends `plankFeatureFlags` with the bit set.
+- Host echoes acceptance. If absent, behavior matches today's product: no
+  sync; optional legacy `Ctrl+Option+Shift+V` text inject only.
 
 ## Wire format
 
-PlankTransport **control** messages (reliable, session-scoped):
+PlankTransport native messages (session-scoped):
 
-| Message | Direction | Fields |
+| Message | Direction | Type |
 |---|---|---|
-| `clipboard_offer` | Either | `generation: u64`, `mime: "text/plain;charset=utf-8"`, `bytes: utf8` |
-| `clipboard_reject` | Receiver | `generation`, `reason: too_large \| unsupported_mime \| session_inactive` |
+| `PLANK_TRANSPORT_EVENT_CLIPBOARD_OFFER` | Host → Client | 5 |
+| `PLANK_TRANSPORT_INPUT_CLIPBOARD_OFFER` | Client → Host | 9 |
+
+Wire payload is `PLANK_CLIPBOARD_WIRE_HEADER` plus UTF-8 bytes. Generations
+are independent per direction and reset when the session starts.
 
 Rules:
 
 - Maximum payload **1 MiB** UTF-8 after validation.
-- Monotonic `generation` per sender; ignore offers older than the last applied
-  generation from that side.
-- Do not log payload contents in client or host diagnostics; log size and
-  generation only.
-- Rate limit: at most one offer per second per direction unless generation
-  changes (debounce pasteboard churn).
+- Reject frames whose received length is not `sizeof(header) + chunkSize`.
+- Ignore offers older than the last applied generation from that same
+  direction. Do not compare host generations with client outbound generations.
+- Do not log payload contents; log size and generation only.
+- Mac Client sends only while a presentation window is focused.
+- Host and Client drop queued text after disconnect or reconnect.
 
 ## Client (macOS)
 
