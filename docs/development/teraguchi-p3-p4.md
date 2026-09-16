@@ -153,14 +153,22 @@ Offline P3 work cannot satisfy these gates. Builder provisioning remains paused.
 
 ## Next coding slice
 
-The task-bar network RTT monitor, transport-counter inventory,
-P4 evidence-manifest template, guest-access prep checker and product-identity
-packaging scaffold are implemented locally. Next independent coding: wire the
-selected product identity through the Mac DMG collector path, integrate actual
-bundle attestation with the installer, and extend telemetry export for P4 runs.
-Help, tablet/display repair guidance and private status export are implemented
-locally. Workstation-specific HTTPS trust and offline signed package/rollback
-verification now pass locally. Production keys, notarization and clean-Mac
+Parallel daily-work blockers now have product and protocol specs in
+[teraguchi-daily-work-blockers.md](teraguchi-daily-work-blockers.md) and
+[clipboard-sync.md](../protocol/clipboard-sync.md). Next independent coding:
+
+1. **Flame UI monitor selection** — `plank-display-prepare --flame-ui-origin`,
+   host supervisor wiring, Teraguchi picker, topology `flame_ui` echo.
+2. **Bidirectional clipboard sync** — launch feature flag, PlankTransport
+   `clipboard_offer` messages, Mac `NSPasteboard` and host X11 `CLIPBOARD`
+   watchers.
+
+These tracks need host submodule commits before end-to-end qualification on
+dxs-flame-06. Client-only scaffolding can land first in the Teraguchi client
+fork.
+
+Product identity metadata, P4 manifest helpers, and network impairment prep
+remain in flight on sibling branches. Production keys, notarization and clean-Mac
 install qualification remain open. Full-policy and external-guest acceptance
 remain. Physical Mac window/input qualification and P2 hardware limits remain
 explicit; this work does not complete P3 or enter P4.
