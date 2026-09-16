@@ -31,6 +31,12 @@ require administrator review. Picture help retains the strict native ten-bit,
 HEVC 4:4:4 ten-bit and hardware-decoding requirements. Help does not authorize a
 fallback, force a seat takeover or change any connection-admission check.
 
+Clipboard help states the current product has no Mac ↔ Linux clipboard sync.
+Copy/paste inside the remote session uses Linux Control shortcuts. Planned
+bidirectional sync (`Cmd+C` on Mac, `Ctrl+V` on Linux, and the reverse) is
+specified in [daily-work blockers](teraguchi-daily-work-blockers.md) and
+[clipboard sync](../../protocol/clipboard-sync.md).
+
 ## Report boundary
 
 Support report is a separate help topic. Prepare report snapshots launcher status
