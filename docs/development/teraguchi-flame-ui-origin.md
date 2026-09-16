@@ -24,16 +24,15 @@ When `plankHostLayout=dual-horizontal`, the client sends:
 - `plankFlameUiOrigin=left` (default)
 - `plankFlameUiOrigin=right`
 
-`left` is ignored on single-output and physical layouts. `right` is rejected
-there so a miswired client fails instead of silently pinning the wrong output.
+Clients omit the field for single-output and physical layouts. The
+`plank-display-prepare` CLI rejects `--flame-ui-origin right` unless the
+requested layout is `dual-horizontal`.
 
 ## Implementation status
 
 | Layer | Status |
 |---|---|
-| `plank-display-prepare --flame-ui-origin` | Done in root packaging |
-| Dual canvas ceiling check (8192x2160) | Done |
-| `--cleanup` without `host.conf` | Done |
+| `plank-display-prepare --flame-ui-origin` | Boot-overlay generation complete; hardware validation pending |
 | Host supervisor live xrandr / MetaMode swap | Pending host submodule |
 | Launch parse + topology `flame_ui` echo | Pending host submodule |
 | Teraguchi picker + per-host persistence | Pending client UI |
