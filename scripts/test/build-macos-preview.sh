@@ -1,8 +1,8 @@
 #!/bin/bash
 # Signed, loopback-only authenticated capture qualification, not a release.
 set -euo pipefail
-if [[ $# != 3 || $1 != /* || $2 != /* || $3 != /* ]]; then
-    echo "Usage: $0 /absolute/source /absolute/empty-output /absolute/libplank_transport.a" >&2
+if [[ ($# != 3 && $# != 4) || $1 != /* || $2 != /* || $3 != /* || (${4:-} != '' && ${4:-} != --synthetic-only) ]]; then
+    echo "Usage: $0 /absolute/source /absolute/empty-output /absolute/libplank_transport.a [--synthetic-only]" >&2
     exit 2
 fi
 source_root=$1
@@ -12,8 +12,10 @@ if [[ $(uname -s) != Darwin || $(sw_vers -productVersion | cut -d . -f 1) -lt 27
     $(xcrun --sdk macosx --show-sdk-version | cut -d . -f 1) -lt 27 ]]; then
     echo "Requires dedicated macOS 27/SDK 27 development Mac." >&2; exit 2
 fi
-: "${PLANK_MACOS_SIGNING_IDENTITY:?Set the existing Apple Development identity SHA-1}"
-[[ $PLANK_MACOS_SIGNING_IDENTITY =~ ^[[:xdigit:]]{40}$ ]]
+if [[ ${4:-} != --synthetic-only ]]; then
+    : "${PLANK_MACOS_SIGNING_IDENTITY:?Set the existing Apple Development identity SHA-1}"
+    [[ $PLANK_MACOS_SIGNING_IDENTITY =~ ^[[:xdigit:]]{40}$ ]]
+fi
 mkdir -p "$preview_build"
 [[ -z $(ls -A "$preview_build") ]]
 cd "$source_root"
@@ -22,7 +24,7 @@ common=(-mmacosx-version-min=27.0 -fobjc-arc -Wall -Wextra -Werror
     -framework Foundation -framework Security -framework SystemConfiguration -framework CoreFoundation
     -framework CoreGraphics -framework AppKit -framework Network -framework CoreMedia
     -framework CoreVideo -framework ScreenCaptureKit -framework VideoToolbox -framework AudioToolbox -framework CoreAudio
-    -framework Carbon -framework ApplicationServices -Wl,-sectcreate,__CGPreLoginApp,__cgpreloginapp,/dev/null)
+    -framework Carbon -framework ApplicationServices -framework IOKit -Wl,-sectcreate,__CGPreLoginApp,__cgpreloginapp,/dev/null)
 sources=(apps/host/macos/auth/authentication-session.m apps/host/macos/auth/graphical-authority.m
     apps/host/macos/session/host-runtime.m
     apps/host/macos/control/http-request.m apps/host/macos/control/server-information.m
@@ -35,6 +37,12 @@ xcrun clang "${common[@]}" -DPLANK_MAC_PREVIEW_TEST -DPLANK_SYNTHETIC_AUTH_TEST 
     "${sources[@]}" tests/input/macos-fake-input.m "$archive" -lpthread -lm -o "$preview_build/preview-synthetic"
 xcrun clang "${common[@]}" probes/macos/preview-receive.m "$archive" -lpthread -lm \
     -o "$preview_build/preview-receive"
+if [[ ${4:-} = --synthetic-only ]]; then
+    python3 tests/auth/macos-https-auth.py --server "$preview_build/preview-synthetic" \
+        --config probes/macos/https-cert.cnf --preview-receiver "$preview_build/preview-receive"
+    python3 tests/auth/macos-permission-admission.py --server "$preview_build/preview-synthetic"
+    exit 0
+fi
 preview_app="$preview_build/PLANK Host Probe.app"
 mkdir -p "$preview_app/Contents/MacOS"
 install -m 0644 probes/macos/Info.plist "$preview_app/Contents/Info.plist"

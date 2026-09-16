@@ -13,6 +13,10 @@ source "$source_root/scripts/build/build-paths.sh"
 plank_build_path_flags "$source_root" "$output"
 mkdir "$output"
 cd "$source_root"
+bash "$source_root/scripts/test/build-macos-display-recovery.sh" "$source_root" "$output/display-recovery-tests"
+bash "$source_root/scripts/test/build-macos-input.sh" "$source_root" "$output/input-tests" "$archive"
+bash "$source_root/scripts/test/build-macos-preview.sh" "$source_root" "$output/preview-tests" "$archive" --synthetic-only
+python3 "$source_root/tests/packaging/test-macos-host-permissions.py"
 xcrun clang -mmacosx-version-min=27.0 -fobjc-arc -Wall -Wextra -Werror \
     -Iapps/host/macos/input -Iprotocol/plank-transport/include \
     apps/host/macos/input/input-events.m tests/input/macos-pen-events.m \
@@ -51,6 +55,18 @@ xcrun clang -mmacosx-version-min=27.0 -fobjc-arc -Wall -Wextra -Werror \
     -framework Foundation -framework CoreMedia -framework CoreAudio -framework Security -o "$output/audio-tap-lifecycle-test"
 "$output/audio-tap-lifecycle-test"
 xcrun clang -mmacosx-version-min=27.0 -fobjc-arc -Wall -Wextra -Werror \
+    -Iapps/host/macos/media tests/audio/macos-output-volume.m \
+    -framework Foundation -framework CoreAudio -o "$output/output-volume-test"
+"$output/output-volume-test"
+xcrun clang -mmacosx-version-min=27.0 -fobjc-arc -Wall -Wextra -Werror \
+    -Iapps/host/macos/media -Iapps/host/macos/auth -Iapps/host/macos/control -Iapps/host/macos/input -Iprotocol/plank-transport/include \
+    tests/audio/macos-audio-recovery.m apps/host/macos/media/screen-capture.m \
+    apps/host/macos/media/audio-tap.m apps/host/macos/media/opus-encoder.m apps/host/macos/control/fixed-capture.m \
+    -framework Foundation -framework CoreMedia -framework CoreAudio -framework Security \
+    -framework CoreGraphics -framework CoreVideo -framework ScreenCaptureKit -framework VideoToolbox -framework AudioToolbox \
+    -o "$output/audio-recovery-test"
+"$output/audio-recovery-test"
+xcrun clang -mmacosx-version-min=27.0 -fobjc-arc -Wall -Wextra -Werror \
     -Iapps/host/macos/media tests/audio/macos-opus-encoder.m apps/host/macos/media/opus-encoder.m \
     -framework Foundation -framework CoreMedia -framework AudioToolbox -o "$output/opus-encoder-test"
 "$output/opus-encoder-test" "$output/opus-fixture.pao"
@@ -66,7 +82,7 @@ common=("${PLANK_FILE_FLAGS[@]}" -mmacosx-version-min=27.0 -fobjc-arc -Wall -Wex
     -framework Foundation -framework Security -framework SystemConfiguration -framework CoreFoundation
     -framework CoreGraphics -framework AppKit -framework Network -framework CoreMedia
     -framework CoreVideo -framework ScreenCaptureKit -framework VideoToolbox -framework AudioToolbox -framework CoreAudio
-    -framework Carbon -framework ApplicationServices -framework OpenDirectory
+    -framework Carbon -framework ApplicationServices -framework OpenDirectory -framework IOKit
     -Wl,-sectcreate,__CGPreLoginApp,__cgpreloginapp,/dev/null)
 sources=(apps/host/macos/auth/authentication-session.m apps/host/macos/auth/graphical-authority.m
     apps/host/macos/auth/account-verifier.m apps/host/macos/auth/account-channel.m
@@ -86,8 +102,19 @@ strip -S "$output/plank-host"
 codesign --force --sign - --identifier la.instinctual.PLANK.Host "$output/plank-host"
 codesign --verify --strict "$output/plank-host"
 shasum -a 256 "$archive" "$output/plank-host"
-if [[ -n ${PLANK_MACOS_SIGNING_IDENTITY:-} ]]; then
-    [[ $PLANK_MACOS_SIGNING_IDENTITY =~ ^[[:xdigit:]]{40}$ ]]
+(
+    # Distributable resources (including codesign's seal) must be readable by
+    # every desktop account, even when the caller protects its workspace at 077.
+    # This scope never creates installed configuration, keys or logs.
+    umask 022
+    # Credential-free CI also assembles a complete ad-hoc test bundle. It is
+    # never published as an installer or used for TCC/live capture acceptance.
+    signing_identity=${PLANK_MACOS_SIGNING_IDENTITY:--}
+    if [[ $signing_identity != - ]]; then
+        [[ $signing_identity =~ ^[[:xdigit:]]{40}$ ]]
+    else
+        [[ ${PLANK_MACOS_DISTRIBUTION:-0} = 0 ]]
+    fi
     app="$output/PLANK Host.app"
     mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$output/plank.iconset"
     xcrun clang -mmacosx-version-min=27.0 -fobjc-arc -Wall -Wextra -Werror \
@@ -116,8 +143,9 @@ if [[ -n ${PLANK_MACOS_SIGNING_IDENTITY:-} ]]; then
     /usr/libexec/PlistBuddy -c "Add :PLANKVersion string $PLANK_MACOS_HOST_VERSION" "$app/Contents/Info.plist"
     /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${PLANK_MACOS_HOST_VERSION%%-*}" "$app/Contents/Info.plist"
     /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string ${PLANK_MACOS_HOST_VERSION%%-*}" "$app/Contents/Info.plist"
-    codesign --force --sign "$PLANK_MACOS_SIGNING_IDENTITY" "${signing_flags[@]}" \
+    codesign --force --sign "$signing_identity" "${signing_flags[@]}" \
         --identifier la.instinctual.PLANK.Host "$app"
     codesign --verify --strict "$app"
+    python3 "$source_root/scripts/test/check-macos-host-permissions.py" --app "$app"
     shasum -a 256 "$app/Contents/MacOS/plank-host"
-fi
+)

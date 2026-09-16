@@ -10,7 +10,9 @@
 #include "account-channel.m"
 
 PLANKMacAuthenticationResult PLANKMacVerifyAccount(
-        NSString *name, NSMutableData *password, PLANKMacAccountIdentity *output) {
+        NSString *name, NSMutableData *password, PLANKMacAccountIdentity *output,
+        PLANKMacAuthenticationStage *stage) {
+    *stage = PLANKMacAuthPassword;
     memset(output, 0, sizeof(*output));
     @try {
         struct rlimit core;
@@ -19,10 +21,16 @@ PLANKMacAuthenticationResult PLANKMacVerifyAccount(
         assert(getenv("PLANK_AUTH_SYNTHETIC_SECRET") == NULL);
         if ([name isEqualToString:@"hang"]) { for (;;) pause(); }
         if ([name isEqualToString:@"crash"]) _exit(8);
+        if ([name isEqualToString:@"unavailable"]) {
+            *stage = PLANKMacAuthDirectory;
+            return PLANKMacAuthenticationUnavailable;
+        }
+        if ([name isEqualToString:@"bad-stage"]) *stage = (PLANKMacAuthenticationStage)999;
         if ([name isEqualToString:@"synthetic"] && password.length == 4 &&
             memcmp(password.bytes, "test", 4) == 0) {
             output->uid = 123;
             output->uuid[0] = 1;
+            *stage = PLANKMacAuthComplete;
             return PLANKMacAuthenticationVerified;
         }
         return PLANKMacAuthenticationDenied;
@@ -83,12 +91,17 @@ int main(int argc, const char *argv[]) {
         close(unrelated);
         assert(!setenv("PLANK_AUTH_SYNTHETIC_SECRET", "not-a-real-secret", 1));
         isolated(@"synthetic", PLANKMacAuthenticationVerified);
-        isolated(@"synthetic", PLANKMacAuthenticationUnavailable); // Rate limit.
+        isolated(@"synthetic", PLANKMacAuthenticationVerified); // Success never consumes retry backoff.
         assert(!pthread_mutex_lock(&attemptLock));
         isolated(@"synthetic", PLANKMacAuthenticationUnavailable); // Concurrent attempt.
         pthread_mutex_unlock(&attemptLock);
         nextAttempt = 0; // Tests access internals, not a product bypass switch.
         isolated(@"denied", PLANKMacAuthenticationDenied);
+        isolated(@"synthetic", PLANKMacAuthenticationUnavailable); // Failed verification retains backoff.
+        nextAttempt = 0;
+        isolated(@"unavailable", PLANKMacAuthenticationUnavailable);
+        nextAttempt = 0;
+        isolated(@"bad-stage", PLANKMacAuthenticationUnavailable);
         nextAttempt = 0;
         isolated(@"crash", PLANKMacAuthenticationUnavailable);
         nextAttempt = 0;
@@ -106,7 +119,7 @@ int main(int argc, const char *argv[]) {
         int status;
         assert(waitpid(-1, &status, WNOHANG) == -1 && errno == ECHILD);
         close(77);
-        puts("macos_account_channel=pass cases=16 synthetic_only=1 children_reaped=1");
+        puts("macos_account_channel=pass cases=19 synthetic_only=1 children_reaped=1");
     }
     return 0;
 }

@@ -5,8 +5,12 @@
 #include <arpa/inet.h>
 #include <sys/resource.h>
 #include <time.h>
+#include <stdatomic.h>
 
-@interface PLANKMacHTTPSRequest : NSObject
+@interface PLANKMacHTTPSRequest : NSObject {
+@public
+    atomic_bool cancelled;
+}
 @property nw_connection_t connection;
 @property NSMutableData *bytes;
 @property NSData *peer;
@@ -58,6 +62,7 @@
 - (void)finish:(PLANKMacHTTPSRequest *)request {
     if (request.finished) return;
     request.finished = YES;
+    atomic_store(&request->cancelled, true);
     [request.bytes resetBytesInRange:NSMakeRange(0, request.bytes.length)];
     request.bytes = nil;
     nw_connection_set_state_changed_handler(request.connection, NULL);
@@ -136,10 +141,16 @@
                             reply = _launch(value, token, request.peer, _controlPort, &status) ?: @{@"state": @"denied"};
                             if (status == 200) claimedToken = token;
                         }
-                        // A failed setup attempt is finished. Do not retain its
-                        // login token until expiry while the Client signs in again.
-                        // Only revoke after peer-bound authorization succeeded.
-                        if (status != 200) [_sessions revokeToken:token];
+                        // An authorized display which is not ready yet may be
+                        // polled with the same setup context. Do not extend its
+                        // expiry. Launch remains one-shot and all other failures
+                        // revoke only after peer-bound authorization succeeded.
+                        BOOL readinessPending = [path isEqual:@"/plank/display"] && status == 503;
+                        BOOL expiredRequest = atomic_load(&request->cancelled) ||
+                            clock_gettime_nsec_np(CLOCK_MONOTONIC) >= request.deadline;
+                        if ((status != 200 && !readinessPending) || expiredRequest) [_sessions revokeToken:token];
+                        if ([path isEqual:@"/plank/display"] && (status == 200 || readinessPending))
+                            claimedToken = token; // revoke if delivery fails/cancels
                     }
                 }
             }
@@ -194,6 +205,7 @@
                         dispatch_async(owner->_authQueue, ^{
                             @autoreleasepool {
                                 NSDictionary *topology = nil;
+                                NSString *setupToken = nil;
                                 BOOL authorized = NO;
                                 unsigned status = 401;
                                 @try {
@@ -202,7 +214,31 @@
                                     PLANKMacAccountIdentity before = {0}, after = {0};
                                     if (token && [owner->_sessions authorizeToken:token peer:request.peer identity:&before]) {
                                         authorized = YES;
+                                        if (PLANKMacIsTopologyTarget(path)) setupToken = token;
                                         if (!information) topology = owner->_topology();
+                                        if (!topology && PLANKMacIsTopologyTarget(path) && owner.recoverTopology) {
+                                            // At most one attempt per request, on the existing auth lane.
+                                            // Discovery, app-list reads and invalid tokens never wake or
+                                            // mutate a display. Cancellation is shared with the network lane.
+                                            BOOL (^valid)(void) = ^BOOL {
+                                                PLANKMacAccountIdentity current = {0};
+                                                return !atomic_load(&request->cancelled) &&
+                                                    clock_gettime_nsec_np(CLOCK_MONOTONIC) < request.deadline &&
+                                                    [owner->_sessions authorizeToken:token peer:request.peer identity:&current] &&
+                                                    before.uid == current.uid && !memcmp(before.uuid, current.uuid, sizeof(before.uuid));
+                                            };
+                                            if (valid() && owner.recoverTopology(valid)) {
+                                                // Display-active arrives before capture geometry settles.
+                                                // Poll readiness on this bounded worker, not the main or
+                                                // network loop, and never repeat credential verification.
+                                                uint64_t settle = clock_gettime_nsec_np(CLOCK_MONOTONIC) + NSEC_PER_SEC;
+                                                while (valid()) {
+                                                    topology = owner->_topology();
+                                                    if (topology || clock_gettime_nsec_np(CLOCK_MONOTONIC) >= settle) break;
+                                                    [NSThread sleepForTimeInterval:.05];
+                                                }
+                                            }
+                                        }
                                         status = information || topology ? 200 : 503;
                                         if (![owner->_sessions authorizeToken:token peer:request.peer identity:&after] ||
                                             before.uid != after.uid || memcmp(before.uuid, after.uuid, sizeof(before.uuid))) {
@@ -211,6 +247,15 @@
                                     }
                                 } @catch (NSException *exception) {
                                     (void)exception; authorized = NO; topology = nil; status = 503;
+                                } @finally {
+                                    // Retry readiness without repeating OS auth.
+                                    // Identity/peer checks and the original expiry
+                                    // remain authoritative; cancellation and actual
+                                    // rejection still finish this setup context.
+                                    if (setupToken && ((status != 200 && !(status == 503 && authorized)) ||
+                                                      atomic_load(&request->cancelled) ||
+                                                      clock_gettime_nsec_np(CLOCK_MONOTONIC) >= request.deadline))
+                                        [owner->_sessions revokeToken:setupToken];
                                 }
                                 dispatch_async(owner->_networkQueue, ^{
                                     if (information) {
@@ -223,7 +268,9 @@
                                             dataUsingEncoding:NSUTF8StringEncoding];
                                         [owner replyBytes:desktop type:@"application/xml; charset=utf-8" token:nil
                                                   status:200 request:request];
-                                    } else [owner reply:topology ?: @{@"state": @"denied"} status:status request:request];
+                                    } else [owner replyBytes:[NSJSONSerialization dataWithJSONObject:
+                                                topology ?: @{@"state": @"denied"} options:0 error:NULL]
+                                                type:@"application/json" token:setupToken status:status request:request];
                                     owner->_authBusy = NO;
                                 });
                             }

@@ -49,6 +49,22 @@
         if (!owner) { *status = 503; return nil; }
         return [owner prepareDisplayRequest:request token:token peer:peer status:status];
     };
+    _server.recoverTopology = ^BOOL(BOOL (^authorized)(void)) {
+        typeof(self) owner = weakSelf;
+        if (!owner) return NO;
+        @synchronized(owner) {
+            if (!owner.recoverDisplay || !owner->_started || atomic_load(&owner->_stopping) ||
+                (owner->_stream && owner->_stream.state != PLANKMacPreviewStopped)) return NO;
+            PLANKMacGraphicalIdentity scope = owner->_snapshot();
+            BOOL (^valid)(void) = ^BOOL {
+                return !atomic_load(&owner->_stopping) && authorized() &&
+                    plank_macos_same_graphical_scope(scope, owner->_snapshot());
+            };
+            unsigned status = 0;
+            if (!valid() || [owner permissionError:&status]) return NO;
+            return owner.recoverDisplay(valid) && valid();
+        }
+    };
     return _server ? self : nil;
 }
 - (NSDictionary *)prepareDisplayRequest:(NSDictionary *)request token:(NSString *)token
@@ -60,16 +76,17 @@
             *status = 503; return nil;
         }
         if (_stream && _stream.state != PLANKMacPreviewStopped) { *status = 409; return nil; }
-        if (request.count != 4 || !PLANKMacEncodingProfile(request[@"encoding_mode"])) { *status = 400; return nil; }
-        for (NSString *key in @[@"schema_version", @"width", @"height"]) {
+        if (request.count != 5 || !PLANKMacEncodingProfile(request[@"encoding_mode"])) { *status = 400; return nil; }
+        for (NSString *key in @[@"schema_version", @"width", @"height", @"scale"]) {
             id number = request[key];
             if (![number isKindOfClass:NSNumber.class] ||
                 CFGetTypeID((__bridge CFTypeRef)number) == CFBooleanGetTypeID() ||
                 [number doubleValue] != [number unsignedIntValue]) { *status = 400; return nil; }
         }
         unsigned width = [request[@"width"] unsignedIntValue], height = [request[@"height"] unsignedIntValue];
-        if ([request[@"schema_version"] unsignedIntValue] != 2 || width < 2 || height < 2 ||
-            width > 8192 || height > 8192) { *status = 400; return nil; }
+        unsigned scale = [request[@"scale"] unsignedIntValue];
+        if ([request[@"schema_version"] unsignedIntValue] != 3 || (scale != 1 && scale != 2) ||
+            width < 2 || height < 2 || width > 8192 || height > 8192 || width % 2 || height % 2) { *status = 400; return nil; }
         PLANKMacGraphicalIdentity scope = _snapshot();
         BOOL (^valid)(void) = ^BOOL {
             PLANKMacAccountIdentity account = {0};
@@ -80,13 +97,15 @@
         if (!valid()) { *status = 401; return nil; }
         NSDictionary *permissionError = [self permissionError:status];
         if (permissionError) return permissionError;
-        if (!self.prepareDisplay(width, height, request[@"encoding_mode"], valid) || !valid()) {
+        if (!self.prepareDisplay(width, height, scale, request[@"encoding_mode"], valid) || !valid()) {
             NSLog(@"PLANK desktop preparation failed: %ux%u", width, height);
             *status = 503; return nil;
         }
         NSDictionary *topology = _topology();
         if (!topology || [topology[@"capture"][@"width"] unsignedIntValue] != width ||
             [topology[@"capture"][@"height"] unsignedIntValue] != height ||
+            [topology[@"capture"][@"logical_bounds"][@"width"] doubleValue] != width / scale ||
+            [topology[@"capture"][@"logical_bounds"][@"height"] doubleValue] != height / scale ||
             ![topology[@"capture"][@"encoding_profile"] isEqual:PLANKMacEncodingProfile(request[@"encoding_mode"])] || !valid()) {
             *status = 503; return nil;
         }
