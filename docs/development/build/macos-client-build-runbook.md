@@ -4,6 +4,11 @@ Experimental Apple Silicon/macOS27 only. Read the canonical release runbook
 first. Linux builder/test roles remain unchanged. Use clean Git worktrees and
 verified Git bundles imported dependency-first, with recursive fetch disabled.
 
+For hosted candidates use [GitHub builds](github-builds.md), including the
+exact-input dependency cache and explicit clean-bootstrap option. The local
+recipe below is for separately authorized/self-managed builders, not a silent
+fallback from a failed hosted run.
+
 Install Xcode/SDK27 and accept its license before bootstrap. Required tools are
 Apple clang/make/git, Python3 with `venv`/pip, curl, tar, patch and CMake. The
 bootstrap finds the official CMake app in `/Applications/CMake.app/Contents/bin`
@@ -57,8 +62,16 @@ Candidate builds must independently reverse-dry-run that patch and verify its
 hash. Private dylibs must be bundled with relocatable install names, licensed,
 signed and closure-checked before any package is offered to a user.
 
-Implementation/qualification is in progress; there is no accepted macOS Client
-package yet. Do not use the old upstream setup-deps/prebuilts workflow.
+SDL3.4.2 uses its unmodified native fullscreen Spaces implementation. Match
+Client requests the usable logical/backing area below a display's camera inset;
+non-notched displays retain the complete area. No content-size delegate patch
+or custom fullscreen hint is required. The changed bootstrap/cache inputs force
+a fresh hosted dependency build after removal of the experimental SDL patch.
+For local prepared dependencies, rerun the complete bootstrap, not FFmpeg-only.
+
+The current packaging path is qualified; each new candidate still requires its
+affected live acceptance gates. Do not use the old upstream setup-deps/prebuilts
+workflow.
 
 ## Build and package
 
@@ -113,7 +126,9 @@ the app to Trash. Host installation/permissions are separate and unchanged.
 - Private pkgconf filters its own prefix as system flags: require
   `PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1` and `PKG_CONFIG_ALLOW_SYSTEM_LIBS=1`.
 - Qt6.10.2/SDK27 Clang21 `__yield` declaration: the Mac arm64 build includes
-  `arm_acle.h` explicitly. Do not change Linux compiler flags.
+  `arm_acle.h` explicitly. Standalone Qt test projects must receive the same
+  `QMAKE_CXXFLAGS+=-include arm_acle.h` input; they do not inherit app.pro's
+  flags. The hosted outputtopology gate covers this. Do not change Linux flags.
 - FreeType's optional zlib pkgconfig dependency is not available from the SDK:
   bootstrap disables that optional compression backend; SDL_ttf fonts work
   through retained FreeType. Do not introduce a moving Homebrew dependency.

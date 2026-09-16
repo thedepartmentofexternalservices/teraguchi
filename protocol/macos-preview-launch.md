@@ -19,9 +19,11 @@ or creating a transport lease. Missing permission returns HTTP 403 with exactly
 extension, not a change to the schema-2 success manifest or transport ABI.
 Unauthenticated callers still receive 401 without permission details. The Client
 maps only this fixed code to local instructions; arbitrary Host text is not
-displayed. Permission denial does not alter display topology. Any failed
-authenticated display/launch attempt revokes that attempt's HTTP token (and
-any claimed lease); retry requires fresh authentication. Unauthenticated or
+displayed. Permission denial does not alter display topology. Failed launch
+and rejected display requests revoke that attempt's HTTP token (and any
+claimed lease); retry requires fresh authentication. A display-readiness
+HTTP503 retains the still-authorized setup context for another readiness
+request, without extending its expiry. Unauthenticated or
 wrong-peer requests cannot revoke another attempt. Successful display
 preparation retains its token for launch. The Client stops automatic reconnect
 on HTTP403, since operator consent cannot be recovered by repeated logins.
@@ -29,8 +31,29 @@ Capture/input still recheck access at startup to cover revocation races.
 
 Authentication capacity/verification contention returns `{"state":"busy"}`,
 distinct from `{"state":"denied"}` for rejected authentication. The Client
-reports busy as HTTP503 locally, not an incorrect-password message. The existing
-16-record limits remain unchanged. No account details or secrets enter errors.
+reports busy as HTTP503 locally, not an incorrect-password message. Pending
+challenges are bounded at 16; unused authenticated setup tokens are bounded at
+four. After successful account/ownership verification, a new token supersedes
+unused tokens for the same verified account and peer. A full token table does
+not prevent that verification/replacement. Account UUID and UID, not an
+unverified username, define identity. Different accounts sharing a relay/NAT
+remain independent. Active stream leases are separate and are never replaced
+by a login attempt. Failed passwords cannot invalidate setup or stream access.
+An authorized topology-readiness HTTP503 likewise retains the setup context.
+Rejected/cancelled topology retrieval and failed topology/display reply delivery
+revoke it. This avoids repeating password verification merely to wait for a
+display. Ownership/peer checks and the original five-minute expiry still apply
+to every request; no keepalive or poll renews that expiry.
+Unobserved client abandonment remains bounded by replacement and the five-minute
+setup expiry. No account details or secrets enter errors. The wire format is
+unchanged. Matching Client recovery retains this context until explicit
+invalidation or launch consumption. It stops on rejected authentication,
+permission denial or TLS failure; an expired readiness token may be refreshed.
+The configured Host Timeout bounds each automatic recovery window. In Ask mode,
+the local prompt pauses new control requests until Keep Waiting; an in-flight
+bounded request may finish but cannot trigger more work behind that prompt.
+Disconnect cancels the paused worker. Login/logout recovery otherwise remains
+automatic. These rules do not apply credentials to bookmark discovery polls.
 
 The body has exactly the nine fields in
 `tests/protocol/macos-preview-launch-v2.json`:
@@ -96,3 +119,27 @@ The ordinary Session calls the pinned HTTPS launch, then consumes this manifest
 instead of sending a Linux setup exchange. Capture pixels remain host-native;
 Scaled-Span fits them at presentation. A changed topology requires fresh
 authentication/geometry instead of silently reusing stale dimensions.
+
+Mac display preparation uses `POST /plank/display` schema **3**, with exactly
+five fields: `schema_version`, `width`, `height`, `scale`, `encoding_mode`.
+See `tests/protocol/macos-display-v3.json`. Width and height are even backing
+pixel counts from 2 through 8192; scale is integer 1 or 2. Logical desktop
+dimensions are pixels divided by scale and may be odd. Booleans, fractional
+values, missing/extra fields and prior schemas are rejected. Matching Host and
+Client builds are required; no silent 1x downgrade. Launch remains schema 2
+and fixed-capture topology remains schema 13 (already carrying both geometries).
+
+For macOS Clients, Match Client reads the current CoreGraphics mode's backing
+pixels and logical bounds, preserving the user's current "Looks like" setting
+rather than guessing from panel-native pixels. One display or two horizontally
+arranged displays at the same 1x/2x scale form one canvas. Mixed-scale layouts
+fail explicitly and can use a manual mode instead. Manual modes and Linux
+Client Match Client remain 1x; Linux Host EDID policy is unchanged.
+
+The Host registers at most one additional custom 60 Hz mode alongside its
+presets, with logical dimensions for HiDPI, only applying changed settings
+while an existing output is online. Preparation confirms exact backing pixels,
+logical bounds and selected encoder profile; launch validates the resulting
+topology. Recovery retains the successful scale. Size bounds are not a promise
+of encoder support for every size. No nearest-preset substitution or global
+display preference is used.

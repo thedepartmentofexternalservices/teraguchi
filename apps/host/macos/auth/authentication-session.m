@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #import "authentication-session.h"
 #import <Security/Security.h>
+#include <stdio.h>
 #include <time.h>
 
 @interface PLANKMacAuthRecord : NSObject
@@ -53,6 +54,8 @@ static BOOL validPeer(NSData *peer) {
 static NSDictionary *denied(void) { return @{@"state": @"denied"}; }
 static NSDictionary *busy(void) { return @{@"state": @"busy"}; }
 
+enum { MaximumPendingChallenges = 16, MaximumSetupTokens = 4 };
+
 - (instancetype)init { return nil; }
 
 - (instancetype)initWithGraphicalSnapshot:(PLANKMacGraphicalSnapshot)snapshot {
@@ -89,7 +92,9 @@ static NSDictionary *busy(void) { return @{@"state": @"busy"}; }
         if (!nameBytes.length || nameBytes.length > 255 || memchr(nameBytes.bytes, 0, nameBytes.length))
             return denied();
         [self prune];
-        if (_pending.count >= 16 || _tokens.count >= 16) return busy();
+        // A full setup table must not prevent an existing owner from verifying
+        // and replacing their abandoned token. Challenges have their own bound.
+        if (_pending.count >= MaximumPendingChallenges) return busy();
         PLANKMacGraphicalIdentity scope = _snapshot();
         if (!plank_macos_graphical_identity_valid(scope)) return denied();
         NSString *conversation = randomToken();
@@ -118,7 +123,7 @@ static NSDictionary *busy(void) { return @{@"state": @"busy"}; }
             if (!record || ![record.peer isEqual:peer]) return denied();
             // Consume BEFORE any verification. A response can never be replayed.
             [_pending removeObjectForKey:conversation];
-            if (_verifying || _tokens.count >= 16) return busy();
+            if (_verifying) return busy();
             _verifying = YES;
             generation = _revocationGeneration;
         }
@@ -128,12 +133,32 @@ static NSDictionary *busy(void) { return @{@"state": @"busy"}; }
             PLANKMacAccountIdentity account = {0};
             PLANKMacAuthenticationResult result = PLANKMacVerifyAccountIsolated(record.username, password, &account);
             @synchronized(self) {
-                if (generation != _revocationGeneration ||
-                        result != PLANKMacAuthenticationVerified ||
-                        !plank_macos_account_may_attach(account, record.scope, _snapshot())) return denied();
-                if (_tokens.count >= 16) return busy();
+                if (generation != _revocationGeneration) {
+                    fprintf(stderr, "macos_auth_setup rejected=revoked-during-verification\n");
+                    return denied();
+                }
+                // A helper timeout/cooldown is not a rejected OS password.
+                if (result == PLANKMacAuthenticationUnavailable) return busy();
+                if (result != PLANKMacAuthenticationVerified) return denied();
+                if (!plank_macos_account_may_attach(account, record.scope, _snapshot())) {
+                    fprintf(stderr, "macos_auth_setup rejected=desktop-authority\n");
+                    return denied();
+                }
+                [self prune];
+                // Only a VERIFIED account can supersede its unused setup on
+                // this peer. Never let an unauthenticated name/IP invalidate
+                // another login, a different account behind NAT, or a lease.
+                NSMutableArray<NSString *> *superseded = [NSMutableArray array];
+                for (NSString *key in _tokens) {
+                    PLANKMacAuthRecord *old = _tokens[key];
+                    if ([old.peer isEqual:peer] && old.account.uid == account.uid &&
+                            !memcmp(old.account.uuid, account.uuid, sizeof(account.uuid)))
+                        [superseded addObject:key];
+                }
+                if (_tokens.count - superseded.count >= MaximumSetupTokens) return busy();
                 NSString *token = randomToken();
                 if (!token || _tokens[token]) return denied();
+                [_tokens removeObjectsForKeys:superseded];
                 record.account = account;
                 record.username = nil;
                 record.expires = monotonicSeconds() + 300;

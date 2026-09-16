@@ -17,6 +17,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdatomic.h>
+#include <time.h>
 
 #ifndef PLANK_MACOS_HOST_VERSION
 #error Build must supply an explicit branch-qualified Host version
@@ -260,12 +261,12 @@ static int graphical(const char *service, NSString *role, NSString *directory, B
             return [[PLANKMacScreenCapture alloc] initWithDesktopAudioTap:phase == PLANKMacScopeDesktop];
         }
         input:^id<PLANKMacInputDevice> { return [PLANKMacQuartzInput new]; }];
-    runtime.prepareDisplay = ^BOOL(unsigned width, unsigned height, NSString *encodingMode, BOOL (^valid)(void)) {
+    runtime.prepareDisplay = ^BOOL(unsigned width, unsigned height, unsigned scale, NSString *encodingMode, BOOL (^valid)(void)) {
         if (!PLANKMacDesktopModeSupported(width, height)) return NO;
         dispatch_semaphore_t finished = dispatch_semaphore_create(0);
         __block atomic_bool cancelled = false, ready = false;
         dispatch_async(dispatch_get_main_queue(), ^{
-            [desktopDisplay prepareWidth:width height:height
+            [desktopDisplay prepareWidth:width height:height scale:scale
                 valid:^BOOL { return !atomic_load(&cancelled) && valid(); }
                 completion:^(BOOL success) {
                     if (success && !atomic_load(&cancelled) && valid()) {
@@ -279,6 +280,31 @@ static int graphical(const char *service, NSString *role, NSString *directory, B
         // Only the bounded authentication lane waits, never the graphical or
         // network event loops. A timeout revokes pending mutation, not authority.
         BOOL completed = dispatch_semaphore_wait(finished, dispatch_time(DISPATCH_TIME_NOW, 7*NSEC_PER_SEC)) == 0;
+        atomic_store(&cancelled, true);
+        return completed && atomic_load(&ready);
+    };
+    runtime.recoverDisplay = ^BOOL(BOOL (^authorized)(void)) {
+        dispatch_semaphore_t finished = dispatch_semaphore_create(0);
+        __block atomic_bool cancelled = false, ready = false;
+        // Leave room inside the existing five-second HTTPS deadline. Never
+        // wait on the graphical or network queue, or retry indefinitely.
+        uint64_t deadline = clock_gettime_nsec_np(CLOCK_MONOTONIC) + 3 * NSEC_PER_SEC;
+        BOOL (^valid)(void) = ^BOOL {
+            return !atomic_load(&cancelled) && clock_gettime_nsec_np(CLOCK_MONOTONIC) < deadline && authorized();
+        };
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // Zero/zero is first-use capture of the current desktop, before
+            // bookmark preparation creates our virtual display. It may need
+            // waking too. A nonzero selection must still be our owned output.
+            if (!valid() || capture.selectedDisplay != desktopDisplay.displayID) {
+                dispatch_semaphore_signal(finished); return;
+            }
+            [desktopDisplay recoverWithValidity:valid completion:^(BOOL success) {
+                if (success && valid()) atomic_store(&ready, true);
+                dispatch_semaphore_signal(finished);
+            }];
+        });
+        BOOL completed = dispatch_semaphore_wait(finished, dispatch_time(DISPATCH_TIME_NOW, 3500*NSEC_PER_MSEC)) == 0;
         atomic_store(&cancelled, true);
         return completed && atomic_load(&ready);
     };
