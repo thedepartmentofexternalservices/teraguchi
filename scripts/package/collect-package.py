@@ -9,7 +9,12 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPT_DIR))
+import product_identity
 
 
 def git(root, *args):
@@ -90,6 +95,11 @@ def collect(args):
                   'size': source.stat().st_size, 'sha256': checksum,
                   'source_commit': commit, 'submodules': submodules,
                   'validation': {'package': args.validation, 'functional': 'not-recorded'}}
+        if getattr(args, 'product_identity', None):
+            profile = product_identity.load(args.product_identity)
+            if profile['product'] != 'teraguchi-client' or args.product != 'client':
+                raise ValueError('product identity profile does not match collected product')
+            record['product_identity'] = product_identity.manifest_block(profile)
         previous = next((p for p in manifest['packages'] if p['path'] == relative), None)
         if previous and previous != record:
             raise ValueError('conflicting artifact/provenance; increment the version, do not overwrite')
@@ -136,6 +146,8 @@ def main():
     parser.add_argument('--expected-sha256')
     parser.add_argument('--output-root', type=Path)
     parser.add_argument('--move', action='store_true', help='remove the supplied file only after verified collection')
+    parser.add_argument('--product-identity', type=Path,
+                        help='optional Teraguchi Mac client identity profile JSON')
     args = parser.parse_args()
     try:
         collect(args)

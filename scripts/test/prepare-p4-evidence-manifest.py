@@ -33,6 +33,32 @@ def gitlink(root: Path, commit: str, path: str) -> str:
     raise ValueError("gitlink not found: " + path)
 
 
+def load_transport_summary(path: Path) -> dict:
+    if path.suffix == ".json":
+        summary = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(summary, dict):
+            raise ValueError("Transport summary JSON must be an object")
+        return summary
+    script = Path(__file__).resolve().parent / "parse-session-transport-log.py"
+    payload = subprocess.check_output(["python3", str(script), str(path)], text=True)
+    return json.loads(payload)
+
+
+def merge_transport(manifest: dict, summary: dict) -> None:
+    measurements = manifest.setdefault("measurements", {})
+    mapping = {
+        "network_rtt_ms_final": "network_rtt_ms_max",
+        "pre_fec_loss_percent_final": "pre_fec_loss_percent_max",
+        "post_fec_loss_percent_final": "post_fec_loss_percent_max",
+    }
+    for source_key, target_key in mapping.items():
+        if source_key in summary and summary[source_key] is not None:
+            measurements[target_key] = summary[source_key]
+    transport = manifest.setdefault("transport_summary", {})
+    transport.update(summary)
+    manifest["status"] = INCOMPLETE
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, default=Path(__file__).resolve().parents[2])
@@ -43,6 +69,8 @@ def main() -> int:
     parser.add_argument("--route-class", choices=("direct", "relay", "unknown"), default="unknown")
     parser.add_argument("--duration-minutes", type=int, default=30)
     parser.add_argument("--operator", default="", help="optional role label; never an account name")
+    parser.add_argument("--merge-transport-log", type=Path,
+                        help="private client log excerpt or parsed transport JSON")
     args = parser.parse_args()
 
     root = args.source_root.resolve()
@@ -121,6 +149,9 @@ def main() -> int:
             "capture_paths": [],
         },
     }
+
+    if args.merge_transport_log:
+        merge_transport(manifest, load_transport_summary(args.merge_transport_log.resolve()))
 
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")

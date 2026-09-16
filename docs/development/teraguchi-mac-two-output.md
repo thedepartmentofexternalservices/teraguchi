@@ -29,12 +29,16 @@ complete geometry after native identity verification; enumeration order cannot
 select an output. Unsupported counts, mirroring, rotation, ambiguous identity or
 geometry and unsupported native resolutions fail explicitly before login.
 
-Two Mac windows use borderless fullscreen in the current desktop space. The
-session toolbar toggles both between that layout and separate windowed views;
-both retain their own canvas crop. The native green button is disabled for this
-pair because it would move only one window into a fullscreen Space. One-output
-sessions retain the existing native fullscreen behavior. No display mode is
-changed by assigned-session startup.
+Assigned Mac outputs use borderless desktop windows sized to each selected
+monitor. They stay in the current Space and do not enter SDL exclusive
+fullscreen or a separate fullscreen Space. This works with unified Spaces
+("Displays have separate Spaces" off): a one-output session can fill one Mac
+monitor while the other stays available for local work. Two-output sessions use
+the same borderless contract on both monitors. The session toolbar toggles
+between that layout and separate windowed views; each output retains its canvas
+crop. The native green button is disabled because it would move only one window
+into its own fullscreen Space. No display mode is changed by assigned-session
+startup. Session logs record whether separate Spaces is enabled.
 
 While the fullscreen pair is visible and either window has input focus, the
 session hides the macOS menu bar and Dock completely so Linux receives the

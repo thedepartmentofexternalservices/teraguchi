@@ -75,3 +75,6 @@ end-to-end measurement method.
 
 Use `scripts/test/prepare-p4-evidence-manifest.py` to start a run record that
 links candidate provenance to these counters and explicit pass/fail gates.
+`scripts/test/parse-session-transport-log.py` extracts final teardown counters
+from a private client log; pass that file to
+`prepare-p4-evidence-manifest.py --merge-transport-log`.

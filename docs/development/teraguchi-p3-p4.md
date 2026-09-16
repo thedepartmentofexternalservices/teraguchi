@@ -105,6 +105,8 @@ code behavior; they do not establish live access or physical video qualification
   identity. Retain exact root/client pins, package hash, signer, and version.
   Example profile: `packaging/client/macos/product-identity.example.json`.
   Offline prep helper: `scripts/package/prepare-teraguchi-product-packaging.sh`.
+  `collect-package.py --product-identity` now records validated identity metadata
+  while retaining the inherited `plank-client` collector filename.
 - [x] Add [offline signed release verification](teraguchi-client-release.md):
   exact collector provenance/package bytes, identity policy, expired/replayed
   metadata, downgrade rejection and fresh exact rollback authorization.
@@ -132,9 +134,10 @@ code behavior; they do not establish live access or physical video qualification
   Record direct/relay path, RTT, jitter, loss, wire bitrate, FEC, dropped/replaced
   frames, queue sizes, and per-stage timings. Counter sums do not prove physical
   input-to-display latency.
-- [ ] Prepare repeatable loss/burst and endpoint-change cases from the inherited
-  acceptance criteria. Keep impairment and recovery procedures reversible and
-  limited to the designated pilot endpoints.
+- [x] Prepare repeatable loss/burst and endpoint-change cases from the inherited
+  acceptance criteria. See [teraguchi-p4-network-impairment.md](teraguchi-p4-network-impairment.md)
+  and `scripts/test/prepare-p4-network-impairment.sh`. Live impairment and
+  endpoint-change qualification remain operator-owned.
 - [ ] Run at least two representative artist routes, with 30-minute direct-path
   load observations, interruption/reconnect, revocation, and seat-denial drills.
   Relay runs retain that label and do not pass the direct-path gate.
@@ -153,14 +156,11 @@ Offline P3 work cannot satisfy these gates. Builder provisioning remains paused.
 
 ## Next coding slice
 
-The task-bar network RTT monitor, transport-counter inventory,
-P4 evidence-manifest template, guest-access prep checker and product-identity
-packaging scaffold are implemented locally. Next independent coding: wire the
-selected product identity through the Mac DMG collector path, integrate actual
-bundle attestation with the installer, and extend telemetry export for P4 runs.
-Help, tablet/display repair guidance and private status export are implemented
-locally. Workstation-specific HTTPS trust and offline signed package/rollback
-verification now pass locally. Production keys, notarization and clean-Mac
+Product identity metadata now attaches to package collection, session transport
+logs can merge into P4 manifests, and network impairment prep is documented with
+a bounded cross-host helper. Next independent coding: rename/collector DMG output
+once bundle ID is chosen, integrate bundle attestation with a native installer,
+and add installer idle-state history. Production keys, notarization and clean-Mac
 install qualification remain open. Full-policy and external-guest acceptance
 remain. Physical Mac window/input qualification and P2 hardware limits remain
 explicit; this work does not complete P3 or enter P4.
