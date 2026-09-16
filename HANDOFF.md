@@ -11,6 +11,15 @@ paused builder attempt. Earlier checkpoint sections below are historical.
 
 ## P3/P4 continuation
 
+### Saved checkpoint and next request
+
+Current source rollback: root `a3355d7`, client `4d29aa4e`. The full Mac compile,
+16,439 pen assertions and native input-wire checks pass. The installed baseline
+remains root `fd5e9c3` / client `5955945b`; source compilation did not replace it.
+The operator requested a checkpoint and queued a latency monitor beside **Loss %**
+in the in-session task bar. See [the to-do](docs/development/teraguchi-p3-p4.md#queued-follow-up-task-bar-latency-monitor).
+No latency monitor is implemented in this checkpoint.
+
 **Cursor candidate rejected for latency.** After the visibility repair, the
 operator reported that the cursor drags behind the pen. Mac pen input now keeps
 native cursor ownership in source; the host-position callback is disabled. The
@@ -48,11 +57,11 @@ cursor despite valid parent attachment. The Mac overlay now restores its sibling
 order when dispatching updates. The new regression fails before the repair and
 all 43 native checks pass afterward. A visible local Metal fixture confirms the
 replacement cursor is drawn over video. The clean candidate at root `478690d` /
-client `293b4a08` is installed locally. All 107 Mach-O/signature/path checks and
-packaged setup/startup/restart/Quit checks pass. Diagnostic coordinate logging is
-absent. Pilot is reopened for operator-owned input-grant renewal; physical cursor
-visibility and 5% alignment remain pending. This does not resolve the separate
-margin state discrepancy by itself.
+client `293b4a08` was installed locally and subsequently rejected for visible
+cursor lag. Its 107 Mach-O/signature/path checks and packaged setup/startup/
+restart/Quit checks passed, with diagnostic coordinate logging absent. Those
+checks did not qualify physical latency or 5% alignment. The installed rollback
+and open margin discrepancy are recorded above.
 
 The preceding onboarding pilot was installed from root `fd5e9c3` and client
 `5955945b`. Its bundled setup loaded automatically, and the live list contains
@@ -119,7 +128,7 @@ real native-provider-to-QML regression reproduces the failure before the fix;
 all 29 native provider/worker results pass afterward. This is discovery repair,
 not live login, video, input, or external-guest qualification.
 
-Current client gitlink: `6267acf7a04023281b19fb72a58cb8984a6d3b39` on `codex/assignment-refresh`.
+Current client gitlink: `4d29aa4e` on `codex/assignment-refresh`; the installed rollback uses `5955945b`.
 
 The operator deferred physical input follow-up and prioritized independent P3/P4
 work. Start with [the ordered implementation checklist](docs/development/teraguchi-p3-p4.md).

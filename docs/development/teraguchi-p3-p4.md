@@ -11,6 +11,17 @@ requires the P2 hardware gates and P3 access/distribution controls.
 
 ## P3: work in this order
 
+### Queued follow-up: task-bar latency monitor
+
+- [ ] Add a live latency monitor immediately beside **Loss %** in the in-session
+  task bar, as requested on 2026-09-15. Display milliseconds and identify the
+  measurement clearly. Inventory existing session/transport timing first;
+  network RTT must not be presented as total pen-to-picture latency. Show an
+  unavailable state when no valid measurement exists, and check layout/refresh
+  behavior with one and two displays. Start at `PlankToolbar::setRenderedStats`
+  and the existing Loss field in `apps/client/app/streaming/planktoolbar.cpp`.
+  This is queued work; the checkpoint does not implement or install it.
+
 ### 1. Finish the assignment-to-session boundary
 
 - [x] Add generation-scoped refresh replies, bounded cache lifetime, refresh
