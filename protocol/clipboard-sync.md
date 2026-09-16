@@ -1,6 +1,7 @@
 # Clipboard sync (draft)
 
-Status: **draft** — required for Teraguchi daily work; not implemented.
+Status: **implemented (v1 text)** — feature flag `0x400000`, host event type 5,
+client input type 9.
 
 ## Goal
 
@@ -27,21 +28,24 @@ session for Mac→host paste — Command maps to Linux Super, not Control.
 
 ## Negotiation
 
-Add a protocol feature bit on `/launch` (exact value TBD in
-`protocol/host-version.md`):
+Add a protocol feature bit on `/launch` (`NvOutputTopology::ClipboardSyncFeature`
+`0x400000`):
 
-- Client sends `plankFeatureFlags` with `PLANK_FEATURE_CLIPBOARD_SYNC`.
+- Client sends `plankFeatureFlags` with `ClipboardSyncFeature`.
 - Host echoes acceptance in the launch response. If absent, behavior matches
   today's product: no sync; optional legacy text inject only.
 
 ## Wire format
 
-PlankTransport **control** messages (reliable, session-scoped):
+Chunked UTF-8 offers use `PLANK_CLIPBOARD_WIRE_HEADER` in `moonlight-common-c/src/plank.h`.
 
-| Message | Direction | Fields |
+| Lane | Type | Direction |
 |---|---|---|
-| `clipboard_offer` | Either | `generation: u64`, `mime: "text/plain;charset=utf-8"`, `bytes: utf8` |
-| `clipboard_reject` | Receiver | `generation`, `reason: too_large \| unsupported_mime \| session_inactive` |
+| PLE1 event `PLANK_TRANSPORT_EVENT_CLIPBOARD_OFFER` (5) | Host → client |
+| Input `PLANK_TRANSPORT_INPUT_CLIPBOARD_OFFER` (9) | Client → host |
+
+Each chunk carries `generation`, `totalSize`, `chunkOffset`, `chunkSize`, and
+`FIRST`/`LAST` flags. MIME is implicit UTF-8 plain text.
 
 Rules:
 
