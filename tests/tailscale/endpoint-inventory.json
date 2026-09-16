@@ -16,7 +16,7 @@
     },
     {
       "path": "apps/client",
-      "commit": "5955945b9840e5c144d618af5d5fb3053024e1b5",
+      "commit": "94f3bf496dc1c8cbf7c32f01fbfc44894057ac86",
       "sha256": {
         "app/backend/nvhttp.cpp": "9d93e88f887b6263fdbe62ff1634fe96a3bf97b08ea2b265d44f1fec66ae2a67",
         "app/backend/computermanager.cpp": "3a8f8de6d650b1357f7973e68f3d6a2a4b64e1565acf7eadf3bf2f8dca7eb17d",
@@ -24,7 +24,7 @@
         "app/gui/computermodel.cpp": "1dbbabb0eeac4535ecbf7e340e76876cb5a4aaf01bf5fdf61106305de5f5a676",
         "app/settings/plankclientpolicy.h": "597abdd5c33f4f5a87b6cc09749c815fe70c616b483de13c1ab1a5136ec4c46f",
         "app/settings/plankclientpolicy.cpp": "fc5248e1e07a4b2677341313f77441920fd0d8f54e2b9d43a25b1314e2be8145",
-        "app/streaming/session.cpp": "9dc3437ecab54bb906102dcd95b59d0b6aebbdf3ce19bece5a621f0089830e22",
+        "app/streaming/session.cpp": "26af4a941e26835330cfce8cd31c2ef39bff8f496da876c3cd234462a288b8bf",
         "app/backend/teraguchi/hosttrust.h": "5d3f3117e5211c9fa554cb2cda0a336603d1c99a3dfcd8539905b8420eaf4732",
         "app/backend/teraguchi/studiosetup.h": "6936c508aace982936d532f941f392e89a9d4aa074fcbff114da86a2a7253ebe",
         "app/backend/teraguchi/studiosetup.cpp": "3d88dcb67dff83271b495fafe18260891574c3658e0a8edd72fab4db75027757",

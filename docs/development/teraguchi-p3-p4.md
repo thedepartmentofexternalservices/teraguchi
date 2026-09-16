@@ -13,14 +13,12 @@ requires the P2 hardware gates and P3 access/distribution controls.
 
 ### Queued follow-up: task-bar latency monitor
 
-- [ ] Add a live latency monitor immediately beside **Loss %** in the in-session
-  task bar, as requested on 2026-09-15. Display milliseconds and identify the
-  measurement clearly. Inventory existing session/transport timing first;
-  network RTT must not be presented as total pen-to-picture latency. Show an
-  unavailable state when no valid measurement exists, and check layout/refresh
-  behavior with one and two displays. Start at `PlankToolbar::setRenderedStats`
-  and the existing Loss field in `apps/client/app/streaming/planktoolbar.cpp`.
-  This is queued work; the checkpoint does not implement or install it.
+- [x] Add a live network RTT monitor immediately beside **Loss %** in the in-session
+  task bar, as requested on 2026-09-15. Display milliseconds with an **RTT**
+  label; zero means unavailable (`--`). The value comes from sampled QUIC RTT in
+  `Session::currentNetworkRttMs()` and must not be presented as total
+  pen-to-picture latency. Toolbar width and slider layout were adjusted for the
+  extra field. Live one- and two-display qualification remains open.
 
 ### 1. Finish the assignment-to-session boundary
 
@@ -105,6 +103,8 @@ code behavior; they do not establish live access or physical video qualification
 
 - [ ] Extend the existing Mac DMG/build manifest path for the chosen product
   identity. Retain exact root/client pins, package hash, signer, and version.
+  Example profile: `packaging/client/macos/product-identity.example.json`.
+  Offline prep helper: `scripts/package/prepare-teraguchi-product-packaging.sh`.
 - [x] Add [offline signed release verification](teraguchi-client-release.md):
   exact collector provenance/package bytes, identity policy, expired/replayed
   metadata, downgrade rejection and fresh exact rollback authorization.
@@ -123,10 +123,12 @@ code behavior; they do not establish live access or physical video qualification
 
 ## P4: prepare now, run after entry gates
 
-- [ ] Prepare a private evidence manifest linking each run to exact candidate
+- [x] Prepare a private evidence manifest template linking each run to exact candidate
   hashes, hardware/OS, display count, route class, duration, and test result.
-  Missing measurements and skipped tests remain visibly incomplete.
-- [ ] Inventory the existing native transport counters before adding telemetry.
+  Use `scripts/test/prepare-p4-evidence-manifest.py`; missing measurements and
+  skipped tests remain visibly incomplete until an operator fills them privately.
+- [x] Inventory the existing native transport counters before adding telemetry.
+  See [teraguchi-transport-counters.md](teraguchi-transport-counters.md).
   Record direct/relay path, RTT, jitter, loss, wire bitrate, FEC, dropped/replaced
   frames, queue sizes, and per-stage timings. Counter sums do not prove physical
   input-to-display latency.
@@ -151,13 +153,14 @@ Offline P3 work cannot satisfy these gates. Builder provisioning remains paused.
 
 ## Next coding slice
 
-The [integrated development picker](teraguchi-tailscale-workstations.md) now reaches
-native login and Session execution with permission onboarding and bound one/two
-Mac outputs. Signed studio setup is implemented locally. Next independent coding:
-P4 evidence manifest and transport-counter inventory. Help, tablet/display repair
-guidance and private status export are implemented locally. Workstation-specific HTTPS trust and
-offline signed package/rollback verification now pass locally. Product identity,
-production keys, actual bundle attestation and installer integration remain open.
-Endpoint inventory and the guest policy draft are prepared; full-policy and
-external-guest acceptance remain. Physical Mac window/input qualification and
-P2 hardware limits remain explicit; this work does not complete P3 or enter P4.
+The task-bar network RTT monitor, transport-counter inventory,
+P4 evidence-manifest template, guest-access prep checker and product-identity
+packaging scaffold are implemented locally. Next independent coding: wire the
+selected product identity through the Mac DMG collector path, integrate actual
+bundle attestation with the installer, and extend telemetry export for P4 runs.
+Help, tablet/display repair guidance and private status export are implemented
+locally. Workstation-specific HTTPS trust and offline signed package/rollback
+verification now pass locally. Production keys, notarization and clean-Mac
+install qualification remain open. Full-policy and external-guest acceptance
+remain. Physical Mac window/input qualification and P2 hardware limits remain
+explicit; this work does not complete P3 or enter P4.

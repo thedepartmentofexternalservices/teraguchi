@@ -60,8 +60,9 @@ It excludes names, studio labels, account/node/host identifiers, addresses,
 certificate fingerprints, keys, tokens, passwords, logs, file paths, device
 serials, artwork, timestamps, keystrokes, pen coordinates and pressure samples.
 Status is a snapshot of launcher presentation, not proof of access, a free seat,
-live performance or hardware qualification. Exact candidate hashes and private
-P4 measurements require the separate evidence manifest still on the roadmap.
+live performance or hardware qualification. Exact candidate hashes and private P4 measurements use
+`scripts/test/prepare-p4-evidence-manifest.py`; see
+[teraguchi-transport-counters.md](teraguchi-transport-counters.md).
 
 Reports are saved under the running app's application-data location in
 `support-reports`, with random filenames and no overwrite. The report directory

@@ -14,3 +14,11 @@ before adapting them.
 Individual accepted machine shares control the reachable machines. The draft
 limits their destination ports to TCP/UDP 28989. No script here applies policy,
 invites guests, modifies host firewalls or enables SSH.
+
+Offline guard:
+
+```bash
+bash scripts/test/check-guest-access-prep.sh "$PRIVATE_AUDIT/guest-access"
+```
+
+The checker requires populated reviewed submodules at their pinned gitlinks.
