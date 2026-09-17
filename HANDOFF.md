@@ -19,13 +19,17 @@ remain under review; implementation and regression evidence are not approval.
 
 | Component | Commit |
 |---|---|
-| Root implementation snapshot | `be4007d248c296bf8c3d0061d007925844745a90` |
+| Root production snapshot (before fixture-only follow-up) | `be4007d248c296bf8c3d0061d007925844745a90` |
 | Client | `38b9e3fa610ce6ea5fd45ec7a259ff1e0afc3dce` |
 | Client common-c | `390774c58043d6af6d516251afcaab5aa4ed6028` |
 | Client qmdnsengine | `b7a5a9f225d5e14b39f9fd1f905c4f505cf2ee99` |
-| Linux Host | `77b0b62a0b2f53c1f5d2f9889534a49f2cde159e` |
+| Linux Host | `950acf5f493a264ae846931502914a316f2e81f5` |
 | Host common-c | `2ad9d89a41428601c5f36001a5a7c9ab5359a274` |
 | Kyber/Kymux | `912ece5c64787997f978673ca60d313898a3548c` |
+
+Host `950acf5f` changes only the test fixture: it observes the completed PRIMARY
+claim before stealing ownership. Production Host code is identical to the
+passing `77b0b62a` snapshot; current PR checks validate the corrected fixture.
 
 The focused upstream parent is [PLANK PR #3](https://github.com/instinctual/plank/pull/3).
 It has the same Host and clipboard fixes, with Client `139add9b` instead of the
