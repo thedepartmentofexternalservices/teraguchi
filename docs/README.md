@@ -1,5 +1,8 @@
 # Documentation
 
+Start with the [Teraguchi forward plan and branch guide](development/teraguchi-forward-plan.md)
+and [current candidate handoff](../HANDOFF.md) for the integration state.
+
 - [User documentation](user/): bookmark behavior and product configuration.
 - [Architecture](architecture/): media, input, authentication and lifecycle.
 - [Development](development/): platform matrix, acceptance, build runbooks and plans.

@@ -8,22 +8,27 @@ release claims, and studio integration clearly owned by DXS.
 
 ## Current state
 
-The public fork starts at PLANK root commit
-`d40f5587aea130cd967a426da60026859e820994`. Its initial documentation changes
-establish attribution and scope. Product source, submodule pins, configuration
-paths, application names, package identifiers, and wire behavior remain the
-upstream baseline. No Teraguchi package has been built or installed, and no
-Teraguchi production qualification is claimed.
+The current candidate is `codex/teraguchi-integration`, tracked in
+[consolidation PR #7](https://github.com/thedepartmentofexternalservices/teraguchi/pull/7).
+It combines the retained Teraguchi product lineage with Alan's frozen PLANK root
+`413594743d110d6a9965e639068f132379e82ab2` and Client
+`95060dee8fa63e0da98dfa83e7ddd8185731a837`.
+
+The candidate restores the fuller workstation interface alongside the hardened
+clipboard stack. macOS 26 build policy, strict hardware/video admission,
+assigned-workstation trust, onboarding, native pen/keyboard handling, one/two
+selected outputs, and support tooling are implemented. The arm64 Mac client
+build and isolated regression suites pass locally. Implementation and synthetic
+tests do not establish production acceptance; see [HANDOFF](../HANDOFF.md) for
+exact source pins, results, and limitations.
 
 The existing [Phase 0 project](https://github.com/thedepartmentofexternalservices/teraguchi-sunshine-kyber)
-retains the requirements, probes, and redacted evidence. It is also public.
-Its local raw results are ignored and must not be copied into this fork.
-This documentation change does not import that repository's history or patches.
+retains earlier requirements, probes, and redacted evidence. Its raw results and
+all private operational evidence must remain outside public Git.
 
-Machine testing is paused. Do not change occupied Flame workstations or their
-remote-access configuration. The existing host and hardware gates remain open;
-additional Teraguchi transport development waits for those gates. Reading
-PLANK's existing transport source does not count as developing a new transport.
+Machine testing is paused. Main, prior source branches, and the installed pilot
+remain preserved. Do not change occupied Flame workstations or their remote-access
+configuration. Host, physical input/video, WAN, and stability gates remain open.
 
 ## First supported configuration to qualify
 
@@ -39,26 +44,26 @@ PLANK's existing transport source does not count as developing a new transport.
 
 These are Teraguchi targets, not additions to upstream's supported platform
 matrix. PLANK currently targets macOS/SDK 27 and has its own profile selection
-and fallback policy. Teraguchi's stricter target does not mean the current
-inherited implementation already enforces it. Windows client work starts only
+and fallback policy. Teraguchi implements stricter admission checks, but those checks do not prove
+the physical end-to-end path meets the target. Windows client work starts only
 after the Mac production gate and a separate feasibility decision.
 
 ## Next work
 
-1. Follow the [completed macOS 26 source review](development/macos-26-feasibility.md).
-   A bounded compatibility build is recommended; explicit build/launch guards
-   and bundled dependency targets need coordinated changes. No client port
-   or runtime qualification has been performed.
-2. Correct hardware-decode attestation before accepting new Mac results. Both
-   the PLANK probe and the earlier Phase 0 probe identify VideoToolbox output
-   without proving its decoder used hardware. Strict `MAC-01`/`MAC-02` passes
-   are reopened; throughput observations remain. PLANK's identity-GBR profile
-   also needs its own exact-format decode and presentation evidence.
-3. Resume host qualification only with an agreed test session and recovery
-   access. Establish a pinned PLANK baseline before changing its runtime.
-4. Adapt the existing client interface and onboarding after feasibility is
-   established. Keep protocol names and component paths stable while cosmetic
-   work is separated from compatibility and behavior changes.
+1. Finish platform build validation and review the single integration candidate.
+   Maintain the focused clipboard and native Quit contributions separately for
+   upstream review. See the [branch guide and forward plan](development/teraguchi-forward-plan.md).
+2. Complete Flame UI side selection across the client, protocol, Host topology,
+   persistence, and restoration. The existing boot helper is only part of this.
+3. Arrange a scoped operator qualification session with recovery access. Exercise
+   picture precision, hardware decode, pen/tablet margins, one/two outputs,
+   hardened clipboard, reconnect, native Quit and Command-Q, and audio against
+   the exact candidate. Preserve the immediate native cursor behavior; the
+   earlier host-mapped cursor was rejected for lag.
+4. Complete signed/notarized distribution and clean-install/rollback acceptance,
+   then qualify representative WAN routes and the inherited stability gates.
+   macOS 26 support remains a Teraguchi qualification claim to earn independently
+   of upstream macOS 27 results.
 
 ## Collaboration and public information
 
