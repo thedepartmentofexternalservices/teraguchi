@@ -62,11 +62,23 @@ Candidate builds must independently reverse-dry-run that patch and verify its
 hash. Private dylibs must be bundled with relocatable install names, licensed,
 signed and closure-checked before any package is offered to a user.
 
+SDL3.4.2 uses its unmodified native fullscreen Spaces implementation. Match
+Client requests the usable logical/backing area below a display's camera inset;
+non-notched displays retain the complete area. No content-size delegate patch
+or custom fullscreen hint is required. The changed bootstrap/cache inputs force
+a fresh hosted dependency build after removal of the experimental SDL patch.
+For local prepared dependencies, rerun the complete bootstrap, not FFmpeg-only.
+
 The current packaging path is qualified; each new candidate still requires its
 affected live acceptance gates. Do not use the old upstream setup-deps/prebuilts
 workflow.
 
 ## Build and package
+
+Teraguchi's root Mac build enables the
+[strict video admission policy](../teraguchi-strict-video.md). Existing NvFBC
+bookmarks will be rejected by that candidate. A successful compile does not
+authorize switching the host capture path or replacing an installed client.
 
 Initialize Client, common-c, qmdnsengine and Kymux at their exact gitlinks from
 verified local Git bundles/mirrors. Do not initialize the Linux Host to build
@@ -78,6 +90,15 @@ bootstrap bundle, so fetching that origin is not a source update.
 bash "$PLANK_SOURCE_ROOT/scripts/build/build-macos-client.sh" \
   "$PLANK_SOURCE_ROOT" "$PLANK_WORK_ROOT/client-build"
 ```
+
+A configured Teraguchi workstation picker can pin a studio Ed25519 public key
+using `PLANK_STUDIO_CONFIG_PUBLIC_KEY` (64 lowercase hex characters). See
+[signed studio setup](../teraguchi-studio-setup.md). Empty input deliberately
+leaves signed setup unavailable; it must not inherit a previous retained-build
+key. To include signed studio setup and make the picker the default, set
+`PLANK_STUDIO_SETUP_FILE` to its absolute private path during packaging. The
+package helper verifies it against the compiled key before code signing. This
+does not choose a product signing identity or authorize distribution.
 
 For a self-contained drag-to-Applications DMG, in the signing SSH session:
 
@@ -99,6 +120,18 @@ the app to Trash. Host installation/permissions are separate and unchanged.
 
 ## Known failure signatures
 
+- Command-Q reaching the Host and also quitting PLANK is duplicate native
+  shortcut handling, not a transport disconnect. SDL queues the key before
+  AppKit can activate the local Quit menu. The shortcut guard prevents local
+  activation while captured. Explicit menu/Dock shutdown is owned by
+  MacApplication, which waits for Session readyForDeletion before Qt exits;
+  do not restore the removed Qt-to-SDL Quit bridge or treat sessionFinished
+  as completed cleanup.
+  The `macquitshortcut` native suite runs in every Mac Client build and checks
+  native menu dispatch, capture transitions, restoration and queued SDL input.
+  The macapplication suite checks real Qt application lifetimes separately.
+  Shortcut tests use a harmless Quit target rather than an active remote app;
+  a live captured Command-Q/menu/Dock test is still required for acceptance.
 - Rust1.89 proc macros fail under SDK27 stripping: retain `RUSTFLAGS=-C
   strip=none`, as for the Host. Missing macros here need not mean missing Cargo
   inputs; do not redownload them blindly.

@@ -42,12 +42,31 @@ case $role in
     export PLANK_QT_ROOT="$PLANK_DEP_ROOT/qt/6.10.2/macos"
     if [[ ${PLANK_CI_SIGNED:-false} = true ]]; then
       bash "$PLANK_SOURCE_ROOT/scripts/package/build-macos-client-dmg.sh" "$PLANK_SOURCE_ROOT" "$PLANK_WORK_ROOT/client-package"
+      client_build=${PLANK_MAC_CLIENT_BUILD:-"$PLANK_WORK_ROOT/client-package/build"}
     else
       bash "$PLANK_SOURCE_ROOT/scripts/build/build-macos-client.sh" "$PLANK_SOURCE_ROOT" "$PLANK_WORK_ROOT/client-build"
+      client_build="$PLANK_WORK_ROOT/client-build"
     fi
     bash "$PLANK_SOURCE_ROOT/scripts/test/build-macos-decode-probe.sh" "$PLANK_WORK_ROOT/decode-probe"
     python3 "$PLANK_SOURCE_ROOT/scripts/test/check-macos-decode-probe.py" "$PLANK_WORK_ROOT/decode-probe/macos-videotoolbox-decode" "$PLANK_WORK_ROOT/decode-cases"
-    bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-quit-bridge.sh" "$PLANK_WORK_ROOT/quit-regression"
+    # The canonical Client build runs the upstream macapplication and
+    # macquitshortcut suites for the PLANK 1.0.124 replacement lifecycle.
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-strict-video.sh" "$PLANK_WORK_ROOT/strict-video"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-client-pen.sh" "$PLANK_WORK_ROOT/pen-input" \
+      "$client_build/moonlight-common-c/libmoonlight-common-c.a"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-tablet-cursor.sh" "$PLANK_WORK_ROOT/tablet-cursor" --build-only
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-client-keyboard.sh" "$PLANK_WORK_ROOT/keyboard-input"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-studio-setup.sh" "$PLANK_WORK_ROOT/studio-setup"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-host-trust.sh" "$PLANK_WORK_ROOT/host-trust"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-client-release.sh" "$PLANK_WORK_ROOT/client-release"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-support-diagnostics.sh" "$PLANK_WORK_ROOT/support-diagnostics"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-input-permissions.sh" "$PLANK_WORK_ROOT/mac-input-permissions"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-presentation.sh" "$PLANK_WORK_ROOT/mac-presentation"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-macos-display-binding.sh" "$PLANK_WORK_ROOT/mac-display-binding"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-tailscale-workstations.sh" "$PLANK_WORK_ROOT/tailscale-workstations"
+    bash "$PLANK_SOURCE_ROOT/scripts/test/check-workstation-ui.sh" "$PLANK_WORK_ROOT/workstation-ui"
+    PLANK_CLIENT_EXECUTABLE="$client_build/app/plank-client.app/Contents/MacOS/plank-client" \
+      bash "$PLANK_SOURCE_ROOT/scripts/test/check-workstation-client.sh" "$PLANK_WORK_ROOT/workstation-client"
     ;;
   *) exit 2 ;;
 esac

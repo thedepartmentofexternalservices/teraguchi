@@ -1,0 +1,44 @@
+{
+  "hosts": {
+    "shared-workstation": "192.0.2.10"
+  },
+  "tests": [
+    {
+      "src": "artist@example.com",
+      "proto": "tcp",
+      "accept": ["shared-workstation:28989"],
+      "deny": [
+        "shared-workstation:22",
+        "shared-workstation:80",
+        "shared-workstation:443",
+        "shared-workstation:445",
+        "shared-workstation:2049",
+        "shared-workstation:3389",
+        "shared-workstation:5900",
+        "shared-workstation:28988",
+        "shared-workstation:28990",
+        "shared-workstation:47984",
+        "shared-workstation:47989",
+        "shared-workstation:47990",
+        "shared-workstation:48010"
+      ]
+    },
+    {
+      "src": "artist@example.com",
+      "proto": "udp",
+      "accept": ["shared-workstation:28989"],
+      "deny": [
+        "shared-workstation:53",
+        "shared-workstation:111",
+        "shared-workstation:2049",
+        "shared-workstation:5353",
+        "shared-workstation:28988",
+        "shared-workstation:28990",
+        "shared-workstation:47998",
+        "shared-workstation:47999",
+        "shared-workstation:48000",
+        "shared-workstation:48010"
+      ]
+    }
+  ]
+}

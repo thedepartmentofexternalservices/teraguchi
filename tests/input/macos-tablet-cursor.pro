@@ -1,0 +1,13 @@
+QT += core gui
+CONFIG += c++17 console
+CONFIG -= app_bundle
+TEMPLATE = app
+TARGET = mac-tablet-cursor
+INCLUDEPATH += ../../apps/client/app $$(PLANK_MAC_CLIENT_DEPS)/install/include
+OBJECTIVE_SOURCES += macos-tablet-cursor.mm ../../apps/client/app/streaming/mactabletcursor.mm
+SOURCES += ../../apps/client/app/streaming/plankpresentation.cpp
+LIBS += -L$$(PLANK_MAC_CLIENT_DEPS)/install/lib -lSDL3 -framework AppKit -framework QuartzCore
+QMAKE_LFLAGS += -Wl,-rpath,$$(PLANK_MAC_CLIENT_DEPS)/install/lib
+QMAKE_APPLE_DEVICE_ARCHS = arm64
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 26.0
+QMAKE_CXXFLAGS += -include arm_acle.h

@@ -9,5 +9,8 @@
 - [macOS Client build](build/macos-client-build-runbook.md)
 - [Plans](plans/), [investigations](investigations/) and [reviews](reviews/)
 - [Evaluated upstream commits](upstream-commit-audit.md)
+- [Teraguchi P3/P4 order](teraguchi-p3-p4.md)
+- [Transport counter inventory](teraguchi-transport-counters.md)
+- [P4 network impairment prep](teraguchi-p4-network-impairment.md)
 
 Plans describe intended work; only recorded validation establishes acceptance.

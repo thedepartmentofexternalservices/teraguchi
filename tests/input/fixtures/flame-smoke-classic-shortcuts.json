@@ -1,0 +1,175 @@
+{
+  "schema": "teraguchi.input.shortcut-draft/1",
+  "status": "DRAFT_NOT_EXECUTED",
+  "flame_version": "2027.1",
+  "saved_profile": "SmokeClassic",
+  "scope": "Nine selected saved bindings; active profile and physical behavior unconfirmed. Generic Shift uses left Shift in this draft.",
+  "cases": [
+    {
+      "id": "mark_in",
+      "description": "Mark In",
+      "expected_host_key_events": [
+        {
+          "key": "KEY_RIGHTALT",
+          "value": 1
+        },
+        {
+          "key": "KEY_RIGHTALT",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "mark_out",
+      "description": "Mark Out",
+      "expected_host_key_events": [
+        {
+          "key": "KEY_RIGHTCTRL",
+          "value": 1
+        },
+        {
+          "key": "KEY_RIGHTCTRL",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "play",
+      "description": "Play",
+      "expected_host_key_events": [
+        {
+          "key": "KEY_V",
+          "value": 1
+        },
+        {
+          "key": "KEY_V",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "stop",
+      "description": "Stop Play/Render",
+      "expected_host_key_events": [
+        {
+          "key": "KEY_SPACE",
+          "value": 1
+        },
+        {
+          "key": "KEY_SPACE",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "schematic",
+      "description": "Toggle Node Schematic View",
+      "expected_host_key_events": [
+        {
+          "key": "KEY_GRAVE",
+          "value": 1
+        },
+        {
+          "key": "KEY_GRAVE",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "alternate_schematic",
+      "description": "Toggle Batch/MK Schematic View",
+      "expected_host_key_events": [
+        {
+          "key": "KEY_ESC",
+          "value": 1
+        },
+        {
+          "key": "KEY_ESC",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "next_version",
+      "description": "Select Next Version",
+      "expected_host_key_events": [
+        {
+          "key": "KEY_LEFTALT",
+          "value": 1
+        },
+        {
+          "key": "KEY_UP",
+          "value": 1
+        },
+        {
+          "key": "KEY_UP",
+          "value": 0
+        },
+        {
+          "key": "KEY_LEFTALT",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "previous_version",
+      "description": "Select Previous Version",
+      "expected_host_key_events": [
+        {
+          "key": "KEY_LEFTALT",
+          "value": 1
+        },
+        {
+          "key": "KEY_DOWN",
+          "value": 1
+        },
+        {
+          "key": "KEY_DOWN",
+          "value": 0
+        },
+        {
+          "key": "KEY_LEFTALT",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "audio_monitoring",
+      "description": "Toggle Audio Monitoring",
+      "expected_host_key_events": [
+        {
+          "key": "KEY_LEFTSHIFT",
+          "value": 1
+        },
+        {
+          "key": "KEY_LEFTCTRL",
+          "value": 1
+        },
+        {
+          "key": "KEY_LEFTMETA",
+          "value": 1
+        },
+        {
+          "key": "KEY_A",
+          "value": 1
+        },
+        {
+          "key": "KEY_A",
+          "value": 0
+        },
+        {
+          "key": "KEY_LEFTMETA",
+          "value": 0
+        },
+        {
+          "key": "KEY_LEFTCTRL",
+          "value": 0
+        },
+        {
+          "key": "KEY_LEFTSHIFT",
+          "value": 0
+        }
+      ]
+    }
+  ]
+}

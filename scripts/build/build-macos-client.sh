@@ -29,6 +29,8 @@ version=$PLANK_PACKAGE_VERSION
 client="$source_root/apps/client"
 test "$(qmake -query QT_VERSION)" = 6.10.2
 test "$(rustc --version | awk '{print $2}')" = 1.89.0
+python3 "$source_root/tests/packaging/test-macos-fullscreen.py" "$source_root"
+python3 "$source_root/tests/packaging/test-macos-quit-lifecycle.py" "$source_root"
 patch_file="$client/app/deploy/linux/ffmpeg-patches/0001-hevc-enable-hwaccel-for-identity-gbr.patch"
 printf '%s  %s\n' 059cc9c0d585d71e292cd7421a43f239b1e7ce94e8598d0a7427dfe48e55847e "$patch_file" | shasum -a 256 -c -
 patch --batch --reverse --dry-run -d "$PLANK_MAC_CLIENT_DEPS/src/ffmpeg-9.0.1" -p1 < "$patch_file"
@@ -41,6 +43,7 @@ cd "$build"
 # Recursive generation is mandatory when retaining a build: otherwise existing
 # subproject Makefiles may silently retain the previous source/version/flags.
 qmake -r "$client/moonlight-qt.pro" CONFIG+=release CONFIG+=disable-prebuilts \
+    CONFIG+=teraguchi-strict-video \
     CONFIG+=plank-transport CONFIG+=disable-libplacebo CONFIG+=disable-wayland \
     CONFIG+=disable-x11 CONFIG+=disable-libva CONFIG+=disable-libdrm \
     "QMAKE_MACOSX_DEPLOYMENT_TARGET=$PLANK_MACOS_CLIENT_TARGET" QMAKE_APPLE_DEVICE_ARCHS=arm64 \
@@ -48,12 +51,12 @@ qmake -r "$client/moonlight-qt.pro" CONFIG+=release CONFIG+=disable-prebuilts \
     "QMAKE_CFLAGS+=$PLANK_C_FILE_FLAGS" "QMAKE_CXXFLAGS+=$PLANK_C_FILE_FLAGS"
 make -j"${PLANK_BUILD_JOBS:-8}" release
 # Run shared topology and toolbar geometry on every Mac Client candidate.
-for suite in outputtopology planktoolbarlogic desktopstage; do
+for suite in outputtopology planktoolbarlogic desktopstage macquitshortcut macapplication; do
 mkdir -p "$build/tests/$suite"
 (
     cd "$build/tests/$suite"
     qmake "$client/tests/$suite/$suite.pro" CONFIG+=release CONFIG-=app_bundle \
-        QMAKE_MACOSX_DEPLOYMENT_TARGET=27.0 QMAKE_APPLE_DEVICE_ARCHS=arm64 \
+        QMAKE_MACOSX_DEPLOYMENT_TARGET="$PLANK_MACOS_CLIENT_TARGET" QMAKE_APPLE_DEVICE_ARCHS=arm64 \
         "QMAKE_CXXFLAGS+=-include arm_acle.h"
     make -j"${PLANK_BUILD_JOBS:-8}"
     PLANK_REPO_ROOT="$source_root" QT_QPA_PLATFORM=offscreen "./$suite"
@@ -68,3 +71,13 @@ if /usr/libexec/PlistBuddy -c 'Print :PLANKVersion' "$plist" >/dev/null 2>&1; th
 else
     /usr/libexec/PlistBuddy -c "Add :PLANKVersion string $version" "$plist"
 fi
+# Clipboard session/lifecycle suite is Mac-only and required for this candidate.
+mkdir -p "$build/tests/macclipboardsync"
+(
+    cd "$build/tests/macclipboardsync"
+    qmake "$client/tests/macclipboardsync/macclipboardsync.pro" CONFIG+=release CONFIG-=app_bundle \
+        QMAKE_MACOSX_DEPLOYMENT_TARGET="$PLANK_MACOS_CLIENT_TARGET" QMAKE_APPLE_DEVICE_ARCHS=arm64 \
+        "QMAKE_CXXFLAGS+=$PLANK_C_FILE_FLAGS -include arm_acle.h"
+    make -j"${PLANK_BUILD_JOBS:-8}"
+    PLANK_REPO_ROOT="$source_root" QT_QPA_PLATFORM=offscreen "./macclipboardsync"
+)

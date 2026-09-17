@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "base_port": 28989,
+  "scope": "Offline source review of the Linux host / assigned Mac client path. No live endpoint or Tailscale validation.",
+  "sources": [
+    {
+      "path": ".",
+      "commit": "d1722b9ea0c2ee2664234ac6acceeaad19f6119b",
+      "sha256": {
+        "packaging/host/linux/config/plank-host.conf": "7f22d36efa8186b992aedb978ae55c08e27adf580552cd7b8fda5c8457ba62ec",
+        "packaging/host/linux/firewalld/plank.xml": "c1ebd7f084437197b5722313ec7204852ebd97923863646ab865221a9a7b2e1f",
+        "protocol/plank-transport/src/native.rs": "a0981e80e8b7828591e284bcdf60b57f00c554e508b134daf1e3b8b70a9d98a2",
+        "protocol/plank-transport/src/native_ffi.rs": "6ab122976f6d02cb6bd0e06d91261e2e780a968c930817e8159f4e11f4ea8311",
+        "protocol/plank-transport/src/lib.rs": "c5cd7068f4e431b8c67f18e9d1b1812ebddac3405e17c785b2d1618ca5c9f528"
+      }
+    },
+    {
+      "path": "apps/client",
+      "commit": "94f3bf496dc1c8cbf7c32f01fbfc44894057ac86",
+      "sha256": {
+        "app/backend/nvhttp.cpp": "9d93e88f887b6263fdbe62ff1634fe96a3bf97b08ea2b265d44f1fec66ae2a67",
+        "app/backend/computermanager.cpp": "3a8f8de6d650b1357f7973e68f3d6a2a4b64e1565acf7eadf3bf2f8dca7eb17d",
+        "app/backend/teraguchi/tailscaleworkstations.cpp": "7377970fa8759e0ebc922364bd484cd179801d123f7b0fad9cb4b8be447de8ff",
+        "app/gui/computermodel.cpp": "1dbbabb0eeac4535ecbf7e340e76876cb5a4aaf01bf5fdf61106305de5f5a676",
+        "app/settings/plankclientpolicy.h": "597abdd5c33f4f5a87b6cc09749c815fe70c616b483de13c1ab1a5136ec4c46f",
+        "app/settings/plankclientpolicy.cpp": "fc5248e1e07a4b2677341313f77441920fd0d8f54e2b9d43a25b1314e2be8145",
+        "app/streaming/session.cpp": "26af4a941e26835330cfce8cd31c2ef39bff8f496da876c3cd234462a288b8bf",
+        "app/backend/teraguchi/hosttrust.h": "5d3f3117e5211c9fa554cb2cda0a336603d1c99a3dfcd8539905b8420eaf4732",
+        "app/backend/teraguchi/studiosetup.h": "6936c508aace982936d532f941f392e89a9d4aa074fcbff114da86a2a7253ebe",
+        "app/backend/teraguchi/studiosetup.cpp": "3d88dcb67dff83271b495fafe18260891574c3658e0a8edd72fab4db75027757",
+        "app/backend/teraguchi/supportdiagnostics.h": "0eafd5cb03d9467303936f1923ce78c0dd7d8782902ba6fa8dfb52203ee39a51",
+        "app/backend/teraguchi/supportdiagnostics.cpp": "1d2f70e4d40606f2d7274e28a6a0fe8f606e2edca419713857ea0f172efcf0e2"
+      }
+    },
+    {
+      "path": "apps/host/linux",
+      "commit": "9329784ac41f50cbec0c9d76badfd22227ec5e5f",
+      "sha256": {
+        "src/nvhttp.cpp": "5a5fd148271b9adb4211b291a97432f47193b767a950bb1db6ff23f9757956c6",
+        "src/nvhttp.h": "69562f885446b5e6e3ec180e26bb085be5c58ba798bdff96b218f00e19686aa0",
+        "src/config.cpp": "b5e607377939540c40407fdde220d7ca920b76bae1a62302eb516337802f6505",
+        "src/network.cpp": "4f8f041924ad4b741b2038dbec4f1d1f4c9652884d761f6ac1d5d5c29c46e8e5",
+        "src/auth/pam_broker.cpp": "c88d0edecf0650a5924c7da0a2649bfac47eb6d877f6fb79a88bb55dc1cda427",
+        "src/session/host_supervisor.cpp": "d1208e9537e00ebd737559c10f89968216c829d4859915eb2e0ba11447f8242a"
+      }
+    },
+    {
+      "path": "third_party/kyber-kymux",
+      "commit": "912ece5c64787997f978673ca60d313898a3548c",
+      "sha256": {
+        "kynet/src/driver/quinn.rs": "5de466fc41e8b31cfa7599d5506441f87d6090ef1b68e4e36a31d943eb0f64e8"
+      }
+    }
+  ]
+}

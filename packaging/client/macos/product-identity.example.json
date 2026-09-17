@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "status": "example-only",
+  "product": "teraguchi-client",
+  "platform": "macos",
+  "architecture": "arm64",
+  "bundle_id": "com.example.studio.teraguchi-client",
+  "team_id": "ABCDE12345",
+  "minimum_os": "26.0",
+  "display_name": "Teraguchi",
+  "channel": "candidate",
+  "notes": "Copy to a private owner-only profile before signing or clean-Mac permission qualification. Replace every example value. The inherited collector still emits plank-client filenames until this identity is selected and wired through build-macos-client-dmg.sh."
+}

@@ -17,9 +17,10 @@ audit notes, not Git.
 - Induce production account lockouts for a test
 - Relabel an old candidate package after merging main
 
-## Clipboard regression (2026-09-16 baseline)
+## Clipboard regression
 
-After reconnect work, re-check on the clipboard-qualified Pilot build:
+After reconnect work, re-check on the clipboard-hardened Pilot build:
 
-- [ ] Mac → Flame copy/paste still works
-- [ ] Flame → Mac copy/paste still works
+- [ ] Mac → Flame copy/paste still works (`Cmd+C` on Mac, `Ctrl+V` in Flame)
+- [ ] Flame → Mac copy/paste still works (`Ctrl+C` on host, `Cmd+V` on Mac)
+- [ ] Copy while Pilot is unfocused does not send to the host

@@ -1,0 +1,21 @@
+<RCC>
+  <qresource prefix="/preview">
+    <file alias="Preview.qml">Preview.qml</file>
+    <file alias="PreviewPower.qml">PreviewPower.qml</file>
+  </qresource>
+  <qresource prefix="/teraguchi">
+    <file alias="WorkstationHome.qml">../../apps/client/app/gui/teraguchi/WorkstationHome.qml</file>
+    <file alias="WorkstationSettings.qml">../../apps/client/app/gui/teraguchi/WorkstationSettings.qml</file>
+    <file alias="StudioSetupPanel.qml">../../apps/client/app/gui/teraguchi/StudioSetupPanel.qml</file>
+    <file alias="MacPermissionsPanel.qml">../../apps/client/app/gui/teraguchi/MacPermissionsPanel.qml</file>
+    <file alias="MacPermissionsDialog.qml">../../apps/client/app/gui/teraguchi/MacPermissionsDialog.qml</file>
+    <file alias="SupportDialog.qml">../../apps/client/app/gui/teraguchi/SupportDialog.qml</file>
+    <file alias="WorkstationFlow.qml">../../apps/client/app/gui/teraguchi/WorkstationFlow.qml</file>
+    <file alias="WorkstationPicker.qml">../../apps/client/app/gui/teraguchi/WorkstationPicker.qml</file>
+    <file alias="TeraguchiButton.qml">../../apps/client/app/gui/teraguchi/TeraguchiButton.qml</file>
+    <file alias="TeraguchiDisplayChoice.qml">../../apps/client/app/gui/teraguchi/TeraguchiDisplayChoice.qml</file>
+    <file alias="TeraguchiScrollBar.qml">../../apps/client/app/gui/teraguchi/TeraguchiScrollBar.qml</file>
+    <file alias="TeraguchiComputerIcon.qml">../../apps/client/app/gui/teraguchi/TeraguchiComputerIcon.qml</file>
+    <file alias="TeraguchiTheme.qml">../../apps/client/app/gui/teraguchi/TeraguchiTheme.qml</file>
+  </qresource>
+</RCC>

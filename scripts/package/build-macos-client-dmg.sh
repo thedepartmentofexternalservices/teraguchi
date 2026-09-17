@@ -52,6 +52,9 @@ for name in SDL3-3.4.2 SDL3_ttf-3.2.2 opus-1.5.2 openssl-3.5.5 freetype-2.14.1 f
         \( -name 'COPYING*' -o -name 'LICENSE*' -o -name 'LICENSE.txt' \) \
         -exec cp {} "$app/Contents/Resources/licenses/$name/" \;
 done
+DYLD_LIBRARY_PATH="$PLANK_MAC_CLIENT_DEPS/install/lib" python3 "$source_root/scripts/package/stage-studio-setup.py" \
+    --app "$app" --setup "${PLANK_STUDIO_SETUP_FILE:-}" \
+    --key-header "$build/app/teraguchi-studio-key.h" --openssl "$PLANK_MAC_CLIENT_DEPS/install/bin/openssl"
 while IFS= read -r -d '' binary; do
     file -b "$binary" | grep -q 'Mach-O' || continue
     # Remove debug sections before distribution signing, not runtime strings.

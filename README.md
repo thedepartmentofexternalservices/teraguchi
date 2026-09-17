@@ -16,16 +16,22 @@ support commitment or endorsement.
 
 ## Teraguchi status
 
-This fork starts from PLANK's existing implementation. The first change is
-project documentation and attribution; application branding and runtime behavior
-are still inherited from PLANK. There is no qualified Teraguchi release yet.
+The current development candidate is `codex/teraguchi-integration`, tracked in
+[consolidation PR #7](https://github.com/thedepartmentofexternalservices/teraguchi/pull/7).
+It combines the existing artist interface, assigned-workstation onboarding and
+trust, strict video policy, Mac input, and clipboard repairs with Alan's frozen
+PLANK 1.0.120 source. There is no qualified Teraguchi production release yet.
 
-Apple Silicon is the first client target. The [macOS 26 source review](docs/development/macos-26-feasibility.md)
-recommends a bounded compatibility build; runtime support remains unproved.
-Upstream currently targets macOS 27. Windows client support remains
-an option after the Mac production gate. Native 10-bit capture, exact-format
-hardware decode, Mac pen input, and end-to-end Flame behavior still need
-Teraguchi qualification. See the [scope document](docs/teraguchi.md).
+The Apple Silicon client compiles locally for macOS 26, and its isolated product
+regression suites pass. Upstream macOS 27 builds remain a separate contract.
+Native ten-bit capture, exact-format hardware decode and presentation, physical
+Mac pen input, sustained dual-display operation, and end-to-end Flame behavior
+still require exact-candidate qualification. Machine testing is paused.
+
+See [current provenance and validation](HANDOFF.md), the
+[forward plan and branch guide](docs/development/teraguchi-forward-plan.md), and
+the [scope document](docs/teraguchi.md). Main and the installed pilot have not
+been replaced by this development candidate.
 
 ## PLANK upstream overview
 
