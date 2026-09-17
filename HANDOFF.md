@@ -22,12 +22,16 @@ overview-document changes do not change these component pins.
 | Component | Commit |
 |---|---|
 | Root implementation | `5bcb53934a601e00d328c05fe430c710f36d157a` |
-| Client | `d8b655bbbc30fb08e6e18fb7770ed7a6d08bd7d2` |
+| Client | `d78e2a1634e782fe56add6788cbf229dfa862a50` |
 | Client common-c | `390774c58043d6af6d516251afcaab5aa4ed6028` |
 | Client qmdnsengine | `b7a5a9f225d5e14b39f9fd1f905c4f505cf2ee99` |
 | Linux Host | `1ad746b626f31f43ec564f49d5e78ce14ab7a68e` |
 | Host common-c | `2ad9d89a41428601c5f36001a5a7c9ab5359a274` |
 | Kyber/Kymux | `912ece5c64787997f978673ca60d313898a3548c` |
+
+Client `d78e2a16` records the preserved main ancestry with exactly the same tree
+as tested Client `d8b655bb`. Root likewise reconciles main without changing the
+implementation. Both draft PRs can now be reviewed against main normally.
 
 The retained Mac dependency profile uses Qt 6.10.2, Rust 1.89.0, SDK 26.5,
 and deployment target 26.0. Its bootstrap recipe fingerprint matches this
@@ -51,7 +55,7 @@ See the [forward plan](docs/development/teraguchi-forward-plan.md) for all PR li
   suite reports 16,439 assertions, without its optional common-c wire archive.
 - Eight native Quit bridge scenarios pass, including a negative control against
   the earlier broken bridge. This is not physical Command-Q acceptance.
-- All five root CTest suites pass, plus 41 CI policy tests, eight Mac target
+- All five root CTest suites pass, plus 43 CI policy tests, eight Mac target
   tests, four minimum-OS tests, 14 reconnect guards, and five fullscreen guards.
 - Six portable Host clipboard protocol tests and the header-only Host gate pass.
   No local Linux Xlib runtime or hardware qualification is implied.
@@ -76,9 +80,18 @@ with the fixture repair.
 
 Targeted follow-up runs are [Linux Client](https://github.com/thedepartmentofexternalservices/teraguchi/actions/runs/35166162032)
 and [Mac Client targets](https://github.com/thedepartmentofexternalservices/teraguchi/actions/runs/35166298981).
-These follow-ups and the first integration Linux Host job were still running at
-this update. Signing was not requested. Treat final job conclusions as authoritative;
-a dispatched run is not a passing build.
+The Linux Client follow-up and first integration Linux Host job passed. Both Mac
+Client targets completed compilation and all product regression suites, including
+the repaired keyboard fixture and native input wire tests. Their cache-sealing
+step then exposed an old dependency-directory assumption. The cache now shares
+the bootstrap target/SDK policy, saves the required dependency-profile receipt,
+and rejects mismatched targets/SDKs/recipes. All 43 CI policy tests and a check
+against the real local prepared dependencies pass. A fresh final-head hosted run
+must validate that cache repair before the overall Mac jobs can be called green.
+
+Linux RPM/DEB artifacts were retained privately with their exact source manifests
+and verified SHA-256 hashes. Neither was installed. Signing was not requested.
+Treat final job conclusions as authoritative; a dispatched run is not a pass.
 
 ## Preserved sources and evidence boundaries
 

@@ -11,11 +11,9 @@ which side holds Flame UI.
 | Left (default) | Left monitor at `+0+0` | Either side |
 | Right | Chosen output at `+0+0` | Either side |
 
-Qualification on dxs-flame-06 used:
-
-```bash
-xrandr --output DP-2 --pos 0x0 --output DP-0 --pos 3840x0 --output DP-2 --primary
-```
+Earlier operator observations motivate this contract. Machine-specific commands
+and qualification receipts remain in private notes; they do not qualify the
+current integration candidate.
 
 ## Launch parameter (planned)
 
@@ -36,6 +34,7 @@ requested layout is `dual-horizontal`.
 | Host supervisor live xrandr / MetaMode swap | Pending host submodule |
 | Launch parse + topology `flame_ui` echo | Pending host submodule |
 | Teraguchi picker + per-host persistence | Pending client UI |
+| Client launch wiring | Pending |
 
 ## Acceptance
 
