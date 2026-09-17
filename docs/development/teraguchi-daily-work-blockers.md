@@ -119,6 +119,6 @@ first.
 ## References
 
 - [Headless display plan](plans/headless-display-plan.md) — `primary display` in bookmarks
-- [Output topology](../protocol/output-topology.md) — launch parameters and topology JSON
+- [Output topology](../../protocol/output-topology.md) — launch parameters and topology JSON
 - [Teraguchi Mac two-output](teraguchi-mac-two-output.md) — client presentation (orthogonal)
 - [Teraguchi support](teraguchi-support.md) — current clipboard limitation statement
