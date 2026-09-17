@@ -10,9 +10,9 @@ release claims, and studio integration clearly owned by DXS.
 
 The current candidate is `codex/teraguchi-integration`, tracked in
 [consolidation PR #7](https://github.com/thedepartmentofexternalservices/teraguchi/pull/7).
-It combines the retained Teraguchi product lineage with Alan's frozen PLANK root
-`413594743d110d6a9965e639068f132379e82ab2` and Client
-`95060dee8fa63e0da98dfa83e7ddd8185731a837`.
+It combines the retained Teraguchi product lineage with PLANK 1.0.124 upstream root
+`20ee198b4fd76d6bd3ddf51e0174de28f844da4e` and Client
+`86682b5b596e5c31b81a6e2a4b238bb62dc6e42c`.
 
 The candidate restores the fuller workstation interface alongside the hardened
 clipboard stack. macOS 26 build policy, strict hardware/video admission,

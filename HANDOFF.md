@@ -9,6 +9,11 @@ It preserves the full Teraguchi product lineage and Alan's upstream history.
 Main, recovery branches and the installed pilot remain preserved. Machine
 qualification and installation are paused; this is an unqualified candidate.
 
+The candidate now incorporates PLANK 1.0.124 (upstream root `20ee198b`,
+Client `86682b5b`), including explicit application-exit ownership and captured
+Command-Q handling. The old Quit bridge is removed. Published Teraguchi history
+is preserved by merge; the focused upstream clipboard stack is rebased.
+
 The September 17 clipboard follow-up implements the four Client and four Host
 findings from Alan's changes-requested reviews. See the
 [finding-to-test record](docs/development/clipboard-review-followup.md).
@@ -19,8 +24,8 @@ remain under review; implementation and regression evidence are not approval.
 
 | Component | Commit |
 |---|---|
-| Root production snapshot (before fixture-only follow-up) | `be4007d248c296bf8c3d0061d007925844745a90` |
-| Client | `cbd83cecd216a26664f5bb9fa97c9b653ba14e18` |
+| Upstream root baseline | `20ee198b4fd76d6bd3ddf51e0174de28f844da4e` |
+| Client | `954afdbc9468b8caf01c5f960ef52e5449595b9d` |
 | Client common-c | `390774c58043d6af6d516251afcaab5aa4ed6028` |
 | Client qmdnsengine | `b7a5a9f225d5e14b39f9fd1f905c4f505cf2ee99` |
 | Linux Host | `950acf5f493a264ae846931502914a316f2e81f5` |
@@ -34,10 +39,10 @@ changes only the timer regression to await a real queued event for up to two
 seconds, avoiding a fixed-sleep assumption under hosted-runner scheduling.
 
 The focused upstream parent is [PLANK PR #3](https://github.com/instinctual/plank/pull/3).
-It has the same Host and clipboard fixes, with Client `520139b5` instead of the
+It has the same Host and clipboard fixes, with Client `6cb721bc` instead of the
 Teraguchi product Client. The earlier parent PR #2 is closed. Native Quit
-[Client PR #1](https://github.com/instinctual/plank-client/pull/1) was approved
-and merged upstream; that approval did not establish native runtime acceptance.
+PR #1 was merged historically; PLANK 1.0.124 replaces that bridge. Teraguchi now
+uses the replacement rather than retaining the superseded implementation.
 
 The local Mac dependency profile remains Qt 6.10.2, Rust 1.89.0, SDK 26.5 and
 macOS deployment target 26.0. Nested gitlinks retain exact dependency provenance.
@@ -47,8 +52,8 @@ builders, not on this Mac or hardware-test workstations.
 ## Validation of this update
 
 - Full arm64 Mac Client build passes with the component pins above. Its native
-  suites report 20 topology, 24 toolbar, 7 desktop/reconnect and 19 clipboard
-  results. Clipboard tests use a private named NSPasteboard.
+  suites report 20 topology, 24 toolbar, 7 desktop/reconnect, 9 native shortcut,
+  8 application lifecycle and 19 clipboard results. Clipboard tests use a private named NSPasteboard.
 - The reconnect test exercises the production SDL timer and clipboard bridge
   across stop/restart with focus unchanged. A source guard checks the Session
   teardown and success-only restart call sites. It is not a live network,
@@ -88,9 +93,11 @@ clipboard in both directions, local A–B–A, disconnect into a different Host,
 large text, active desktop handoff/reconnect without focus changes, picture,
 pen/tablet margins, one/two outputs, native Quit, audio and recovery.
 
-The Quit bridge handles any Qt Quit event and adds no Command-Q binding; it
-cannot distinguish menu from shortcut-origin Quit. Native session testing must
-settle Command-Q behavior before claiming remote-keyboard safety.
+The imported application lifecycle keeps Qt alive until session cleanup completes;
+ordinary Disconnect remains separate from application Quit. The native shortcut
+guard reserves captured Command-Q for the remote session. Synthetic/native suites
+pass; combined Teraguchi pen, display and physical shortcut behavior still needs
+the scoped operator session.
 
 Signed/notarized distribution, clean install/rollback, native ten-bit picture,
 sustained physical input, WAN and stability gates remain open. Main must not be
