@@ -20,7 +20,7 @@ remain under review; implementation and regression evidence are not approval.
 | Component | Commit |
 |---|---|
 | Root production snapshot (before fixture-only follow-up) | `be4007d248c296bf8c3d0061d007925844745a90` |
-| Client | `38b9e3fa610ce6ea5fd45ec7a259ff1e0afc3dce` |
+| Client | `cbd83cecd216a26664f5bb9fa97c9b653ba14e18` |
 | Client common-c | `390774c58043d6af6d516251afcaab5aa4ed6028` |
 | Client qmdnsengine | `b7a5a9f225d5e14b39f9fd1f905c4f505cf2ee99` |
 | Linux Host | `950acf5f493a264ae846931502914a316f2e81f5` |
@@ -29,10 +29,12 @@ remain under review; implementation and regression evidence are not approval.
 
 Host `950acf5f` changes only the test fixture: it observes the completed PRIMARY
 claim before stealing ownership. Production Host code is identical to the
-passing `77b0b62a` snapshot; current PR checks validate the corrected fixture.
+passing `77b0b62a` snapshot; current PR checks validate the corrected fixture. Client `cbd83cec` likewise
+changes only the timer regression to await a real queued event for up to two
+seconds, avoiding a fixed-sleep assumption under hosted-runner scheduling.
 
 The focused upstream parent is [PLANK PR #3](https://github.com/instinctual/plank/pull/3).
-It has the same Host and clipboard fixes, with Client `139add9b` instead of the
+It has the same Host and clipboard fixes, with Client `520139b5` instead of the
 Teraguchi product Client. The earlier parent PR #2 is closed. Native Quit
 [Client PR #1](https://github.com/instinctual/plank-client/pull/1) was approved
 and merged upstream; that approval did not establish native runtime acceptance.
