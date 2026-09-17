@@ -127,16 +127,22 @@ int main()
     @autoreleasepool {
         [NSApplication sharedApplication];
         [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
-        // Local event monitors need a running AppKit application. Posting and
-        // draining markers before run() can leave the local monitors inactive.
-        // Stay non-activating and use only this process's synthetic events.
-        dispatch_async(dispatch_get_main_queue(), ^{
+        // A queued dispatch block can run during AppKit launch, before run()
+        // activates local event monitors (observed on SDK/OS 27 runners).
+        // Wait for the actual running state without activating this process.
+        const CFAbsoluteTime deadline = CFAbsoluteTimeGetCurrent() + 5.0;
+        [NSTimer scheduledTimerWithTimeInterval:0.01 repeats:YES block:^(NSTimer* timer) {
+            if (![NSApp isRunning]) {
+                CHECK(CFAbsoluteTimeGetCurrent() < deadline);
+                return;
+            }
+            [timer invalidate];
             runChecks();
             [NSApp stop:nil];
             [NSApp postEvent:[NSEvent otherEventWithType:NSEventTypeApplicationDefined
                 location:NSZeroPoint modifierFlags:0 timestamp:0 windowNumber:0
                 context:nil subtype:0 data1:0 data2:0] atStart:NO];
-        });
+        }];
         [NSApp run];
     }
 }
