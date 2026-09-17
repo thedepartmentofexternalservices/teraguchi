@@ -42,3 +42,5 @@ Shared wire contracts live in [protocol](../protocol/). Current work belongs in
   pinned endpoint inventory, offline sharing draft, certificate trust gap and live cases.
 - [P3/P4 implementation order](development/teraguchi-p3-p4.md): current coding
   priorities and the live gates before the WAN pilot.
+
+- [Clipboard review follow-up](development/clipboard-review-followup.md): September 17 review findings, regression coverage and remaining paired-system gates.

@@ -74,7 +74,7 @@ security audit or live hardware qualification. No installed binary was inspected
 
 Alan explicitly froze PLANK at
 `413594743d110d6a9965e639068f132379e82ab2` and requested rebases:
-[root discussion](https://github.com/instinctual/plank/pull/2#issuecomment-5704435469).
+[root discussion](https://github.com/instinctual/plank/pull/3#issuecomment-5704435469).
 That source has been fetched. It includes the published 1.0.120 source lineage,
 accepted native fullscreen changes, and all-product dependency caching. Its
 Client pin is `95060dee`; its Linux Host remains `9329784a`.
@@ -179,6 +179,14 @@ out to a small group first. Windows feasibility follows the Mac production gate.
 
 ## Current results and next gate
 
+The September 17 update implements Alan's four Client and four Host clipboard
+findings in both the focused upstream stack and consolidated candidate. The
+native Client suite reports 19 passing results; the Host Xvfb suite reports nine
+passing cases and four failing-baseline negative controls. See the
+[review follow-up](clipboard-review-followup.md). PR approval and live paired
+clipboard/handoff acceptance remain open. Native Quit PR #1 has merged upstream;
+its approval does not establish native runtime qualification.
+
 The focused root and Client PRs have been rebased on Alan's frozen commits. The
 Host base was unchanged; its safety repairs are published. Both common-c header
 branches are represented in the upstream stack. Product integration restores the
@@ -186,7 +194,7 @@ full Client lineage and reconciles reconnect, assignment trust, native fullscree
 dual-output behavior, and clipboard focus. See [HANDOFF](../../HANDOFF.md) for
 exact pins and validation results.
 
-Upstream review links: [root clipboard](https://github.com/instinctual/plank/pull/2),
+Upstream review links: [root clipboard](https://github.com/instinctual/plank/pull/3),
 [Client clipboard](https://github.com/instinctual/plank-client/pull/2),
 [Host clipboard](https://github.com/instinctual/plank-host-linux/pull/1),
 [Host headers](https://github.com/instinctual/plank-common-c/pull/1),

@@ -51,8 +51,9 @@ after the Mac production gate and a separate feasibility decision.
 ## Next work
 
 1. Finish platform build validation and review the single integration candidate.
-   Maintain the focused clipboard and native Quit contributions separately for
-   upstream review. See the [branch guide and forward plan](development/teraguchi-forward-plan.md).
+   The eight clipboard review findings now have code fixes and isolated
+   regressions; obtain review and paired-system acceptance before promotion.
+   Native Quit has merged upstream. Keep the focused clipboard stack separate. See the [branch guide and forward plan](development/teraguchi-forward-plan.md).
 2. Complete Flame UI side selection across the client, protocol, Host topology,
    persistence, and restoration. The existing boot helper is only part of this.
 3. Arrange a scoped operator qualification session with recovery access. Exercise
